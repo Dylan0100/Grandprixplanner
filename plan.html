@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Your Race — Grand Prix Planner</title>
+  <meta name="description" content="Choose your 2026 Formula 1 Grand Prix and start planning the perfect race weekend." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #E8002D;
+      --red-dark: #B8001F;
+      --black: #09090B;
+      --surface: #111115;
+      --surface-2: #1A1A22;
+      --surface-3: #22222E;
+      --border: rgba(255,255,255,0.07);
+      --border-md: rgba(255,255,255,0.12);
+      --text: #F4F4F6;
+      --text-muted: #6B6B80;
+      --text-dim: #3D3D50;
+      --green: #22C55E;
+      --amber: #F59E0B;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(9,9,11,0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 28px; height: 28px;
+      background: var(--red);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+
+    .nav-link {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    .nav-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border-md);
+      color: var(--text);
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .nav-btn:hover { background: var(--surface-3); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 56px 40px 40px;
+      border-bottom: 1px solid var(--border);
+      background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(232,0,45,0.08) 0%, transparent 70%);
+    }
+
+    .page-header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .breadcrumb {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb span { color: var(--text-dim); }
+
+    .page-header h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 0.95;
+      margin-bottom: 14px;
+    }
+
+    .page-header h1 em { color: var(--red); font-style: normal; }
+
+    .page-header p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 500px;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .stat-dot.completed { background: var(--text-dim); }
+    .stat-dot.next { background: var(--red); box-shadow: 0 0 6px rgba(232,0,45,0.5); }
+    .stat-dot.upcoming { background: var(--text-muted); }
+    .stat-dot.sprint { background: var(--amber); }
+
+    .stat-item span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── FILTERS ── */
+    .filters-bar {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--border-md);
+      color: var(--text);
+    }
+
+    .filter-btn.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    /* ── SECTION HEADING ── */
+    .section-heading {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .section-heading h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .race-count {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* ── RACE GRID ── */
+    .race-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* ── RACE CARD ── */
+    .race-card {
+      background: var(--surface);
+      padding: 24px;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+      user-select: none;
+    }
+
+    .race-card:hover { background: var(--surface-2); }
+    .race-card.selected { background: var(--surface-3); }
+    .race-card.completed { opacity: 0.55; }
+    .race-card.completed:hover { opacity: 0.75; background: var(--surface-2); }
+
+    .race-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .race-round {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .race-badges {
+      display: flex;
+      gap: 5px;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 7px;
+      border-radius: 100px;
+    }
+
+    .badge-sprint {
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.3);
+      color: #F59E0B;
+    }
+
+    .badge-next {
+      background: rgba(232,0,45,0.15);
+      border: 1px solid rgba(232,0,45,0.35);
+      color: #ff4d6d;
+    }
+
+    .badge-done {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .badge-new {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: #4ade80;
+    }
+
+    .race-flag {
+      font-size: 32px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .race-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .race-circuit {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .race-date {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .race-date-icon {
+      width: 14px; height: 14px;
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+
+    .race-card-footer {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .plan-btn {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .plan-btn svg { transition: transform 0.15s; }
+    .race-card:hover .plan-btn svg { transform: translateX(3px); }
+
+    .race-card.completed .plan-btn { color: var(--text-dim); }
+
+    .region-tag {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── DETAIL PANEL ── */
+    .detail-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border-md);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .detail-panel.visible { display: block; }
+
+    .detail-header {
+      padding: 28px 32px 24px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface) 100%);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .detail-flag { font-size: 48px; line-height: 1; margin-bottom: 12px; }
+
+    .detail-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .detail-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .detail-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .detail-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .detail-meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .detail-meta-value {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .close-btn {
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 18px;
+      transition: all 0.15s;
+    }
+    .close-btn:hover { background: var(--surface-2); color: var(--text); }
+
+    /* ── PLANNING MODULES ── */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+    }
+
+    .module-card {
+      background: var(--surface);
+      padding: 24px;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    .module-card:hover { background: var(--surface-2); }
+
+    .module-card.coming-soon { cursor: default; }
+    .module-card.coming-soon:hover { background: var(--surface); }
+
+    .module-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .module-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .module-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .module-cta {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .module-card:not(.coming-soon):hover .module-cta svg { transform: translateX(3px); }
+    .module-cta svg { transition: transform 0.15s; }
+
+    .coming-chip {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+
+    .module-card.coming-soon .module-title,
+    .module-card.coming-soon .module-desc { opacity: 0.5; }
+    .module-card.coming-soon .module-icon { opacity: 0.4; }
+
+    /* ── EMPTY STATE ── */
+    .pick-prompt {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 48px;
+      text-align: center;
+    }
+
+    .pick-prompt-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.4; }
+
+    .pick-prompt h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .pick-prompt p { font-size: 15px; color: var(--text-muted); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .page-header { padding: 36px 20px 28px; }
+      .filters-bar { padding: 16px 20px; }
+      .main { padding: 24px 20px 60px; }
+      .detail-header { padding: 20px 20px 18px; }
+      .modules-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .race-grid { grid-template-columns: 1fr; }
+      .nav-right .nav-link { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="logo-mark">GP</div>
+      Grand Prix Planner
+    </a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="index.html#signup" class="nav-btn">Get Early Access</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span>›</span>
+        <span>Plan a Race</span>
+      </div>
+      <h1>Choose Your<br /><em>2026 Grand Prix</em></h1>
+      <p>Select a race below to start building your perfect race weekend. We'll guide you through tickets, travel, accommodation, and everything in between.</p>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-dot next"></span>
+          <span>Next race: Miami — 1–3 May</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-dot sprint"></span>
+          <span>Sprint weekend</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-dot upcoming"></span>
+          <span>Upcoming</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-dot completed"></span>
+          <span>Completed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" onclick="filterRaces('all', this)">All 22 Races</button>
+    <button class="filter-btn" onclick="filterRaces('europe', this)">Europe</button>
+    <button class="filter-btn" onclick="filterRaces('americas', this)">Americas</button>
+    <button class="filter-btn" onclick="filterRaces('asia', this)">Asia & Pacific</button>
+    <button class="filter-btn" onclick="filterRaces('middle-east', this)">Middle East</button>
+    <button class="filter-btn" onclick="filterRaces('sprint', this)">Sprint Weekends</button>
+    <button class="filter-btn" onclick="filterRaces('upcoming', this)">Upcoming Only</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- PICK PROMPT / DETAIL PANEL -->
+    <div id="pick-prompt" class="pick-prompt">
+      <div class="pick-prompt-icon">🏁</div>
+      <h3>Pick a Race to Start Planning</h3>
+      <p>Select any Grand Prix from the calendar below to see planning options, grandstand guides, and travel information.</p>
+    </div>
+
+    <div id="detail-panel" class="detail-panel">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- RACE GRID -->
+    <div>
+      <div class="section-heading">
+        <h2>2026 Season Calendar</h2>
+        <span class="race-count" id="race-count">22 races</span>
+      </div>
+      <div class="race-grid" id="race-grid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const races = [
+      {
+        round: 1, name: "Australian Grand Prix", short: "Australia",
+        circuit: "Albert Park Circuit", city: "Melbourne", country: "Australia",
+        flag: "🇦🇺", dates: "6–8 Mar 2026", region: "asia",
+        sprint: false, status: "completed", isNew: false,
+        tip: "A fan favourite season opener. Great atmosphere, walking distance from the city.",
+        airport: "Melbourne Tullamarine (MEL) — 30 min to circuit",
+        ticketRange: "£120–£620", bestFor: "First-timers — relaxed, walkable, great facilities"
+      },
+      {
+        round: 2, name: "Chinese Grand Prix", short: "China",
+        circuit: "Shanghai International Circuit", city: "Shanghai", country: "China",
+        flag: "🇨🇳", dates: "13–15 Mar 2026", region: "asia",
+        sprint: true, status: "completed", isNew: false,
+        tip: "Sprint weekend. Requires a Chinese visa for most passport holders — apply early.",
+        airport: "Shanghai Pudong (PVG) — 45 min to circuit",
+        ticketRange: "£95–£480", bestFor: "Budget-conscious fans — excellent value tickets"
+      },
+      {
+        round: 3, name: "Japanese Grand Prix", short: "Japan",
+        circuit: "Suzuka Circuit", city: "Suzuka", country: "Japan",
+        flag: "🇯🇵", dates: "27–29 Mar 2026", region: "asia",
+        sprint: false, status: "completed", isNew: false,
+        tip: "One of the most passionate fan bases in F1. Book accommodation in Nagoya — closer and cheaper than Osaka.",
+        airport: "Nagoya Chubu (NGO) — 50 min to circuit",
+        ticketRange: "£130–£580", bestFor: "Atmosphere seekers — legendary crowd energy"
+      },
+      {
+        round: 4, name: "Miami Grand Prix", short: "Miami",
+        circuit: "Miami International Autodrome", city: "Miami", country: "USA",
+        flag: "🇺🇸", dates: "1–3 May 2026", region: "americas",
+        sprint: true, status: "next", isNew: false,
+        tip: "Sprint weekend. Tickets are premium but the event experience is unmatched. Hard Rock Stadium area — plan for heat.",
+        airport: "Miami International (MIA) — 20 min to circuit",
+        ticketRange: "£280–£1,400+", bestFor: "Experience seekers — premier event feel"
+      },
+      {
+        round: 5, name: "Canadian Grand Prix", short: "Canada",
+        circuit: "Circuit Gilles Villeneuve", city: "Montréal", country: "Canada",
+        flag: "🇨🇦", dates: "22–24 May 2026", region: "americas",
+        sprint: true, status: "upcoming", isNew: false,
+        tip: "Sprint weekend. Île Notre-Dame is stunning. Combine with a few days in Montréal — one of the most fan-friendly host cities.",
+        airport: "Montréal Trudeau (YUL) — 25 min to island, then walk/shuttle",
+        ticketRange: "£160–£700", bestFor: "City lovers — Montréal is exceptional for fans"
+      },
+      {
+        round: 6, name: "Monaco Grand Prix", short: "Monaco",
+        circuit: "Circuit de Monaco", city: "Monaco", country: "Monaco",
+        flag: "🇲🇨", dates: "5–7 Jun 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "The most iconic race on the calendar. Expensive but unmissable once. Free grandstands exist — do your research.",
+        airport: "Nice Côte d'Azur (NCE) — 25 min by train/helicopter",
+        ticketRange: "£180–£2,000+", bestFor: "Bucket list race — pure F1 history"
+      },
+      {
+        round: 7, name: "Spanish Grand Prix", short: "Spain (Barcelona)",
+        circuit: "Circuit de Barcelona-Catalunya", city: "Barcelona", country: "Spain",
+        flag: "🇪🇸", dates: "12–14 Jun 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Great infrastructure and easy to get to. Combine with a city break in Barcelona — 30 mins from the circuit.",
+        airport: "Barcelona El Prat (BCN) — 30 min to circuit",
+        ticketRange: "£110–£560", bestFor: "First-timers — easy logistics, affordable, great city"
+      },
+      {
+        round: 8, name: "Austrian Grand Prix", short: "Austria",
+        circuit: "Red Bull Ring", city: "Spielberg", country: "Austria",
+        flag: "🇦🇹", dates: "26–28 Jun 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Stunning Alpine setting. Camping recommended — transforms the weekend. Take the free shuttle from Zeltweg.",
+        airport: "Graz (GRZ) — 45 min, or Salzburg (SZG) — 80 min",
+        ticketRange: "£90–£480", bestFor: "Camping fans — incredible atmosphere over multiple days"
+      },
+      {
+        round: 9, name: "British Grand Prix", short: "Great Britain",
+        circuit: "Silverstone Circuit", city: "Silverstone", country: "Great Britain",
+        flag: "🇬🇧", dates: "4–6 Jul 2026", region: "europe",
+        sprint: true, status: "upcoming", isNew: false,
+        tip: "Sprint weekend. The home race — always sold out. Book as early as possible. Camping is the preferred fan experience.",
+        airport: "Birmingham (BHX) or London (LHR) — both ~60 min by car",
+        ticketRange: "£180–£820", bestFor: "UK fans — unmissable home race with legendary atmosphere"
+      },
+      {
+        round: 10, name: "Belgian Grand Prix", short: "Belgium",
+        circuit: "Circuit de Spa-Francorchamps", city: "Stavelot", country: "Belgium",
+        flag: "🇧🇪", dates: "17–19 Jul 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Spa in the Ardennes is one of the most beautiful settings. Eau Rouge / Raidillon is the view. Pack rain gear — always.",
+        airport: "Brussels (BRU) — 90 min, Liège (LGG) — 60 min",
+        ticketRange: "£100–£540", bestFor: "Purists — the greatest circuit on the calendar"
+      },
+      {
+        round: 11, name: "Hungarian Grand Prix", short: "Hungary",
+        circuit: "Hungaroring", city: "Budapest", country: "Hungary",
+        flag: "🇭🇺", dates: "25–27 Jul 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Combine with Budapest — one of Europe's best cities. Hot in late July. Grandstand G for best overtaking view.",
+        airport: "Budapest Ferenc Liszt (BUD) — 30 min to circuit",
+        ticketRange: "£95–£420", bestFor: "City trippers — F1 + Budapest is a perfect combination"
+      },
+      {
+        round: 12, name: "Dutch Grand Prix", short: "Netherlands",
+        circuit: "Circuit Zandvoort", city: "Zandvoort", country: "Netherlands",
+        flag: "🇳🇱", dates: "21–23 Aug 2026", region: "europe",
+        sprint: true, status: "upcoming", isNew: false,
+        tip: "Sprint weekend. Final ever Dutch GP — the Orange Army makes this unmissable. Book accommodation in Haarlem or Amsterdam. No cars allowed race weekend.",
+        airport: "Amsterdam Schiphol (AMS) — 30 min by train to Zandvoort",
+        ticketRange: "£135–£620", bestFor: "Atmosphere seekers — the Orange Army is something else"
+      },
+      {
+        round: 13, name: "Italian Grand Prix", short: "Italy",
+        circuit: "Autodromo Nazionale Monza", city: "Monza", country: "Italy",
+        flag: "🇮🇹", dates: "4–6 Sep 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "The Temple of Speed. Tifosi make this electric. Stay in Milan — 30 minutes by commuter train. The Parabolica grandstand is iconic.",
+        airport: "Milan Malpensa (MXP) or Linate (LIN) — both ~40 min",
+        ticketRange: "£110–£480", bestFor: "Atmosphere and history — the Tifosi are unlike anything else"
+      },
+      {
+        round: 14, name: "Madrid Grand Prix", short: "Madrid",
+        circuit: "Circuit Urbano de Madrid", city: "Madrid", country: "Spain",
+        flag: "🇪🇸", dates: "12–14 Sep 2026", region: "europe",
+        sprint: false, status: "upcoming", isNew: true,
+        tip: "Brand new race and venue — the first street circuit in Madrid. Full debut season, expect some infrastructure teething. Great time to visit as a first.",
+        airport: "Madrid Barajas (MAD) — circuit location TBC, likely 20–30 min",
+        ticketRange: "£130–£600", bestFor: "History makers — attend the very first Madrid GP"
+      },
+      {
+        round: 15, name: "Azerbaijan Grand Prix", short: "Azerbaijan",
+        circuit: "Baku City Circuit", city: "Baku", country: "Azerbaijan",
+        flag: "🇦🇿", dates: "25–27 Sep 2026", region: "middle-east",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Saturday race. Baku is wild — the street circuit runs through the old city. The Castle Section is unmissable. eVisa is easy and cheap.",
+        airport: "Baku Heydar Aliyev (GYD) — 25 min to circuit",
+        ticketRange: "£85–£380", bestFor: "Value hunters — underrated, dramatic racing, low cost"
+      },
+      {
+        round: 16, name: "Singapore Grand Prix", short: "Singapore",
+        circuit: "Marina Bay Street Circuit", city: "Singapore", country: "Singapore",
+        flag: "🇸🇬", dates: "9–11 Oct 2026", region: "asia",
+        sprint: true, status: "upcoming", isNew: false,
+        tip: "Sprint weekend. Night race. The most spectacular visual experience in F1 — the lit-up skyline is unforgettable. Hot and humid — dress light.",
+        airport: "Singapore Changi (SIN) — 25 min to circuit, world-class airport",
+        ticketRange: "£200–£900", bestFor: "Night race bucket list — visually unlike any other GP"
+      },
+      {
+        round: 17, name: "United States Grand Prix", short: "USA (Austin)",
+        circuit: "Circuit of The Americas", city: "Austin, Texas", country: "USA",
+        flag: "🇺🇸", dates: "23–25 Oct 2026", region: "americas",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Austin is a brilliant host city. Combine with a few days exploring — great food, live music scene. Big Tex fan area is the best in F1.",
+        airport: "Austin-Bergstrom (AUS) — 25 min to circuit",
+        ticketRange: "£150–£700", bestFor: "First-time Americas race — best all-round US experience"
+      },
+      {
+        round: 18, name: "Mexico City Grand Prix", short: "Mexico",
+        circuit: "Autódromo Hermanos Rodríguez", city: "Mexico City", country: "Mexico",
+        flag: "🇲🇽", dates: "30 Oct–1 Nov 2026", region: "americas",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "The altitude (2,240m) affects the cars dramatically. Foro Sol Grandstand gives you stadium-like atmosphere inside the circuit.",
+        airport: "Mexico City Benito Juárez (MEX) — 20 min to circuit",
+        ticketRange: "£95–£450", bestFor: "Those wanting a unique, cultural race experience"
+      },
+      {
+        round: 19, name: "São Paulo Grand Prix", short: "Brazil",
+        circuit: "Autódromo José Carlos Pace", city: "São Paulo", country: "Brazil",
+        flag: "🇧🇷", dates: "6–8 Nov 2026", region: "americas",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Interlagos has a religious atmosphere — Brazilian passion is extraordinary. Grandstand K for best lap 1 action. Use official transport.",
+        airport: "São Paulo Guarulhos (GRU) — 45 min to circuit",
+        ticketRange: "£85–£380", bestFor: "Atmosphere lovers — Brazilian fans are the most passionate"
+      },
+      {
+        round: 20, name: "Las Vegas Grand Prix", short: "Las Vegas",
+        circuit: "Las Vegas Strip Circuit", city: "Las Vegas", country: "USA",
+        flag: "🇺🇸", dates: "20–21 Nov 2026", region: "americas",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Saturday night race. The strip circuit is unique — views of hotels, neon lights. Late night finish — plan ahead. Combine with a Vegas trip.",
+        airport: "Harry Reid International (LAS) — 15 min to circuit",
+        ticketRange: "£200–£1,200+", bestFor: "Those wanting the ultimate Vegas experience with F1"
+      },
+      {
+        round: 21, name: "Qatar Grand Prix", short: "Qatar",
+        circuit: "Lusail International Circuit", city: "Lusail", country: "Qatar",
+        flag: "🇶🇦", dates: "27–29 Nov 2026", region: "middle-east",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "Night race in the desert. November is much cooler than summer. Very short travel time between Qatar and Abu Dhabi for double-header fans.",
+        airport: "Doha Hamad (DOH) — 15 min to circuit",
+        ticketRange: "£100–£480", bestFor: "Middle East double-header with Abu Dhabi"
+      },
+      {
+        round: 22, name: "Abu Dhabi Grand Prix", short: "Abu Dhabi",
+        circuit: "Yas Marina Circuit", city: "Abu Dhabi", country: "UAE",
+        flag: "🇦🇪", dates: "4–6 Dec 2026", region: "middle-east",
+        sprint: false, status: "upcoming", isNew: false,
+        tip: "The season finale. Yas Marina is a purpose-built F1 venue with excellent facilities. Pair with a few days in Dubai easily.",
+        airport: "Abu Dhabi (AUH) or Dubai (DXB) — both 30–40 min",
+        ticketRange: "£140–£680", bestFor: "Season finales — the championship often decided here"
+      }
+    ];
+
+    let activeFilter = 'all';
+    let selectedRace = null;
+
+    function renderGrid() {
+      const grid = document.getElementById('race-grid');
+      const filtered = races.filter(r => {
+        if (activeFilter === 'all') return true;
+        if (activeFilter === 'sprint') return r.sprint;
+        if (activeFilter === 'upcoming') return r.status !== 'completed';
+        return r.region === activeFilter;
+      });
+
+      document.getElementById('race-count').textContent = `${filtered.length} race${filtered.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = filtered.map(r => `
+        <div class="race-card ${r.status} ${selectedRace === r.round ? 'selected' : ''}"
+             data-round="${r.round}"
+             onclick="selectRace(${r.round})">
+          <div class="race-card-top">
+            <span class="race-round">Round ${r.round}</span>
+            <div class="race-badges">
+              ${r.status === 'next' ? '<span class="badge badge-next">Next Race</span>' : ''}
+              ${r.sprint ? '<span class="badge badge-sprint">Sprint</span>' : ''}
+              ${r.isNew ? '<span class="badge badge-new">New Circuit</span>' : ''}
+              ${r.status === 'completed' ? '<span class="badge badge-done">Done</span>' : ''}
+            </div>
+          </div>
+          <div class="race-flag">${r.flag}</div>
+          <div class="race-name">${r.short}</div>
+          <div class="race-circuit">${r.circuit}</div>
+          <div class="race-date">
+            <svg class="race-date-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="1" y="2" width="14" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M1 6h14" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M5 1v2M11 1v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            ${r.dates}
+          </div>
+          <div class="race-card-footer">
+            <span class="region-tag">${regionLabel(r.region)}</span>
+            <span class="plan-btn">
+              ${r.status === 'completed' ? 'View info' : 'Plan this race'}
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function regionLabel(r) {
+      return { europe: 'Europe', americas: 'Americas', asia: 'Asia & Pacific', 'middle-east': 'Middle East' }[r] || r;
+    }
+
+    function selectRace(round) {
+      const race = races.find(r => r.round === round);
+      if (!race) return;
+
+      selectedRace = round;
+      renderGrid();
+
+      const panel = document.getElementById('detail-panel');
+      const prompt = document.getElementById('pick-prompt');
+
+      prompt.style.display = 'none';
+      panel.classList.add('visible');
+
+      panel.innerHTML = `
+        <div class="detail-header">
+          <div>
+            <div class="detail-flag">${race.flag}</div>
+            <div class="detail-title">${race.name}</div>
+            <div class="detail-sub">${race.circuit} · ${race.city}, ${race.country}</div>
+            <div class="detail-meta">
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Race Weekend</span>
+                <span class="detail-meta-value">${race.dates}</span>
+              </div>
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Round</span>
+                <span class="detail-meta-value">${race.round} of 22</span>
+              </div>
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Est. Tickets</span>
+                <span class="detail-meta-value">${race.ticketRange}</span>
+              </div>
+              <div class="detail-meta-item">
+                <span class="detail-meta-label">Nearest Airport</span>
+                <span class="detail-meta-value">${race.airport.split('—')[0].trim()}</span>
+              </div>
+            </div>
+          </div>
+          <button class="close-btn" onclick="closePanel()">✕</button>
+        </div>
+
+        <div class="modules-grid">
+          <div class="module-card" onclick="alert('Grandstand Picker — coming very soon! This will show every grandstand at ${race.circuit} with views, pricing, and expert tips.')">
+            <div class="module-icon">🏟️</div>
+            <div class="module-title">Grandstand Picker</div>
+            <div class="module-desc">Compare every grandstand at ${race.circuit}. Views, pricing, facilities, and expert positioning tips.</div>
+            <div class="module-cta">Explore grandstands <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <div class="module-card" onclick="alert('Cost Estimator — coming very soon! This will build a full budget breakdown for your ${race.short} trip including flights, hotel, tickets, and local transport.')">
+            <div class="module-icon">💷</div>
+            <div class="module-title">Cost Estimator</div>
+            <div class="module-desc">Build a full trip budget in minutes. Flights, hotel, tickets, food, and local transport — all broken down.</div>
+            <div class="module-cta">Estimate my costs <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          </div>
+
+          <div class="module-card coming-soon">
+            <span class="coming-chip">Coming Soon</span>
+            <div class="module-icon">🛂</div>
+            <div class="module-title">Visa Checker</div>
+            <div class="module-desc">Instant entry requirements for ${race.country} based on your passport. Know before you book.</div>
+            <div class="module-cta" style="color:var(--text-dim)">Check requirements</div>
+          </div>
+
+          <div class="module-card coming-soon">
+            <span class="coming-chip">Coming Soon</span>
+            <div class="module-icon">✈️</div>
+            <div class="module-title">Flight Guide</div>
+            <div class="module-desc">Best airports, optimal booking windows, and smart routing for ${race.country}. Includes: ${race.airport}</div>
+            <div class="module-cta" style="color:var(--text-dim)">Plan my flights</div>
+          </div>
+
+          <div class="module-card coming-soon">
+            <span class="coming-chip">Coming Soon</span>
+            <div class="module-icon">🗺️</div>
+            <div class="module-title">Local Transport</div>
+            <div class="module-desc">Every option to get to and from ${race.circuit} — shuttle, train, walk, and taxi guides.</div>
+            <div class="module-cta" style="color:var(--text-dim)">Plan my transport</div>
+          </div>
+
+          <div class="module-card coming-soon">
+            <span class="coming-chip">Coming Soon</span>
+            <div class="module-icon">📋</div>
+            <div class="module-title">Build Itinerary</div>
+            <div class="module-desc">Compile everything into a shareable, printable race weekend plan you can take offline.</div>
+            <div class="module-cta" style="color:var(--text-dim)">Build my itinerary</div>
+          </div>
+        </div>
+
+        <div style="padding:20px 24px;border-top:1px solid var(--border);background:var(--surface-2);">
+          <p style="font-size:13px;color:var(--text-muted);font-style:italic;">
+            💡 <strong style="color:var(--text);font-weight:500;">Expert tip:</strong> ${race.tip}
+          </p>
+        </div>
+      `;
+
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closePanel() {
+      selectedRace = null;
+      document.getElementById('detail-panel').classList.remove('visible');
+      document.getElementById('pick-prompt').style.display = 'block';
+      renderGrid();
+    }
+
+    function filterRaces(filter, btn) {
+      activeFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGrid();
+    }
+
+    renderGrid();
+  </script>
+
+</body>
+</html>
