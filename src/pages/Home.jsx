@@ -68,7 +68,7 @@ export default function Home() {
     <>
       <nav>
         <Link to="/" className="nav-logo"><div className="logo-mark">GP</div>Grand Prix Planner</Link>
-        <Link to="/plan" className="nav-cta">Get Early Access</Link>
+        <Link to="/plan" className="nav-cta">Start Planning</Link>
       </nav>
 
       <div className="hero">
@@ -76,8 +76,42 @@ export default function Home() {
         <div className="badge"><span className="badge-dot" />Now accepting early access signups</div>
         <h1>Your F1 Race Weekend.<br /><span className="accent">Planned Perfectly.</span></h1>
         <p>Stop spending days across dozens of websites. Grand Prix Planner is the only tool that handles flights, hotels, tickets, grandstands, visas, and local transport — all in one place.</p>
-        <EmailForm buttonText="Get Early Access" />
-        <p className="form-note">No spam. No nonsense. Just launch updates.</p>
+
+        <Link to="/plan" style={{
+          background: 'var(--red)',
+          color: '#fff',
+          padding: '16px 36px',
+          borderRadius: '8px',
+          fontFamily: "'Barlow', sans-serif",
+          fontSize: '16px',
+          fontWeight: '600',
+          textDecoration: 'none',
+          marginBottom: '20px',
+          display: 'inline-block',
+          transition: 'background 0.15s',
+          position: 'relative',
+        }}>
+          Start Planning Your Race Weekend →
+        </Link>
+
+        <p style={{ fontSize: '13px', color: 'var(--text-dim)', marginBottom: '32px' }}>
+          Free to use · No account needed
+        </p>
+
+        <div style={{
+          width: '100%',
+          maxWidth: '460px',
+          borderTop: '1px solid var(--border)',
+          paddingTop: '28px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px',
+          position: 'relative',
+        }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Or join the waitlist for launch updates</p>
+          <EmailForm buttonText="Get Early Access" />
+        </div>
       </div>
 
       <div className="logos-bar">
