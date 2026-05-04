@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import VisaChecker from '../components/VisaChecker'
 
 const races = [
   {round:1,name:"Australian Grand Prix",short:"Australia",circuit:"Albert Park Circuit",city:"Melbourne",country:"Australia",flag:"🇦🇺",dates:"6–8 Mar 2026",region:"asia",sprint:false,status:"completed",isNew:false,tip:"A fan favourite season opener. Great atmosphere, walkable from the city centre.",airport:"Melbourne Tullamarine (MEL) — 30 min",flightBase:950,flightNA:1150,flightAUS:130,accommodation:[85,155,280],tickets:[160,320,580],transport:20,nights:3,ticketLabels:["General Admission","Clark / Whiteford Grandstand","Platinum Club"],accumLabels:["Guest house / inner suburb","3-star city hotel","4–5 star Melbourne CBD"]},
@@ -119,19 +120,30 @@ function DetailHeader({race, onClose}) {
   )
 }
 
-function Modules({race, onOpenEstimator}) {
+function Modules({race, onOpenEstimator, onOpenVisa}) {
   return (
     <>
       <div className="modules-grid">
+
+        {/* Cost Estimator — LIVE */}
         <div className="module-card" onClick={onOpenEstimator}>
           <div className="module-icon">💷</div>
           <div className="module-title">Cost Estimator</div>
           <div className="module-desc">Build a full trip budget in minutes. Flights, hotel, tickets, and transport — broken down by your choices.</div>
           <div className="module-cta">Estimate my costs <ArrowIcon/></div>
         </div>
+
+        {/* Visa Checker — LIVE */}
+        <div className="module-card" onClick={onOpenVisa}>
+          <div className="module-icon">🛂</div>
+          <div className="module-title">Visa Checker</div>
+          <div className="module-desc">{`Instant entry requirements for ${race.country} based on your passport. 25 nationalities covered.`}</div>
+          <div className="module-cta">Check requirements <ArrowIcon/></div>
+        </div>
+
+        {/* Coming Soon modules */}
         {[
           {icon:'🏟️',title:'Grandstand Picker',desc:`Compare every grandstand at ${race.circuit} — views, pricing, and expert tips.`,cta:'Explore grandstands'},
-          {icon:'🛂',title:'Visa Checker',desc:`Instant entry requirements for ${race.country} based on your passport.`,cta:'Check requirements'},
           {icon:'✈️',title:'Flight Guide',desc:`Best airports, booking windows, and routing advice for ${race.country}.`,cta:'Plan my flights'},
           {icon:'🗺️',title:'Local Transport',desc:`Every option to get to and from ${race.circuit}.`,cta:'Plan my transport'},
           {icon:'📋',title:'Build Itinerary',desc:'Compile everything into a shareable, printable race weekend plan.',cta:'Build my itinerary'},
@@ -261,20 +273,41 @@ export default function Plan() {
   const [activeFilter, setActiveFilter] = useState('all')
   const [selectedRound, setSelectedRound] = useState(null)
   const [estimatorOpen, setEstimatorOpen] = useState(false)
+  const [visaOpen, setVisaOpen] = useState(false)
   const detailRef = useRef(null)
+
   const filtered = races.filter(r=>{
     if(activeFilter==='all')return true
     if(activeFilter==='sprint')return r.sprint
     if(activeFilter==='upcoming')return r.status!=='completed'
     return r.region===activeFilter
   })
+
   const selectedRace = races.find(r=>r.round===selectedRound)
+
   function selectRace(round) {
-    setSelectedRound(round); setEstimatorOpen(false)
+    setSelectedRound(round)
+    setEstimatorOpen(false)
+    setVisaOpen(false)
     setTimeout(()=>detailRef.current?.scrollIntoView({behavior:'smooth',block:'start'}),50)
   }
-  function closePanel() { setSelectedRound(null); setEstimatorOpen(false) }
-  const filters = [{id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},{id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},{id:'sprint',label:'Sprint Weekends'},{id:'upcoming',label:'Upcoming Only'}]
+
+  function closePanel() {
+    setSelectedRound(null)
+    setEstimatorOpen(false)
+    setVisaOpen(false)
+  }
+
+  const filters = [
+    {id:'all',label:'All 22 Races'},
+    {id:'europe',label:'Europe'},
+    {id:'americas',label:'Americas'},
+    {id:'asia',label:'Asia & Pacific'},
+    {id:'middle-east',label:'Middle East'},
+    {id:'sprint',label:'Sprint Weekends'},
+    {id:'upcoming',label:'Upcoming Only'}
+  ]
+
   return (
     <>
       <nav className="sticky-nav" style={{padding:'16px 40px'}}>
@@ -284,6 +317,7 @@ export default function Plan() {
           <Link to="/" className="nav-btn">Get Early Access</Link>
         </div>
       </nav>
+
       <div className="page-header">
         <div className="page-header-inner">
           <div className="breadcrumb"><Link to="/">Home</Link><span>›</span><span>Plan a Race</span></div>
@@ -297,23 +331,44 @@ export default function Plan() {
           </div>
         </div>
       </div>
+
       <div className="filters-bar">
         <span className="filter-label">Filter:</span>
-        {filters.map(f=><button key={f.id} className={`filter-btn${activeFilter===f.id?' active':''}`} onClick={()=>setActiveFilter(f.id)}>{f.label}</button>)}
+        {filters.map(f=>(
+          <button key={f.id} className={`filter-btn${activeFilter===f.id?' active':''}`} onClick={()=>setActiveFilter(f.id)}>
+            {f.label}
+          </button>
+        ))}
       </div>
+
       <div className="main">
-        {!selectedRace?(
-          <div className="pick-prompt"><div className="pick-prompt-icon">🏁</div><h3>Pick a Race to Start Planning</h3><p>Select any Grand Prix from the calendar below to see planning options, cost estimates, and travel information.</p></div>
-        ):(
+        {!selectedRace ? (
+          <div className="pick-prompt">
+            <div className="pick-prompt-icon">🏁</div>
+            <h3>Pick a Race to Start Planning</h3>
+            <p>Select any Grand Prix from the calendar below to see planning options, cost estimates, and travel information.</p>
+          </div>
+        ) : (
           <div className="detail-panel" ref={detailRef}>
             <DetailHeader race={selectedRace} onClose={closePanel}/>
-            {estimatorOpen?<Estimator race={selectedRace} onBack={()=>setEstimatorOpen(false)}/>:<Modules race={selectedRace} onOpenEstimator={()=>setEstimatorOpen(true)}/>}
+            {estimatorOpen
+              ? <Estimator race={selectedRace} onBack={()=>setEstimatorOpen(false)}/>
+              : visaOpen
+                ? <VisaChecker race={selectedRace} onBack={()=>setVisaOpen(false)}/>
+                : <Modules race={selectedRace} onOpenEstimator={()=>setEstimatorOpen(true)} onOpenVisa={()=>setVisaOpen(true)}/>
+            }
           </div>
         )}
+
         <div>
-          <div className="section-heading"><h2>2026 Season Calendar</h2><span className="race-count">{filtered.length} race{filtered.length!==1?'s':''}</span></div>
+          <div className="section-heading">
+            <h2>2026 Season Calendar</h2>
+            <span className="race-count">{filtered.length} race{filtered.length!==1?'s':''}</span>
+          </div>
           <div className="race-grid">
-            {filtered.map(race=><RaceCard key={race.round} race={race} selected={selectedRound===race.round} onClick={selectRace}/>)}
+            {filtered.map(race=>(
+              <RaceCard key={race.round} race={race} selected={selectedRound===race.round} onClick={selectRace}/>
+            ))}
           </div>
         </div>
       </div>
