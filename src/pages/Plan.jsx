@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import VisaChecker from '../components/VisaChecker'
+import GrandstandPicker from '../components/GrandstandPicker'
 
 const races = [
   {round:1,name:"Australian Grand Prix",short:"Australia",circuit:"Albert Park Circuit",city:"Melbourne",country:"Australia",flag:"🇦🇺",dates:"6–8 Mar 2026",region:"asia",sprint:false,status:"completed",isNew:false,tip:"A fan favourite season opener. Great atmosphere, walkable from the city centre.",airport:"Melbourne Tullamarine (MEL) — 30 min",flightBase:950,flightNA:1150,flightAUS:130,accommodation:[85,155,280],tickets:[160,320,580],transport:20,nights:3,ticketLabels:["General Admission","Clark / Whiteford Grandstand","Platinum Club"],accumLabels:["Guest house / inner suburb","3-star city hotel","4–5 star Melbourne CBD"]},
@@ -107,10 +108,10 @@ function DetailHeader({race, onClose}) {
       <div>
         <div className="detail-flag">{race.flag}</div>
         <div className="detail-title">{race.name}</div>
-        <div className="detail-sub">{race.circuit} · {race.city}, {race.country}</div>
+        <div className="detail-sub">{race.circuit + ' · ' + race.city + ', ' + race.country}</div>
         <div className="detail-meta">
           <div className="detail-meta-item"><span className="detail-meta-label">Race Weekend</span><span className="detail-meta-value">{race.dates}</span></div>
-          <div className="detail-meta-item"><span className="detail-meta-label">Round</span><span className="detail-meta-value">{race.round} of 22</span></div>
+          <div className="detail-meta-item"><span className="detail-meta-label">Round</span><span className="detail-meta-value">{race.round + ' of 22'}</span></div>
           <div className="detail-meta-item"><span className="detail-meta-label">Tickets from</span><span className="detail-meta-value">{fmt(race.tickets[0])}</span></div>
           <div className="detail-meta-item"><span className="detail-meta-label">Nearest Airport</span><span className="detail-meta-value">{race.airport.split('—')[0].trim()}</span></div>
         </div>
@@ -120,7 +121,7 @@ function DetailHeader({race, onClose}) {
   )
 }
 
-function Modules({race, onOpenEstimator, onOpenVisa}) {
+function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand}) {
   return (
     <>
       <div className="modules-grid">
@@ -136,8 +137,13 @@ function Modules({race, onOpenEstimator, onOpenVisa}) {
           <div className="module-desc">{'Instant entry requirements for ' + race.country + ' based on your passport. 25 nationalities covered.'}</div>
           <div className="module-cta">Check requirements <ArrowIcon/></div>
         </div>
+        <div className="module-card" onClick={onOpenGrandstand}>
+          <div className="module-icon">🏟️</div>
+          <div className="module-title">Grandstand Picker</div>
+          <div className="module-desc">{'Compare every grandstand at ' + race.circuit + ' — views, pricing tiers, and expert tips for every budget.'}</div>
+          <div className="module-cta">Explore grandstands <ArrowIcon/></div>
+        </div>
         {[
-          {icon:'🏟️',title:'Grandstand Picker',desc:'Compare every grandstand at ' + race.circuit + ' — views, pricing, and expert tips.',cta:'Explore grandstands'},
           {icon:'✈️',title:'Flight Guide',desc:'Best airports, booking windows, and routing advice for ' + race.country + '.',cta:'Plan my flights'},
           {icon:'🗺️',title:'Local Transport',desc:'Every option to get to and from ' + race.circuit + '.',cta:'Plan my transport'},
           {icon:'📋',title:'Build Itinerary',desc:'Compile everything into a shareable, printable race weekend plan.',cta:'Build my itinerary'},
@@ -151,7 +157,7 @@ function Modules({race, onOpenEstimator, onOpenVisa}) {
           </div>
         ))}
       </div>
-      <div className="tip-bar"><p>💡 <strong style={{color:'var(--text)',fontWeight:500}}>Expert tip:</strong> {race.tip}</p></div>
+      <div className="tip-bar"><p>{'💡 '}<strong style={{color:'var(--text)',fontWeight:500}}>Expert tip:</strong>{' ' + race.tip}</p></div>
     </>
   )
 }
@@ -159,42 +165,42 @@ function Modules({race, onOpenEstimator, onOpenVisa}) {
 function Results({race, est, c}) {
   if (!c) return <div className="results-waiting"><div className="results-waiting-icon">✈️</div><p>Select your departure region above to see your cost estimate</p></div>
   const isUKHome = race.isUKRace && UK_CLUSTERS.includes(est.departure)
-  const partyLabel = est.party===1?'per person':`for ${est.party} people`
+  const partyLabel = est.party===1?'per person':'for ' + est.party + ' people'
   const depName = clusters.find(cl=>cl.id===est.departure)?.label||'your region'
   const tot = Math.max(c.pct.flight+c.pct.ticket+c.pct.accom+c.pct.transport,1)
   const w = (v,inc) => inc?(v/tot*100).toFixed(1):0
   const BRow = ({color,label,sub,mid,low,high,included,showRange}) => (
     <div className={`breakdown-row${!included?' excluded':''}`}>
       <div className="breakdown-left"><div className="breakdown-dot" style={{background:color}}/><div><div className="breakdown-label">{label}</div><div className="breakdown-sublabel">{sub}</div></div></div>
-      <div className="breakdown-amount"><div className="breakdown-mid">{included?fmt(mid):'—'}</div>{included&&showRange&&mid>0&&<div className="breakdown-range">{fmt(low)} – {fmt(high)}</div>}</div>
+      <div className="breakdown-amount"><div className="breakdown-mid">{included?fmt(mid):'—'}</div>{included&&showRange&&mid>0&&<div className="breakdown-range">{fmt(low) + ' – ' + fmt(high)}</div>}</div>
     </div>
   )
   return (
     <>
       <div className="results-header">
-        <div className="results-total-label">Estimated total {partyLabel}</div>
+        <div className="results-total-label">{'Estimated total ' + partyLabel}</div>
         <div className="results-total">{fmt(c.totalMid)}</div>
-        <div className="results-range" style={{marginTop:'6px'}}>Typically <span>{fmt(c.totalLow)}</span> – <span>{fmt(c.totalHigh)}</span></div>
-        {est.party>1&&<div className="results-range" style={{marginTop:'4px'}}>Per person approx. <span>{fmt(c.ppMid)}</span></div>}
+        <div className="results-range" style={{marginTop:'6px'}}>Typically <span>{fmt(c.totalLow)}</span>{' – '}<span>{fmt(c.totalHigh)}</span></div>
+        {est.party>1&&<div className="results-range" style={{marginTop:'4px'}}>{'Per person approx. '}<span>{fmt(c.ppMid)}</span></div>}
       </div>
       <div>
         <div className="results-bar-wrap">
-          <div className="results-bar-seg bar-flight" style={{width:`${w(c.pct.flight,c.flight.included&&!isUKHome)}%`}}/>
-          <div className="results-bar-seg bar-ticket" style={{width:`${w(c.pct.ticket,c.ticket.included)}%`}}/>
-          <div className="results-bar-seg bar-accom"  style={{width:`${w(c.pct.accom,c.accom.included)}%`}}/>
-          <div className="results-bar-seg bar-transport" style={{width:`${w(c.pct.transport,true)}%`}}/>
+          <div className="results-bar-seg bar-flight" style={{width:w(c.pct.flight,c.flight.included&&!isUKHome)+'%'}}/>
+          <div className="results-bar-seg bar-ticket" style={{width:w(c.pct.ticket,c.ticket.included)+'%'}}/>
+          <div className="results-bar-seg bar-accom"  style={{width:w(c.pct.accom,c.accom.included)+'%'}}/>
+          <div className="results-bar-seg bar-transport" style={{width:w(c.pct.transport,true)+'%'}}/>
         </div>
         <div className="results-bar-legend">
-          {c.flight.included&&!isUKHome&&<div className="legend-item"><div className="legend-dot" style={{background:'#3B82F6'}}/>Flights ({c.pct.flight}%)</div>}
-          {c.ticket.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#E8002D'}}/>Tickets ({c.pct.ticket}%)</div>}
-          {c.accom.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#F59E0B'}}/>Hotel ({c.pct.accom}%)</div>}
-          <div className="legend-item"><div className="legend-dot" style={{background:'#22C55E'}}/>Transport ({c.pct.transport}%)</div>
+          {c.flight.included&&!isUKHome&&<div className="legend-item"><div className="legend-dot" style={{background:'#3B82F6'}}/>{'Flights (' + c.pct.flight + '%)'}</div>}
+          {c.ticket.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#E8002D'}}/>{'Tickets (' + c.pct.ticket + '%)'}</div>}
+          {c.accom.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#F59E0B'}}/>{'Hotel (' + c.pct.accom + '%)'}</div>}
+          <div className="legend-item"><div className="legend-dot" style={{background:'#22C55E'}}/>{'Transport (' + c.pct.transport + '%)'}</div>
         </div>
       </div>
       <div className="results-breakdown">
-        <BRow color="#3B82F6" label={isUKHome?'Local Travel':'Return Flights'} sub={isUKHome?'Included in transport cost below':`Per person from ${depName}`} mid={c.flight.mid} low={c.flight.low} high={c.flight.high} included={c.flight.included&&!isUKHome} showRange/>
+        <BRow color="#3B82F6" label={isUKHome?'Local Travel':'Return Flights'} sub={isUKHome?'Included in transport cost below':'Per person from ' + depName} mid={c.flight.mid} low={c.flight.low} high={c.flight.high} included={c.flight.included&&!isUKHome} showRange/>
         <BRow color="#E8002D" label={['Standard','Advanced','Premium'][est.ticketTier]+' Tickets'} sub={race.ticketLabels[est.ticketTier]} mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high} included={c.ticket.included} showRange/>
-        <BRow color="#F59E0B" label={`Accommodation (${c.accom.nights} nights)`} sub={race.accumLabels[est.accumTier]} mid={c.accom.mid} low={c.accom.low} high={c.accom.high} included={c.accom.included} showRange/>
+        <BRow color="#F59E0B" label={'Accommodation (' + c.accom.nights + ' nights)'} sub={race.accumLabels[est.accumTier]} mid={c.accom.mid} low={c.accom.low} high={c.accom.high} included={c.accom.included} showRange/>
         <BRow color="#22C55E" label="Local Transport" sub="Return travel to circuit (per person)" mid={c.transport.mid} low={c.transport.low} high={c.transport.high} included showRange={false}/>
       </div>
       <div className="results-disclaimer">Costs are approximate estimates based on advance bookings (3+ months). Prices vary by date, availability and season. Always verify current prices before booking.</div>
@@ -223,25 +229,25 @@ function Estimator({race, onBack}) {
           <div>
             <div className="est-section-label">Where are you travelling from?</div>
             <div className="cluster-grid">
-              {clusters.map(cl=><button key={cl.id} className={`cluster-btn${est.departure===cl.id?' active':''}`} onClick={()=>set('departure',cl.id)}><span className="cb-label">{cl.label}</span><span className="cb-sub">{cl.sub}</span></button>)}
+              {clusters.map(cl=><button key={cl.id} className={'cluster-btn' + (est.departure===cl.id?' active':'')} onClick={()=>set('departure',cl.id)}><span className="cb-label">{cl.label}</span><span className="cb-sub">{cl.sub}</span></button>)}
             </div>
           </div>
           <div>
             <div className="est-section-label">How many people?</div>
             <div className="party-row">
-              {[1,2,3,4].map(n=><button key={n} className={`party-btn${est.party===n?' active':''}`} onClick={()=>set('party',n)}>{n}{n===4?'+':''}</button>)}
+              {[1,2,3,4].map(n=><button key={n} className={'party-btn' + (est.party===n?' active':'')} onClick={()=>set('party',n)}>{n}{n===4?'+':''}</button>)}
             </div>
           </div>
           <div>
             <div className="est-section-label">Ticket preference</div>
             <div className="tier-grid">
-              {race.ticketLabels.map((label,i)=><button key={i} className={`tier-btn${est.ticketTier===i?' active':''}`} onClick={()=>set('ticketTier',i)}><div className="tier-btn-left"><span className="tier-btn-name">{['Standard','Advanced','Premium'][i]}</span><span className="tier-btn-desc">{label}</span></div><span className="tier-btn-price">{fmt(race.tickets[i])}</span></button>)}
+              {race.ticketLabels.map((label,i)=><button key={i} className={'tier-btn' + (est.ticketTier===i?' active':'')} onClick={()=>set('ticketTier',i)}><div className="tier-btn-left"><span className="tier-btn-name">{['Standard','Advanced','Premium'][i]}</span><span className="tier-btn-desc">{label}</span></div><span className="tier-btn-price">{fmt(race.tickets[i])}</span></button>)}
             </div>
           </div>
           <div>
-            <div className="est-section-label">Accommodation ({race.nights} nights)</div>
+            <div className="est-section-label">{'Accommodation (' + race.nights + ' nights)'}</div>
             <div className="tier-grid">
-              {race.accumLabels.map((label,i)=><button key={i} className={`tier-btn${est.accumTier===i?' active':''}`} onClick={()=>set('accumTier',i)}><div className="tier-btn-left"><span className="tier-btn-name">{['Standard','Advanced','Premium'][i]}</span><span className="tier-btn-desc">{label}</span></div><span className="tier-btn-price">{fmt(race.accommodation[i])}<span style={{fontSize:'11px',color:'var(--text-dim)'}}>/night</span></span></button>)}
+              {race.accumLabels.map((label,i)=><button key={i} className={'tier-btn' + (est.accumTier===i?' active':'')} onClick={()=>set('accumTier',i)}><div className="tier-btn-left"><span className="tier-btn-name">{['Standard','Advanced','Premium'][i]}</span><span className="tier-btn-desc">{label}</span></div><span className="tier-btn-price">{fmt(race.accommodation[i])}<span style={{fontSize:'11px',color:'var(--text-dim)'}}>/night</span></span></button>)}
             </div>
           </div>
           <div>
@@ -250,10 +256,10 @@ function Estimator({race, onBack}) {
               {isUKHome?(
                 <div className="toggle-item disabled-item"><div><div className="toggle-label">Flights / Travel</div><div className="toggle-sub">Local race — included in transport cost</div></div><div className="toggle-switch on"/></div>
               ):(
-                <div className="toggle-item" onClick={()=>toggleInc('incFlights')}><div><div className="toggle-label">Flights</div><div className="toggle-sub">Return flights from your departure region</div></div><div className={`toggle-switch${est.incFlights?' on':''}`}/></div>
+                <div className="toggle-item" onClick={()=>toggleInc('incFlights')}><div><div className="toggle-label">Flights</div><div className="toggle-sub">Return flights from your departure region</div></div><div className={'toggle-switch' + (est.incFlights?' on':'')}/></div>
               )}
-              <div className="toggle-item" onClick={()=>toggleInc('incTickets')}><div><div className="toggle-label">Race Tickets</div><div className="toggle-sub">Already have tickets? Toggle off</div></div><div className={`toggle-switch${est.incTickets?' on':''}`}/></div>
-              <div className="toggle-item" onClick={()=>toggleInc('incAccom')}><div><div className="toggle-label">Accommodation</div><div className="toggle-sub">Already booked? Toggle off</div></div><div className={`toggle-switch${est.incAccom?' on':''}`}/></div>
+              <div className="toggle-item" onClick={()=>toggleInc('incTickets')}><div><div className="toggle-label">Race Tickets</div><div className="toggle-sub">Already have tickets? Toggle off</div></div><div className={'toggle-switch' + (est.incTickets?' on':'')}/></div>
+              <div className="toggle-item" onClick={()=>toggleInc('incAccom')}><div><div className="toggle-label">Accommodation</div><div className="toggle-sub">Already booked? Toggle off</div></div><div className={'toggle-switch' + (est.incAccom?' on':'')}/></div>
             </div>
           </div>
         </div>
@@ -268,6 +274,7 @@ export default function Plan() {
   const [selectedRound, setSelectedRound] = useState(null)
   const [estimatorOpen, setEstimatorOpen] = useState(false)
   const [visaOpen, setVisaOpen] = useState(false)
+  const [grandstandOpen, setGrandstandOpen] = useState(false)
   const detailRef = useRef(null)
   const filtered = races.filter(r=>{
     if(activeFilter==='all')return true
@@ -277,10 +284,10 @@ export default function Plan() {
   })
   const selectedRace = races.find(r=>r.round===selectedRound)
   function selectRace(round) {
-    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false)
+    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false)
     setTimeout(()=>detailRef.current?.scrollIntoView({behavior:'smooth',block:'start'}),50)
   }
-  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false) }
+  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false) }
   const filters = [{id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},{id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},{id:'sprint',label:'Sprint Weekends'},{id:'upcoming',label:'Upcoming Only'}]
   return (
     <>
@@ -306,7 +313,7 @@ export default function Plan() {
       </div>
       <div className="filters-bar">
         <span className="filter-label">Filter:</span>
-        {filters.map(f=><button key={f.id} className={`filter-btn${activeFilter===f.id?' active':''}`} onClick={()=>setActiveFilter(f.id)}>{f.label}</button>)}
+        {filters.map(f=><button key={f.id} className={'filter-btn' + (activeFilter===f.id?' active':'')} onClick={()=>setActiveFilter(f.id)}>{f.label}</button>)}
       </div>
       <div className="main">
         {!selectedRace?(
@@ -318,12 +325,14 @@ export default function Plan() {
               ? <Estimator race={selectedRace} onBack={()=>setEstimatorOpen(false)}/>
               : visaOpen
                 ? <VisaChecker race={selectedRace} onBack={()=>setVisaOpen(false)}/>
-                : <Modules race={selectedRace} onOpenEstimator={()=>setEstimatorOpen(true)} onOpenVisa={()=>setVisaOpen(true)}/>
+                : grandstandOpen
+                  ? <GrandstandPicker race={selectedRace} onBack={()=>setGrandstandOpen(false)}/>
+                  : <Modules race={selectedRace} onOpenEstimator={()=>setEstimatorOpen(true)} onOpenVisa={()=>setVisaOpen(true)} onOpenGrandstand={()=>setGrandstandOpen(true)}/>
             }
           </div>
         )}
         <div>
-          <div className="section-heading"><h2>2026 Season Calendar</h2><span className="race-count">{filtered.length} race{filtered.length!==1?'s':''}</span></div>
+          <div className="section-heading"><h2>2026 Season Calendar</h2><span className="race-count">{filtered.length + ' race' + (filtered.length!==1?'s':'')}</span></div>
           <div className="race-grid">
             {filtered.map(race=><RaceCard key={race.round} race={race} selected={selectedRound===race.round} onClick={selectRace}/>)}
           </div>
