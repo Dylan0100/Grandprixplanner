@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import VisaChecker from '../components/VisaChecker'
 import GrandstandPicker from '../components/GrandstandPicker'
+import FlightGuide from '../components/FlightGuide'
 
 const races = [
   {round:1,name:"Australian Grand Prix",short:"Australia",circuit:"Albert Park Circuit",city:"Melbourne",country:"Australia",flag:"🇦🇺",dates:"6–8 Mar 2026",region:"asia",sprint:false,status:"completed",isNew:false,tip:"A fan favourite season opener. Great atmosphere, walkable from the city centre.",airport:"Melbourne Tullamarine (MEL) — 30 min",flightBase:950,flightNA:1150,flightAUS:130,accommodation:[85,155,280],tickets:[160,320,580],transport:20,nights:3,ticketLabels:["General Admission","Clark / Whiteford Grandstand","Platinum Club"],accumLabels:["Guest house / inner suburb","3-star city hotel","4–5 star Melbourne CBD"]},
@@ -121,7 +122,7 @@ function DetailHeader({race, onClose}) {
   )
 }
 
-function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand}) {
+function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand, onOpenFlight}) {
   return (
     <>
       <div className="modules-grid">
@@ -143,8 +144,13 @@ function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand}) {
           <div className="module-desc">{'Compare every grandstand at ' + race.circuit + ' — views, pricing tiers, and expert tips for every budget.'}</div>
           <div className="module-cta">Explore grandstands <ArrowIcon/></div>
         </div>
+        <div className="module-card" onClick={onOpenFlight}>
+          <div className="module-icon">✈️</div>
+          <div className="module-title">Flight Guide</div>
+          <div className="module-desc">{'Best airports, booking windows, routing from the UK, and pricing tips for ' + race.country + '.'}</div>
+          <div className="module-cta">Plan my flights <ArrowIcon/></div>
+        </div>
         {[
-          {icon:'✈️',title:'Flight Guide',desc:'Best airports, booking windows, and routing advice for ' + race.country + '.',cta:'Plan my flights'},
           {icon:'🗺️',title:'Local Transport',desc:'Every option to get to and from ' + race.circuit + '.',cta:'Plan my transport'},
           {icon:'📋',title:'Build Itinerary',desc:'Compile everything into a shareable, printable race weekend plan.',cta:'Build my itinerary'},
         ].map(m=>(
@@ -194,7 +200,7 @@ function Results({race, est, c}) {
           {c.flight.included&&!isUKHome&&<div className="legend-item"><div className="legend-dot" style={{background:'#3B82F6'}}/>{'Flights (' + c.pct.flight + '%)'}</div>}
           {c.ticket.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#E8002D'}}/>{'Tickets (' + c.pct.ticket + '%)'}</div>}
           {c.accom.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#F59E0B'}}/>{'Hotel (' + c.pct.accom + '%)'}</div>}
-          <div className="legend-item"><div className="legend-dot" style={{background:'#22C55E'}}/>{'Transport (' + c.pct.transport + '%)'}</div>
+          <div className="legend-item"><div className="legend-dot" style={{background:'#22C55E'}}/>{'Transport (' + c.pct.transport + '%)'}</div>}
         </div>
       </div>
       <div className="results-breakdown">
@@ -275,6 +281,7 @@ export default function Plan() {
   const [estimatorOpen, setEstimatorOpen] = useState(false)
   const [visaOpen, setVisaOpen] = useState(false)
   const [grandstandOpen, setGrandstandOpen] = useState(false)
+  const [flightOpen, setFlightOpen] = useState(false)
   const detailRef = useRef(null)
   const filtered = races.filter(r=>{
     if(activeFilter==='all')return true
@@ -284,10 +291,10 @@ export default function Plan() {
   })
   const selectedRace = races.find(r=>r.round===selectedRound)
   function selectRace(round) {
-    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false)
+    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false)
     setTimeout(()=>detailRef.current?.scrollIntoView({behavior:'smooth',block:'start'}),50)
   }
-  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false) }
+  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false) }
   const filters = [{id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},{id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},{id:'sprint',label:'Sprint Weekends'},{id:'upcoming',label:'Upcoming Only'}]
   return (
     <>
@@ -327,7 +334,15 @@ export default function Plan() {
                 ? <VisaChecker race={selectedRace} onBack={()=>setVisaOpen(false)}/>
                 : grandstandOpen
                   ? <GrandstandPicker race={selectedRace} onBack={()=>setGrandstandOpen(false)}/>
-                  : <Modules race={selectedRace} onOpenEstimator={()=>setEstimatorOpen(true)} onOpenVisa={()=>setVisaOpen(true)} onOpenGrandstand={()=>setGrandstandOpen(true)}/>
+                  : flightOpen
+                    ? <FlightGuide race={selectedRace} onBack={()=>setFlightOpen(false)}/>
+                    : <Modules
+                        race={selectedRace}
+                        onOpenEstimator={()=>setEstimatorOpen(true)}
+                        onOpenVisa={()=>setVisaOpen(true)}
+                        onOpenGrandstand={()=>setGrandstandOpen(true)}
+                        onOpenFlight={()=>setFlightOpen(true)}
+                      />
             }
           </div>
         )}
