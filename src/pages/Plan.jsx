@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import VisaChecker from '../components/VisaChecker'
 import GrandstandPicker from '../components/GrandstandPicker'
 import FlightGuide from '../components/FlightGuide'
+import LocalTransport from '../components/LocalTransport' // ← ADDED
 
 const races = [
   {round:1,name:"Australian Grand Prix",short:"Australia",circuit:"Albert Park Circuit",city:"Melbourne",country:"Australia",flag:"🇦🇺",dates:"6–8 Mar 2026",region:"asia",sprint:false,status:"completed",isNew:false,tip:"A fan favourite season opener. Great atmosphere, walkable from the city centre.",airport:"Melbourne Tullamarine (MEL) — 30 min",flightBase:950,flightNA:1150,flightAUS:130,accommodation:[85,155,280],tickets:[160,320,580],transport:20,nights:3,ticketLabels:["General Admission","Clark / Whiteford Grandstand","Platinum Club"],accumLabels:["Guest house / inner suburb","3-star city hotel","4–5 star Melbourne CBD"]},
@@ -122,7 +123,8 @@ function DetailHeader({race, onClose}) {
   )
 }
 
-function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand, onOpenFlight}) {
+// ← ADDED: onOpenTransport prop wired in, Local Transport card made live
+function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand, onOpenFlight, onOpenTransport}) {
   return (
     <>
       <div className="modules-grid">
@@ -150,8 +152,13 @@ function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand, onOpenFli
           <div className="module-desc">{'Best airports, booking windows, routing from the UK, and pricing tips for ' + race.country + '.'}</div>
           <div className="module-cta">Plan my flights <ArrowIcon/></div>
         </div>
+        <div className="module-card" onClick={onOpenTransport}>
+          <div className="module-icon">🗺️</div>
+          <div className="module-title">Local Transport</div>
+          <div className="module-desc">{'Every option to get to and from ' + race.circuit + ' — day by day guidance and insider tips.'}</div>
+          <div className="module-cta">Plan my transport <ArrowIcon/></div>
+        </div>
         {[
-          {icon:'🗺️',title:'Local Transport',desc:'Every option to get to and from ' + race.circuit + '.',cta:'Plan my transport'},
           {icon:'📋',title:'Build Itinerary',desc:'Compile everything into a shareable, printable race weekend plan.',cta:'Build my itinerary'},
         ].map(m=>(
           <div key={m.title} className="module-card coming-soon">
@@ -282,6 +289,7 @@ export default function Plan() {
   const [visaOpen, setVisaOpen] = useState(false)
   const [grandstandOpen, setGrandstandOpen] = useState(false)
   const [flightOpen, setFlightOpen] = useState(false)
+  const [transportOpen, setTransportOpen] = useState(false) // ← ADDED
   const detailRef = useRef(null)
   const filtered = races.filter(r=>{
     if(activeFilter==='all')return true
@@ -291,10 +299,10 @@ export default function Plan() {
   })
   const selectedRace = races.find(r=>r.round===selectedRound)
   function selectRace(round) {
-    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false)
+    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false); setTransportOpen(false) // ← ADDED reset
     setTimeout(()=>detailRef.current?.scrollIntoView({behavior:'smooth',block:'start'}),50)
   }
-  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false) }
+  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false); setTransportOpen(false) } // ← ADDED reset
   const filters = [{id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},{id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},{id:'sprint',label:'Sprint Weekends'},{id:'upcoming',label:'Upcoming Only'}]
   return (
     <>
@@ -336,13 +344,16 @@ export default function Plan() {
                   ? <GrandstandPicker race={selectedRace} onBack={()=>setGrandstandOpen(false)}/>
                   : flightOpen
                     ? <FlightGuide race={selectedRace} onBack={()=>setFlightOpen(false)}/>
-                    : <Modules
-                        race={selectedRace}
-                        onOpenEstimator={()=>setEstimatorOpen(true)}
-                        onOpenVisa={()=>setVisaOpen(true)}
-                        onOpenGrandstand={()=>setGrandstandOpen(true)}
-                        onOpenFlight={()=>setFlightOpen(true)}
-                      />
+                    : transportOpen
+                      ? <LocalTransport race={selectedRace} onBack={()=>setTransportOpen(false)}/> // ← ADDED
+                      : <Modules
+                          race={selectedRace}
+                          onOpenEstimator={()=>setEstimatorOpen(true)}
+                          onOpenVisa={()=>setVisaOpen(true)}
+                          onOpenGrandstand={()=>setGrandstandOpen(true)}
+                          onOpenFlight={()=>setFlightOpen(true)}
+                          onOpenTransport={()=>setTransportOpen(true)}
+                        />
             }
           </div>
         )}
