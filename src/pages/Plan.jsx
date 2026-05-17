@@ -6,6 +6,8 @@ import FlightGuide from '../components/FlightGuide'
 import LocalTransport from '../components/LocalTransport'
 import Itinerary from '../components/Itinerary'
 
+// ─── RACE DATA ────────────────────────────────────────────────────────────────
+
 const races = [
   {round:1,name:"Australian Grand Prix",short:"Australia",circuit:"Albert Park Circuit",city:"Melbourne",country:"Australia",flag:"🇦🇺",dates:"6–8 Mar 2026",region:"asia",sprint:false,status:"completed",isNew:false,tip:"A fan favourite season opener. Great atmosphere, walkable from the city centre.",airport:"Melbourne Tullamarine (MEL) — 30 min",flightBase:950,flightNA:1150,flightAUS:130,accommodation:[85,155,280],tickets:[160,320,580],transport:20,nights:3,ticketLabels:["General Admission","Clark / Whiteford Grandstand","Platinum Club"],accumLabels:["Guest house / inner suburb","3-star city hotel","4–5 star Melbourne CBD"]},
   {round:2,name:"Chinese Grand Prix",short:"China",circuit:"Shanghai International Circuit",city:"Shanghai",country:"China",flag:"🇨🇳",dates:"13–15 Mar 2026",region:"asia",sprint:true,status:"completed",isNew:false,tip:"Sprint weekend. Chinese visa required for UK passport holders — apply 4+ weeks early.",airport:"Shanghai Pudong (PVG) — 45 min",flightBase:720,flightNA:900,flightAUS:650,accommodation:[70,130,250],tickets:[120,240,440],transport:25,nights:3,ticketLabels:["General Admission","Turn 6 Grandstand","VIP Pavilion"],accumLabels:["Budget hotel Pudong","3-star hotel near circuit","5-star Pudong hotel"]},
@@ -28,8 +30,10 @@ const races = [
   {round:19,name:"São Paulo Grand Prix",short:"Brazil",circuit:"Autódromo José Carlos Pace",city:"São Paulo",country:"Brazil",flag:"🇧🇷",dates:"6–8 Nov 2026",region:"americas",sprint:false,status:"upcoming",isNew:false,tip:"Brazilian passion at Interlagos is extraordinary. Use official shuttles — avoid unofficial transport.",airport:"São Paulo Guarulhos (GRU) — 45 min",flightBase:700,flightNA:580,flightAUS:1450,accommodation:[70,130,250],tickets:[110,230,400],transport:20,nights:3,ticketLabels:["General Admission","Grandstand K (Turn 4)","Premium Hospitality"],accumLabels:["Vila Olímpia budget hotel","3-star Pinheiros hotel","4-star Jardins hotel"]},
   {round:20,name:"Las Vegas Grand Prix",short:"Las Vegas",circuit:"Las Vegas Strip Circuit",city:"Las Vegas",country:"USA",flag:"🇺🇸",dates:"20–21 Nov 2026",region:"americas",sprint:false,status:"upcoming",isNew:false,tip:"Saturday night race. Combine with 2–3 nights in Vegas. Late finish — plan your transport ahead.",airport:"Harry Reid International (LAS) — 15 min",flightBase:560,flightNA:180,flightAUS:1280,accommodation:[160,280,520],tickets:[270,550,1020],transport:20,nights:3,ticketLabels:["General Admission","Turn 1 Grandstand","FORMULA 1 Club Hospitality"],accumLabels:["Off-Strip hotel (budget)","Mid-Strip 3-star hotel","Bellagio / Wynn style resort"]},
   {round:21,name:"Qatar Grand Prix",short:"Qatar",circuit:"Lusail International Circuit",city:"Lusail",country:"Qatar",flag:"🇶🇦",dates:"27–29 Nov 2026",region:"middle-east",sprint:false,status:"upcoming",isNew:false,tip:"Night race in the desert. November is much cooler. Pairs perfectly with Abu Dhabi the following week.",airport:"Doha Hamad (DOH) — 15 min",flightBase:420,flightNA:920,flightAUS:780,accommodation:[90,165,320],tickets:[130,270,460],transport:20,nights:3,ticketLabels:["General Admission","Turn 1 / Main Grandstand","Platinum Lounge"],accumLabels:["Lusail or Doha budget hotel","3-star Doha West Bay","5-star Doha corniche hotel"]},
-  {round:22,name:"Abu Dhabi Grand Prix",short:"Abu Dhabi",circuit:"Yas Marina Circuit",city:"Abu Dhabi",country:"UAE",flag:"🇦🇪",dates:"4–6 Dec 2026",region:"middle-east",sprint:false,status:"upcoming",isNew:false,tip:"The season finale. Excellent facilities throughout. Easily pairs with a few days in Dubai.",airport:"Abu Dhabi (AUH) or Dubai (DXB) — 35–40 min",flightBase:480,flightNA:960,flightAUS:820,accommodation:[110,200,380],tickets:[180,380,660],transport:25,nights:3,ticketLabels:["General Admission","Yas Marina Grandstand","Paddock Club"],accumLabels:["Yas Island budget hotel","3-star Yas Island hotel","Yas Viceroy or equivalent"]}
+  {round:22,name:"Abu Dhabi Grand Prix",short:"Abu Dhabi",circuit:"Yas Marina Circuit",city:"Abu Dhabi",country:"UAE",flag:"🇦🇪",dates:"4–6 Dec 2026",region:"middle-east",sprint:false,status:"upcoming",isNew:false,tip:"The season finale. Excellent facilities throughout. Easily pairs with a few days in Dubai.",airport:"Abu Dhabi (AUH) or Dubai (DXB) — 35–40 min",flightBase:480,flightNA:960,flightAUS:820,accommodation:[110,200,380],tickets:[180,380,660],transport:25,nights:3,ticketLabels:["General Admission","Yas Marina Grandstand","Paddock Club"],accumLabels:["Yas Island budget hotel","3-star Yas Island hotel","Yas Viceroy or equivalent"]},
 ]
+
+// ─── CLUSTERS ─────────────────────────────────────────────────────────────────
 
 const clusters = [
   {id:'uk-south',label:'London & South East',sub:'LHR, LGW, STN, LTN, SEN'},
@@ -43,11 +47,124 @@ const clusters = [
   {id:'scandinavia',label:'Scandinavia',sub:'CPH, ARN, HEL, OSL'},
   {id:'n-america',label:'North America',sub:'JFK, LAX, ORD, YYZ'},
   {id:'australia',label:'Australia & NZ',sub:'SYD, MEL, BNE, AKL'},
-  {id:'other',label:'Rest of World',sub:'Middle East, Asia, Africa'}
+  {id:'other',label:'Rest of World',sub:'Middle East, Asia, Africa'},
+]
+
+const departureCities = [
+  { group: 'UK — South & London', cities: [
+    { label: 'London (Heathrow / Gatwick)', cluster: 'uk-south' },
+    { label: 'London (Stansted / Luton / City)', cluster: 'uk-south' },
+    { label: 'Southampton / Bournemouth', cluster: 'uk-south' },
+  ]},
+  { group: 'UK — Midlands & East', cities: [
+    { label: 'Birmingham', cluster: 'uk-midlands' },
+    { label: 'East Midlands (Derby / Leicester / Nottingham)', cluster: 'uk-midlands' },
+    { label: 'Norwich / Cambridge', cluster: 'uk-midlands' },
+  ]},
+  { group: 'UK — North England', cities: [
+    { label: 'Manchester', cluster: 'uk-north' },
+    { label: 'Liverpool', cluster: 'uk-north' },
+    { label: 'Leeds / Bradford', cluster: 'uk-north' },
+    { label: 'Newcastle', cluster: 'uk-north' },
+    { label: 'Sheffield / Doncaster', cluster: 'uk-north' },
+  ]},
+  { group: 'UK — Scotland & Northern Ireland', cities: [
+    { label: 'Edinburgh', cluster: 'uk-scotland' },
+    { label: 'Glasgow', cluster: 'uk-scotland' },
+    { label: 'Belfast', cluster: 'uk-scotland' },
+    { label: 'Aberdeen / Inverness', cluster: 'uk-scotland' },
+  ]},
+  { group: 'UK — Wales & South West', cities: [
+    { label: 'Bristol', cluster: 'uk-wales' },
+    { label: 'Cardiff', cluster: 'uk-wales' },
+    { label: 'Exeter / Plymouth', cluster: 'uk-wales' },
+  ]},
+  { group: 'Ireland', cities: [
+    { label: 'Dublin', cluster: 'ireland' },
+    { label: 'Cork', cluster: 'ireland' },
+    { label: 'Shannon', cluster: 'ireland' },
+  ]},
+  { group: 'Western Europe', cities: [
+    { label: 'Amsterdam', cluster: 'w-europe' },
+    { label: 'Paris', cluster: 'w-europe' },
+    { label: 'Frankfurt / Munich', cluster: 'w-europe' },
+    { label: 'Barcelona', cluster: 'w-europe' },
+    { label: 'Madrid', cluster: 'w-europe' },
+    { label: 'Rome / Milan', cluster: 'w-europe' },
+    { label: 'Brussels', cluster: 'w-europe' },
+    { label: 'Zurich / Geneva', cluster: 'w-europe' },
+    { label: 'Lisbon', cluster: 'w-europe' },
+  ]},
+  { group: 'Central & Eastern Europe', cities: [
+    { label: 'Vienna', cluster: 'e-europe' },
+    { label: 'Prague', cluster: 'e-europe' },
+    { label: 'Warsaw', cluster: 'e-europe' },
+    { label: 'Budapest', cluster: 'e-europe' },
+    { label: 'Bucharest', cluster: 'e-europe' },
+    { label: 'Athens', cluster: 'e-europe' },
+  ]},
+  { group: 'Scandinavia', cities: [
+    { label: 'Copenhagen', cluster: 'scandinavia' },
+    { label: 'Stockholm', cluster: 'scandinavia' },
+    { label: 'Oslo', cluster: 'scandinavia' },
+    { label: 'Helsinki', cluster: 'scandinavia' },
+  ]},
+  { group: 'North America', cities: [
+    { label: 'New York', cluster: 'n-america' },
+    { label: 'Los Angeles', cluster: 'n-america' },
+    { label: 'Chicago', cluster: 'n-america' },
+    { label: 'Toronto / Montreal', cluster: 'n-america' },
+    { label: 'Miami', cluster: 'n-america' },
+    { label: 'Dallas / Houston', cluster: 'n-america' },
+  ]},
+  { group: 'Australia & New Zealand', cities: [
+    { label: 'Sydney', cluster: 'australia' },
+    { label: 'Melbourne', cluster: 'australia' },
+    { label: 'Brisbane', cluster: 'australia' },
+    { label: 'Auckland', cluster: 'australia' },
+    { label: 'Perth', cluster: 'australia' },
+  ]},
+  { group: 'Rest of World', cities: [
+    { label: 'Dubai / Abu Dhabi', cluster: 'other' },
+    { label: 'Singapore', cluster: 'other' },
+    { label: 'Tokyo', cluster: 'other' },
+    { label: 'Johannesburg', cluster: 'other' },
+    { label: 'Sao Paulo', cluster: 'other' },
+  ]},
+]
+
+const passports = [
+  { id: 'gb', label: 'United Kingdom' },
+  { id: 'us', label: 'United States' },
+  { id: 'au', label: 'Australia' },
+  { id: 'ca', label: 'Canada' },
+  { id: 'nz', label: 'New Zealand' },
+  { id: 'ie', label: 'Ireland' },
+  { id: 'de', label: 'Germany' },
+  { id: 'fr', label: 'France' },
+  { id: 'nl', label: 'Netherlands' },
+  { id: 'be', label: 'Belgium' },
+  { id: 'es', label: 'Spain' },
+  { id: 'it', label: 'Italy' },
+  { id: 'pt', label: 'Portugal' },
+  { id: 'se', label: 'Sweden' },
+  { id: 'no', label: 'Norway' },
+  { id: 'dk', label: 'Denmark' },
+  { id: 'fi', label: 'Finland' },
+  { id: 'ch', label: 'Switzerland' },
+  { id: 'at', label: 'Austria' },
+  { id: 'pl', label: 'Poland' },
+  { id: 'br', label: 'Brazil' },
+  { id: 'mx', label: 'Mexico' },
+  { id: 'jp', label: 'Japan' },
+  { id: 'sg', label: 'Singapore' },
+  { id: 'za', label: 'South Africa' },
 ]
 
 const clusterMult = {'uk-south':1.00,'uk-midlands':1.08,'uk-north':1.12,'uk-scotland':1.15,'uk-wales':1.10,'ireland':0.97,'w-europe':0.60,'e-europe':0.70,'scandinavia':0.82,'n-america':null,'australia':null,'other':0.95}
 const UK_CLUSTERS = ['uk-south','uk-midlands','uk-north','uk-scotland','uk-wales','ireland']
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
 
 function fmt(n) { return '£' + Math.round(n).toLocaleString('en-GB') }
 function regionLabel(r) { return {europe:'Europe',americas:'Americas',asia:'Asia & Pacific','middle-east':'Middle East'}[r] || r }
@@ -77,9 +194,13 @@ function calcCost(race, est) {
   return {flight:fl,ticket:tk,accom:ac,transport:tr,ppMid,ppLow,ppHigh,totalMid:ppMid*est.party,totalLow:ppLow*est.party,totalHigh:ppHigh*est.party,pct:{flight:pct(g(fl)),ticket:pct(g(tk)),accom:pct(g(ac)),transport:pct(tr.mid)}}
 }
 
+// ─── ICONS ────────────────────────────────────────────────────────────────────
+
 const ArrowIcon = () => <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
 const BackIcon = () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
 const CalIcon = () => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{opacity:0.4,flexShrink:0}}><rect x="1" y="1.5" width="12" height="11" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M1 5h12" stroke="currentColor" strokeWidth="1.4"/><path d="M4.5 0v2M9.5 0v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+
+// ─── RACE CARD ────────────────────────────────────────────────────────────────
 
 function RaceCard({race, selected, onClick}) {
   return (
@@ -105,6 +226,8 @@ function RaceCard({race, selected, onClick}) {
   )
 }
 
+// ─── DETAIL HEADER ────────────────────────────────────────────────────────────
+
 function DetailHeader({race, onClose}) {
   return (
     <div className="detail-header">
@@ -124,191 +247,346 @@ function DetailHeader({race, onClose}) {
   )
 }
 
-function Modules({race, onOpenEstimator, onOpenVisa, onOpenGrandstand, onOpenFlight, onOpenTransport, onOpenItinerary}) {
+// ─── TRIP INPUTS ──────────────────────────────────────────────────────────────
+
+function TripInputs({ trip, onSet }) {
+  function handleCityChange(e) {
+    if (!e.target.value) { onSet('departureCity', null); return }
+    for (var i = 0; i < departureCities.length; i++) {
+      var found = departureCities[i].cities.find(function(c) { return c.label === e.target.value })
+      if (found) { onSet('departureCity', found); return }
+    }
+  }
   return (
-    <>
-      <div className="modules-grid">
-        <div className="module-card" onClick={onOpenEstimator}>
-          <div className="module-icon">💷</div>
-          <div className="module-title">Cost Estimator</div>
-          <div className="module-desc">Build a full trip budget in minutes. Flights, hotel, tickets, and transport — broken down by your choices.</div>
-          <div className="module-cta">Estimate my costs <ArrowIcon/></div>
+    <div className="trip-inputs">
+      <div className="trip-inputs-eyebrow">Your Trip Details</div>
+      <div className="trip-inputs-row">
+        <div className="trip-input-group trip-input-wide">
+          <label className="trip-input-label">Flying from</label>
+          <select
+            className="trip-select"
+            value={trip.departureCity ? trip.departureCity.label : ''}
+            onChange={handleCityChange}
+          >
+            <option value="">Select city or airport...</option>
+            {departureCities.map(function(g) {
+              return (
+                <optgroup key={g.group} label={g.group}>
+                  {g.cities.map(function(city) {
+                    return <option key={city.label} value={city.label}>{city.label}</option>
+                  })}
+                </optgroup>
+              )
+            })}
+          </select>
         </div>
-        <div className="module-card" onClick={onOpenVisa}>
-          <div className="module-icon">🛂</div>
-          <div className="module-title">Visa Checker</div>
-          <div className="module-desc">{'Instant entry requirements for ' + race.country + ' based on your passport. 25 nationalities covered.'}</div>
-          <div className="module-cta">Check requirements <ArrowIcon/></div>
+        <div className="trip-input-group trip-input-wide">
+          <label className="trip-input-label">Passport / nationality</label>
+          <select
+            className="trip-select"
+            value={trip.passport || ''}
+            onChange={function(e) { onSet('passport', e.target.value || null) }}
+          >
+            <option value="">Select nationality...</option>
+            {passports.map(function(p) {
+              return <option key={p.id} value={p.id}>{p.label}</option>
+            })}
+          </select>
         </div>
-        <div className="module-card" onClick={onOpenGrandstand}>
-          <div className="module-icon">🏟️</div>
-          <div className="module-title">Grandstand Picker</div>
-          <div className="module-desc">{'Compare every grandstand at ' + race.circuit + ' — views, pricing tiers, and expert tips for every budget.'}</div>
-          <div className="module-cta">Explore grandstands <ArrowIcon/></div>
-        </div>
-        <div className="module-card" onClick={onOpenFlight}>
-          <div className="module-icon">✈️</div>
-          <div className="module-title">Flight Guide</div>
-          <div className="module-desc">{'Best airports, booking windows, routing from the UK, and pricing tips for ' + race.country + '.'}</div>
-          <div className="module-cta">Plan my flights <ArrowIcon/></div>
-        </div>
-        <div className="module-card" onClick={onOpenTransport}>
-          <div className="module-icon">🗺️</div>
-          <div className="module-title">Local Transport</div>
-          <div className="module-desc">{'Every option to get to and from ' + race.circuit + ' — day by day guidance and insider tips.'}</div>
-          <div className="module-cta">Plan my transport <ArrowIcon/></div>
-        </div>
-        <div className="module-card" onClick={onOpenItinerary}>
-          <div className="module-icon">📋</div>
-          <div className="module-title">Build Itinerary</div>
-          <div className="module-desc">Compile everything into a shareable, day-by-day race weekend plan you can copy and keep.</div>
-          <div className="module-cta">Build my itinerary <ArrowIcon/></div>
+        <div className="trip-input-group">
+          <label className="trip-input-label">Party size</label>
+          <div className="trip-party-row">
+            {[1,2,3,4].map(function(n) {
+              return (
+                <button
+                  key={n}
+                  className={'trip-party-btn' + (trip.party === n ? ' active' : '')}
+                  onClick={function() { onSet('party', n) }}
+                >
+                  {n}{n === 4 ? '+' : ''}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
-      <div className="tip-bar"><p>{'💡 '}<strong style={{color:'var(--text)',fontWeight:500}}>Expert tip:</strong>{' ' + race.tip}</p></div>
-    </>
-  )
-}
-
-function Results({race, est, c}) {
-  if (!c) return <div className="results-waiting"><div className="results-waiting-icon">✈️</div><p>Select your departure region above to see your cost estimate</p></div>
-  const isUKHome = race.isUKRace && UK_CLUSTERS.includes(est.departure)
-  const partyLabel = est.party===1?'per person':'for ' + est.party + ' people'
-  const depName = clusters.find(cl=>cl.id===est.departure)?.label||'your region'
-  const tot = Math.max(c.pct.flight+c.pct.ticket+c.pct.accom+c.pct.transport,1)
-  const w = (v,inc) => inc?(v/tot*100).toFixed(1):0
-  const BRow = ({color,label,sub,mid,low,high,included,showRange}) => (
-    <div className={`breakdown-row${!included?' excluded':''}`}>
-      <div className="breakdown-left"><div className="breakdown-dot" style={{background:color}}/><div><div className="breakdown-label">{label}</div><div className="breakdown-sublabel">{sub}</div></div></div>
-      <div className="breakdown-amount"><div className="breakdown-mid">{included?fmt(mid):'—'}</div>{included&&showRange&&mid>0&&<div className="breakdown-range">{fmt(low) + ' – ' + fmt(high)}</div>}</div>
+      <div className="trip-inputs-note">All fields optional — fill in what you know to personalise your planning across every section below</div>
     </div>
   )
+}
+
+// ─── SECTION NAV ──────────────────────────────────────────────────────────────
+
+function SectionNav({ navRef }) {
+  var sections = [
+    { id: 'sec-grandstands', icon: '🏟️', label: 'Grandstands' },
+    { id: 'sec-flights',     icon: '✈️',  label: 'Flights' },
+    { id: 'sec-accom',       icon: '🏨',  label: 'Accommodation' },
+    { id: 'sec-transport',   icon: '🗺️',  label: 'Transport' },
+    { id: 'sec-itinerary',   icon: '📋',  label: 'Itinerary' },
+    { id: 'sec-visa',        icon: '🛂',  label: 'Visa Info' },
+  ]
+  function scrollTo(id) {
+    var el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
   return (
-    <>
-      <div className="results-header">
-        <div className="results-total-label">{'Estimated total ' + partyLabel}</div>
-        <div className="results-total">{fmt(c.totalMid)}</div>
-        <div className="results-range" style={{marginTop:'6px'}}>Typically <span>{fmt(c.totalLow)}</span>{' – '}<span>{fmt(c.totalHigh)}</span></div>
-        {est.party>1&&<div className="results-range" style={{marginTop:'4px'}}>{'Per person approx. '}<span>{fmt(c.ppMid)}</span></div>}
-      </div>
-      <div>
-        <div className="results-bar-wrap">
-          <div className="results-bar-seg bar-flight" style={{width:w(c.pct.flight,c.flight.included&&!isUKHome)+'%'}}/>
-          <div className="results-bar-seg bar-ticket" style={{width:w(c.pct.ticket,c.ticket.included)+'%'}}/>
-          <div className="results-bar-seg bar-accom"  style={{width:w(c.pct.accom,c.accom.included)+'%'}}/>
-          <div className="results-bar-seg bar-transport" style={{width:w(c.pct.transport,true)+'%'}}/>
-        </div>
-        <div className="results-bar-legend">
-          {c.flight.included&&!isUKHome&&<div className="legend-item"><div className="legend-dot" style={{background:'#3B82F6'}}/>{'Flights (' + c.pct.flight + '%)'}</div>}
-          {c.ticket.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#E8002D'}}/>{'Tickets (' + c.pct.ticket + '%)'}</div>}
-          {c.accom.included&&<div className="legend-item"><div className="legend-dot" style={{background:'#F59E0B'}}/>{'Hotel (' + c.pct.accom + '%)'}</div>}
-          <div className="legend-item"><div className="legend-dot" style={{background:'#22C55E'}}/>{'Transport (' + c.pct.transport + '%)'}</div>}
-        </div>
-      </div>
-      <div className="results-breakdown">
-        <BRow color="#3B82F6" label={isUKHome?'Local Travel':'Return Flights'} sub={isUKHome?'Included in transport cost below':'Per person from ' + depName} mid={c.flight.mid} low={c.flight.low} high={c.flight.high} included={c.flight.included&&!isUKHome} showRange/>
-        <BRow color="#E8002D" label={['Standard','Advanced','Premium'][est.ticketTier]+' Tickets'} sub={race.ticketLabels[est.ticketTier]} mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high} included={c.ticket.included} showRange/>
-        <BRow color="#F59E0B" label={'Accommodation (' + c.accom.nights + ' nights)'} sub={race.accumLabels[est.accumTier]} mid={c.accom.mid} low={c.accom.low} high={c.accom.high} included={c.accom.included} showRange/>
-        <BRow color="#22C55E" label="Local Transport" sub="Return travel to circuit (per person)" mid={c.transport.mid} low={c.transport.low} high={c.transport.high} included showRange={false}/>
-      </div>
-      <div className="results-disclaimer">Costs are approximate estimates based on advance bookings (3+ months). Prices vary by date, availability and season. Always verify current prices before booking.</div>
-      <div className="results-actions">
-        <a className="results-action-btn results-action-primary" href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer">Search Flights on Skyscanner ↗</a>
-        <a className="results-action-btn results-action-secondary" href="https://www.booking.com" target="_blank" rel="noopener noreferrer">Browse Hotels on Booking.com ↗</a>
-      </div>
-    </>
+    <div className="section-nav-row" ref={navRef}>
+      {sections.map(function(s) {
+        return (
+          <button key={s.id} className="section-nav-btn" onClick={function() { scrollTo(s.id) }}>
+            <span className="snb-icon">{s.icon}</span>
+            <span className="snb-label">{s.label}</span>
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
-function Estimator({race, onBack}) {
-  const [est, setEst] = useState({departure:null,party:2,ticketTier:1,accumTier:1,incFlights:true,incTickets:true,incAccom:true})
-  const isUKHome = race.isUKRace && UK_CLUSTERS.includes(est.departure)
-  const c = calcCost(race, est)
-  const set = (key,val) => setEst(prev=>({...prev,[key]:val}))
-  const toggleInc = key => { if(key==='incFlights'&&isUKHome)return; setEst(prev=>({...prev,[key]:!prev[key]})) }
+// ─── COST ROW ─────────────────────────────────────────────────────────────────
+
+function CostRow({ color, label, sub, mid, low, high, included, noRange }) {
   return (
-    <div className="estimator-wrap">
-      <div className="est-topbar">
-        <button className="est-back" onClick={onBack}><BackIcon/>Back to options</button>
-        <div style={{textAlign:'right'}}><div className="est-title">Cost Estimator</div><div className="est-subtitle">Approximate costs — advance bookings assumed</div></div>
-      </div>
-      <div className="est-body">
-        <div className="est-controls">
-          <div>
-            <div className="est-section-label">Where are you travelling from?</div>
-            <div className="cluster-grid">
-              {clusters.map(cl=><button key={cl.id} className={'cluster-btn' + (est.departure===cl.id?' active':'')} onClick={()=>set('departure',cl.id)}><span className="cb-label">{cl.label}</span><span className="cb-sub">{cl.sub}</span></button>)}
-            </div>
-          </div>
-          <div>
-            <div className="est-section-label">How many people?</div>
-            <div className="party-row">
-              {[1,2,3,4].map(n=><button key={n} className={'party-btn' + (est.party===n?' active':'')} onClick={()=>set('party',n)}>{n}{n===4?'+':''}</button>)}
-            </div>
-          </div>
-          <div>
-            <div className="est-section-label">Ticket preference</div>
-            <div className="tier-grid">
-              {race.ticketLabels.map((label,i)=><button key={i} className={'tier-btn' + (est.ticketTier===i?' active':'')} onClick={()=>set('ticketTier',i)}><div className="tier-btn-left"><span className="tier-btn-name">{['Standard','Advanced','Premium'][i]}</span><span className="tier-btn-desc">{label}</span></div><span className="tier-btn-price">{fmt(race.tickets[i])}</span></button>)}
-            </div>
-          </div>
-          <div>
-            <div className="est-section-label">{'Accommodation (' + race.nights + ' nights)'}</div>
-            <div className="tier-grid">
-              {race.accumLabels.map((label,i)=><button key={i} className={'tier-btn' + (est.accumTier===i?' active':'')} onClick={()=>set('accumTier',i)}><div className="tier-btn-left"><span className="tier-btn-name">{['Standard','Advanced','Premium'][i]}</span><span className="tier-btn-desc">{label}</span></div><span className="tier-btn-price">{fmt(race.accommodation[i])}<span style={{fontSize:'11px',color:'var(--text-dim)'}}>/night</span></span></button>)}
-            </div>
-          </div>
-          <div>
-            <div className="est-section-label">What to include</div>
-            <div className="toggle-row">
-              {isUKHome?(
-                <div className="toggle-item disabled-item"><div><div className="toggle-label">Flights / Travel</div><div className="toggle-sub">Local race — included in transport cost</div></div><div className="toggle-switch on"/></div>
-              ):(
-                <div className="toggle-item" onClick={()=>toggleInc('incFlights')}><div><div className="toggle-label">Flights</div><div className="toggle-sub">Return flights from your departure region</div></div><div className={'toggle-switch' + (est.incFlights?' on':'')}/></div>
-              )}
-              <div className="toggle-item" onClick={()=>toggleInc('incTickets')}><div><div className="toggle-label">Race Tickets</div><div className="toggle-sub">Already have tickets? Toggle off</div></div><div className={'toggle-switch' + (est.incTickets?' on':'')}/></div>
-              <div className="toggle-item" onClick={()=>toggleInc('incAccom')}><div><div className="toggle-label">Accommodation</div><div className="toggle-sub">Already booked? Toggle off</div></div><div className={'toggle-switch' + (est.incAccom?' on':'')}/></div>
-            </div>
-          </div>
+    <div className={'cost-row' + (!included ? ' excluded' : '')}>
+      <div className="cost-row-left">
+        <div className="cost-row-dot" style={{background: color}}/>
+        <div>
+          <div className="cost-row-label">{label}</div>
+          <div className="cost-row-sub">{sub}</div>
         </div>
-        <div className="est-results"><Results race={race} est={est} c={c}/></div>
+      </div>
+      <div className="cost-row-right">
+        <div className="cost-row-mid">{included ? fmt(mid) : '—'}</div>
+        {included && !noRange && mid > 0 && <div className="cost-row-range">{fmt(low) + ' – ' + fmt(high)}</div>}
       </div>
     </div>
   )
 }
+
+// ─── COST PANEL ───────────────────────────────────────────────────────────────
+
+function CostPanel({ race, trip, onSet, c }) {
+  var isUKHome = race.isUKRace && UK_CLUSTERS.includes(trip.departureCity ? trip.departureCity.cluster : '')
+  var depLabel = trip.departureCity ? trip.departureCity.label : ''
+  var tot = c ? Math.max(c.pct.flight + c.pct.ticket + c.pct.accom + c.pct.transport, 1) : 1
+  var w = function(v, inc) { return inc ? (v / tot * 100).toFixed(1) : 0 }
+  var partyLabel = trip.party === 1 ? 'per person' : 'for ' + trip.party + ' people'
+
+  function toggleInc(key) {
+    if (key === 'incFlights' && isUKHome) return
+    onSet(key, !trip[key])
+  }
+
+  return (
+    <div className="cost-panel">
+      <div className="cost-panel-header">
+        <div className="cost-panel-title">Trip Cost</div>
+        <div className="cost-panel-sub">Updates live as you plan</div>
+      </div>
+
+      {!trip.departureCity ? (
+        <div className="cost-panel-empty">
+          <div className="cost-panel-empty-icon">✈️</div>
+          <p>Select your departure city in the trip details above to see your cost estimate</p>
+        </div>
+      ) : (
+        <>
+          <div className="cost-panel-total">
+            <div className="cost-panel-total-label">{'Estimated total ' + partyLabel}</div>
+            <div className="cost-panel-total-amount">{fmt(c.totalMid)}</div>
+            <div className="cost-panel-total-range">
+              {'Typically '}<span>{fmt(c.totalLow)}</span>{' – '}<span>{fmt(c.totalHigh)}</span>
+            </div>
+            {trip.party > 1 && <div className="cost-panel-per-person">{'~' + fmt(c.ppMid) + ' per person'}</div>}
+          </div>
+
+          <div className="cost-bar-outer">
+            <div className="cost-bar-wrap">
+              <div className="cost-bar-seg bar-flight"    style={{width: w(c.pct.flight,    c.flight.included && !isUKHome) + '%'}}/>
+              <div className="cost-bar-seg bar-ticket"   style={{width: w(c.pct.ticket,   c.ticket.included) + '%'}}/>
+              <div className="cost-bar-seg bar-accom"    style={{width: w(c.pct.accom,    c.accom.included) + '%'}}/>
+              <div className="cost-bar-seg bar-transport" style={{width: w(c.pct.transport, true) + '%'}}/>
+            </div>
+          </div>
+
+          <div className="cost-breakdown">
+            <CostRow
+              color="#3B82F6"
+              label={isUKHome ? 'Local Travel' : 'Return Flights'}
+              sub={isUKHome ? 'Local race — no flights needed' : ('From ' + depLabel)}
+              mid={c.flight.mid} low={c.flight.low} high={c.flight.high}
+              included={c.flight.included && !isUKHome}
+            />
+            <CostRow
+              color="#E8002D"
+              label={['Standard','Advanced','Premium'][trip.ticketTier] + ' Tickets'}
+              sub={race.ticketLabels[trip.ticketTier]}
+              mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high}
+              included={c.ticket.included}
+            />
+            <CostRow
+              color="#F59E0B"
+              label={'Accommodation (' + c.accom.nights + ' nights)'}
+              sub={race.accumLabels[trip.accumTier]}
+              mid={c.accom.mid} low={c.accom.low} high={c.accom.high}
+              included={c.accom.included}
+            />
+            <CostRow
+              color="#22C55E"
+              label="Local Transport"
+              sub="Return travel to circuit"
+              mid={c.transport.mid} low={c.transport.low} high={c.transport.high}
+              included={true} noRange
+            />
+          </div>
+        </>
+      )}
+
+      <div className="cost-panel-section">
+        <div className="cost-panel-section-label">Ticket tier</div>
+        <div className="cost-tier-stack">
+          {['Standard','Advanced','Premium'].map(function(t, i) {
+            return (
+              <button
+                key={i}
+                className={'cost-tier-btn' + (trip.ticketTier === i ? ' active' : '')}
+                onClick={function() { onSet('ticketTier', i) }}
+              >
+                <span className="cost-tier-name">{t}</span>
+                <span className="cost-tier-price">{fmt(race.tickets[i])}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="cost-panel-section">
+        <div className="cost-panel-section-label">Include in estimate</div>
+        <div className="cost-toggles">
+          {isUKHome ? (
+            <div className="cost-toggle-item disabled">
+              <div>
+                <div className="cost-toggle-label">Flights / Travel</div>
+                <div className="cost-toggle-sub">Local race — no flights needed</div>
+              </div>
+              <div className="cost-toggle-switch on"/>
+            </div>
+          ) : (
+            <div className="cost-toggle-item" onClick={function() { toggleInc('incFlights') }}>
+              <div>
+                <div className="cost-toggle-label">Flights</div>
+                <div className="cost-toggle-sub">Return from {depLabel}</div>
+              </div>
+              <div className={'cost-toggle-switch' + (trip.incFlights ? ' on' : '')}/>
+            </div>
+          )}
+          <div className="cost-toggle-item" onClick={function() { toggleInc('incTickets') }}>
+            <div>
+              <div className="cost-toggle-label">Race Tickets</div>
+              <div className="cost-toggle-sub">Already have tickets? Toggle off</div>
+            </div>
+            <div className={'cost-toggle-switch' + (trip.incTickets ? ' on' : '')}/>
+          </div>
+          <div className="cost-toggle-item" onClick={function() { toggleInc('incAccom') }}>
+            <div>
+              <div className="cost-toggle-label">Accommodation</div>
+              <div className="cost-toggle-sub">Already booked? Toggle off</div>
+            </div>
+            <div className={'cost-toggle-switch' + (trip.incAccom ? ' on' : '')}/>
+          </div>
+        </div>
+      </div>
+
+      <div className="cost-panel-ctas">
+        <a className="cost-cta-primary" href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer">
+          Search Flights on Skyscanner ↗
+        </a>
+        <a className="cost-cta-secondary" href="https://www.booking.com" target="_blank" rel="noopener noreferrer">
+          Browse Hotels on Booking.com ↗
+        </a>
+      </div>
+
+      <div className="cost-disclaimer">
+        Estimates based on advance bookings (3+ months). Prices vary significantly — always verify before booking.
+      </div>
+    </div>
+  )
+}
+
+// ─── PLAN (MAIN EXPORT) ───────────────────────────────────────────────────────
 
 export default function Plan() {
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [selectedRound, setSelectedRound] = useState(null)
-  const [estimatorOpen, setEstimatorOpen] = useState(false)
-  const [visaOpen, setVisaOpen] = useState(false)
-  const [grandstandOpen, setGrandstandOpen] = useState(false)
-  const [flightOpen, setFlightOpen] = useState(false)
-  const [transportOpen, setTransportOpen] = useState(false)
-  const [itineraryOpen, setItineraryOpen] = useState(false)
-  const detailRef = useRef(null)
-  const filtered = races.filter(r=>{
-    if(activeFilter==='all')return true
-    if(activeFilter==='sprint')return r.sprint
-    if(activeFilter==='upcoming')return r.status!=='completed'
-    return r.region===activeFilter
+  var [activeFilter, setActiveFilter] = useState('all')
+  var [selectedRound, setSelectedRound] = useState(null)
+  var [trip, setTripState] = useState({
+    departureCity: null,
+    passport: null,
+    party: 2,
+    ticketTier: 1,
+    accumTier: 1,
+    incFlights: true,
+    incTickets: true,
+    incAccom: true,
   })
-  const selectedRace = races.find(r=>r.round===selectedRound)
-  function selectRace(round) {
-    setSelectedRound(round); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false); setTransportOpen(false); setItineraryOpen(false)
-    setTimeout(()=>detailRef.current?.scrollIntoView({behavior:'smooth',block:'start'}),50)
+
+  var detailRef = useRef(null)
+  var navRef = useRef(null)
+
+  var selectedRace = races.find(function(r) { return r.round === selectedRound })
+
+  function onSet(key, val) { setTripState(function(prev) { return Object.assign({}, prev, {[key]: val}) }) }
+
+  var est = {
+    departure: trip.departureCity ? trip.departureCity.cluster : null,
+    party: trip.party,
+    ticketTier: trip.ticketTier,
+    accumTier: trip.accumTier,
+    incFlights: trip.incFlights,
+    incTickets: trip.incTickets,
+    incAccom: trip.incAccom,
   }
-  function closePanel() { setSelectedRound(null); setEstimatorOpen(false); setVisaOpen(false); setGrandstandOpen(false); setFlightOpen(false); setTransportOpen(false); setItineraryOpen(false) }
-  const filters = [{id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},{id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},{id:'sprint',label:'Sprint Weekends'},{id:'upcoming',label:'Upcoming Only'}]
+  var c = selectedRace ? calcCost(selectedRace, est) : null
+
+  function selectRace(round) {
+    setSelectedRound(round)
+    setTimeout(function() {
+      if (detailRef.current) detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
+  }
+
+  function closePanel() { setSelectedRound(null) }
+
+  function scrollToNav() {
+    if (navRef.current) navRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  var filters = [
+    {id:'all',label:'All 22 Races'},
+    {id:'europe',label:'Europe'},
+    {id:'americas',label:'Americas'},
+    {id:'asia',label:'Asia & Pacific'},
+    {id:'middle-east',label:'Middle East'},
+    {id:'sprint',label:'Sprint Weekends'},
+    {id:'upcoming',label:'Upcoming Only'},
+  ]
+
+  var filtered = races.filter(function(r) {
+    if (activeFilter === 'all') return true
+    if (activeFilter === 'sprint') return r.sprint
+    if (activeFilter === 'upcoming') return r.status !== 'completed'
+    return r.region === activeFilter
+  })
+
   return (
     <>
-      <nav className="sticky-nav" style={{padding:'16px 40px'}}>
+      <nav className="sticky-nav" style={{padding: '16px 40px'}}>
         <Link to="/" className="nav-logo"><div className="logo-mark">GP</div>Grand Prix Planner</Link>
         <div className="nav-right">
           <Link to="/" className="nav-link">Home</Link>
-          <Link to="/" className="nav-btn">Get Early Access</Link>
         </div>
       </nav>
+
       <div className="page-header">
         <div className="page-header-inner">
           <div className="breadcrumb"><Link to="/">Home</Link><span>›</span><span>Plan a Race</span></div>
@@ -322,46 +600,147 @@ export default function Plan() {
           </div>
         </div>
       </div>
+
       <div className="filters-bar">
         <span className="filter-label">Filter:</span>
-        {filters.map(f=><button key={f.id} className={'filter-btn' + (activeFilter===f.id?' active':'')} onClick={()=>setActiveFilter(f.id)}>{f.label}</button>)}
+        {filters.map(function(f) {
+          return (
+            <button
+              key={f.id}
+              className={'filter-btn' + (activeFilter === f.id ? ' active' : '')}
+              onClick={function() { setActiveFilter(f.id) }}
+            >
+              {f.label}
+            </button>
+          )
+        })}
       </div>
+
       <div className="main">
-        {!selectedRace?(
-          <div className="pick-prompt"><div className="pick-prompt-icon">🏁</div><h3>Pick a Race to Start Planning</h3><p>Select any Grand Prix from the calendar below to see planning options, cost estimates, and travel information.</p></div>
-        ):(
+
+        {!selectedRace ? (
+          <div className="pick-prompt">
+            <div className="pick-prompt-icon">🏁</div>
+            <h3>Pick a Race to Start Planning</h3>
+            <p>Select any Grand Prix from the calendar below to access grandstand guides, cost estimates, flight information, and everything else for your race weekend.</p>
+          </div>
+        ) : (
           <div className="detail-panel" ref={detailRef}>
             <DetailHeader race={selectedRace} onClose={closePanel}/>
-            {estimatorOpen
-              ? <Estimator race={selectedRace} onBack={()=>setEstimatorOpen(false)}/>
-              : visaOpen
-                ? <VisaChecker race={selectedRace} onBack={()=>setVisaOpen(false)}/>
-                : grandstandOpen
-                  ? <GrandstandPicker race={selectedRace} onBack={()=>setGrandstandOpen(false)}/>
-                  : flightOpen
-                    ? <FlightGuide race={selectedRace} onBack={()=>setFlightOpen(false)}/>
-                    : transportOpen
-                      ? <LocalTransport race={selectedRace} onBack={()=>setTransportOpen(false)}/>
-                      : itineraryOpen
-                        ? <Itinerary race={selectedRace} onBack={()=>setItineraryOpen(false)}/>
-                        : <Modules
-                            race={selectedRace}
-                            onOpenEstimator={()=>setEstimatorOpen(true)}
-                            onOpenVisa={()=>setVisaOpen(true)}
-                            onOpenGrandstand={()=>setGrandstandOpen(true)}
-                            onOpenFlight={()=>setFlightOpen(true)}
-                            onOpenTransport={()=>setTransportOpen(true)}
-                            onOpenItinerary={()=>setItineraryOpen(true)}
-                          />
-            }
+
+            <div className="plan-layout">
+
+              {/* ── LEFT: scrollable planning content ── */}
+              <div className="plan-content">
+
+                <TripInputs trip={trip} onSet={onSet}/>
+
+                <SectionNav navRef={navRef}/>
+
+                {/* GRANDSTANDS */}
+                <div id="sec-grandstands" className="plan-section">
+                  <GrandstandPicker race={selectedRace} onBack={scrollToNav}/>
+                </div>
+
+                {/* FLIGHTS */}
+                <div id="sec-flights" className="plan-section">
+                  <FlightGuide race={selectedRace} onBack={scrollToNav}/>
+                </div>
+
+                {/* ACCOMMODATION */}
+                <div id="sec-accom" className="plan-section">
+                  <div className="est-topbar">
+                    <button className="est-back" onClick={scrollToNav}><BackIcon/>Back to options</button>
+                    <div style={{textAlign:'right'}}>
+                      <div className="est-title">Accommodation</div>
+                      <div className="est-subtitle">{selectedRace.nights + ' nights — select your level'}</div>
+                    </div>
+                  </div>
+                  <div className="accom-body">
+                    <div className="accom-tier-grid">
+                      {selectedRace.accumLabels.map(function(label, i) {
+                        return (
+                          <button
+                            key={i}
+                            className={'accom-tier-btn' + (trip.accumTier === i ? ' active' : '')}
+                            onClick={function() { onSet('accumTier', i) }}
+                          >
+                            <div className="accom-tier-left">
+                              <div className="accom-tier-name">{['Standard','Advanced','Premium'][i]}</div>
+                              <div className="accom-tier-desc">{label}</div>
+                            </div>
+                            <div className="accom-tier-right">
+                              <div className="accom-tier-price">
+                                {fmt(selectedRace.accommodation[i])}
+                                <span className="accom-per-night">/night</span>
+                              </div>
+                              <div className="accom-tier-total">
+                                {'~' + fmt(selectedRace.accommodation[i] * selectedRace.nights) + ' total'}
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <div className="accom-note">
+                      Your selection updates the cost estimate on the right. Specific hotel recommendations and booking links are coming soon.
+                    </div>
+                  </div>
+                </div>
+
+                {/* LOCAL TRANSPORT */}
+                <div id="sec-transport" className="plan-section">
+                  <LocalTransport race={selectedRace} onBack={scrollToNav}/>
+                </div>
+
+                {/* ITINERARY */}
+                <div id="sec-itinerary" className="plan-section">
+                  <Itinerary race={selectedRace} onBack={scrollToNav}/>
+                </div>
+
+                {/* VISA INFO */}
+                <div id="sec-visa" className="plan-section">
+                  <VisaChecker race={selectedRace} onBack={scrollToNav}/>
+                </div>
+
+                <div className="tip-bar">
+                  <p>{'💡 '}<strong style={{color:'var(--text)',fontWeight:500}}>Expert tip:</strong>{' ' + selectedRace.tip}</p>
+                </div>
+
+              </div>
+
+              {/* ── RIGHT: sticky cost panel ── */}
+              <div className="plan-sidebar">
+                {c ? (
+                  <CostPanel race={selectedRace} trip={trip} onSet={onSet} c={c}/>
+                ) : (
+                  <CostPanel race={selectedRace} trip={trip} onSet={onSet} c={null}/>
+                )}
+              </div>
+
+            </div>
           </div>
         )}
+
         <div>
-          <div className="section-heading"><h2>2026 Season Calendar</h2><span className="race-count">{filtered.length + ' race' + (filtered.length!==1?'s':'')}</span></div>
+          <div className="section-heading">
+            <h2>2026 Season Calendar</h2>
+            <span className="race-count">{filtered.length + ' race' + (filtered.length !== 1 ? 's' : '')}</span>
+          </div>
           <div className="race-grid">
-            {filtered.map(race=><RaceCard key={race.round} race={race} selected={selectedRound===race.round} onClick={selectRace}/>)}
+            {filtered.map(function(race) {
+              return (
+                <RaceCard
+                  key={race.round}
+                  race={race}
+                  selected={selectedRound === race.round}
+                  onClick={selectRace}
+                />
+              )
+            })}
           </div>
         </div>
+
       </div>
     </>
   )
