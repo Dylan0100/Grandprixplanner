@@ -31,129 +31,30 @@ const races = [
   {round:22,name:"Abu Dhabi Grand Prix",short:"Abu Dhabi",circuit:"Yas Marina Circuit",city:"Abu Dhabi",country:"UAE",flag:"🇦🇪",dates:"4–6 Dec 2026",region:"middle-east",sprint:false,status:"upcoming",isNew:false,tip:"The season finale. Excellent facilities throughout. Easily pairs with a few days in Dubai.",airport:"Abu Dhabi (AUH) or Dubai (DXB) — 35–40 min",flightBase:480,flightNA:960,flightAUS:820,accommodation:[110,200,380],tickets:[180,380,660],transport:25,nights:3,ticketLabels:["General Admission","Yas Marina Grandstand","Paddock Club"],accumLabels:["Yas Island budget hotel","3-star Yas Island hotel","Yas Viceroy or equivalent"]},
 ]
 
-const clusters = [
-  {id:'uk-south',label:'London & South East',sub:'LHR, LGW, STN, LTN, SEN'},
-  {id:'uk-midlands',label:'Midlands & East',sub:'BHX, EMA, NWI'},
-  {id:'uk-north',label:'North England',sub:'MAN, LBA, LPL, NCL'},
-  {id:'uk-scotland',label:'Scotland & N. Ireland',sub:'EDI, GLA, BFS'},
-  {id:'uk-wales',label:'Wales & South West',sub:'CWL, BRS, EXT'},
-  {id:'ireland',label:'Ireland',sub:'DUB, ORK, SNN'},
-  {id:'w-europe',label:'Western Europe',sub:'AMS, CDG, FRA, BCN'},
-  {id:'e-europe',label:'Central & East Europe',sub:'VIE, PRG, WAW, BUD'},
-  {id:'scandinavia',label:'Scandinavia',sub:'CPH, ARN, HEL, OSL'},
-  {id:'n-america',label:'North America',sub:'JFK, LAX, ORD, YYZ'},
-  {id:'australia',label:'Australia & NZ',sub:'SYD, MEL, BNE, AKL'},
-  {id:'other',label:'Rest of World',sub:'Middle East, Asia, Africa'},
-]
-
 const departureCities = [
-  {group:'UK — South & London',cities:[
-    {label:'London (Heathrow / Gatwick)',cluster:'uk-south'},
-    {label:'London (Stansted / Luton / City)',cluster:'uk-south'},
-    {label:'Southampton / Bournemouth',cluster:'uk-south'},
-  ]},
-  {group:'UK — Midlands & East',cities:[
-    {label:'Birmingham',cluster:'uk-midlands'},
-    {label:'East Midlands (Derby / Leicester / Nottingham)',cluster:'uk-midlands'},
-    {label:'Norwich / Cambridge',cluster:'uk-midlands'},
-  ]},
-  {group:'UK — North England',cities:[
-    {label:'Manchester',cluster:'uk-north'},
-    {label:'Liverpool',cluster:'uk-north'},
-    {label:'Leeds / Bradford',cluster:'uk-north'},
-    {label:'Newcastle',cluster:'uk-north'},
-    {label:'Sheffield / Doncaster',cluster:'uk-north'},
-  ]},
-  {group:'UK — Scotland & Northern Ireland',cities:[
-    {label:'Edinburgh',cluster:'uk-scotland'},
-    {label:'Glasgow',cluster:'uk-scotland'},
-    {label:'Belfast',cluster:'uk-scotland'},
-    {label:'Aberdeen / Inverness',cluster:'uk-scotland'},
-  ]},
-  {group:'UK — Wales & South West',cities:[
-    {label:'Bristol',cluster:'uk-wales'},
-    {label:'Cardiff',cluster:'uk-wales'},
-    {label:'Exeter / Plymouth',cluster:'uk-wales'},
-  ]},
-  {group:'Ireland',cities:[
-    {label:'Dublin',cluster:'ireland'},
-    {label:'Cork',cluster:'ireland'},
-    {label:'Shannon',cluster:'ireland'},
-  ]},
-  {group:'Western Europe',cities:[
-    {label:'Amsterdam',cluster:'w-europe'},
-    {label:'Paris',cluster:'w-europe'},
-    {label:'Frankfurt / Munich',cluster:'w-europe'},
-    {label:'Barcelona',cluster:'w-europe'},
-    {label:'Madrid',cluster:'w-europe'},
-    {label:'Rome / Milan',cluster:'w-europe'},
-    {label:'Brussels',cluster:'w-europe'},
-    {label:'Zurich / Geneva',cluster:'w-europe'},
-    {label:'Lisbon',cluster:'w-europe'},
-  ]},
-  {group:'Central & Eastern Europe',cities:[
-    {label:'Vienna',cluster:'e-europe'},
-    {label:'Prague',cluster:'e-europe'},
-    {label:'Warsaw',cluster:'e-europe'},
-    {label:'Budapest',cluster:'e-europe'},
-    {label:'Bucharest',cluster:'e-europe'},
-    {label:'Athens',cluster:'e-europe'},
-  ]},
-  {group:'Scandinavia',cities:[
-    {label:'Copenhagen',cluster:'scandinavia'},
-    {label:'Stockholm',cluster:'scandinavia'},
-    {label:'Oslo',cluster:'scandinavia'},
-    {label:'Helsinki',cluster:'scandinavia'},
-  ]},
-  {group:'North America',cities:[
-    {label:'New York',cluster:'n-america'},
-    {label:'Los Angeles',cluster:'n-america'},
-    {label:'Chicago',cluster:'n-america'},
-    {label:'Toronto / Montreal',cluster:'n-america'},
-    {label:'Miami',cluster:'n-america'},
-    {label:'Dallas / Houston',cluster:'n-america'},
-  ]},
-  {group:'Australia & New Zealand',cities:[
-    {label:'Sydney',cluster:'australia'},
-    {label:'Melbourne',cluster:'australia'},
-    {label:'Brisbane',cluster:'australia'},
-    {label:'Auckland',cluster:'australia'},
-    {label:'Perth',cluster:'australia'},
-  ]},
-  {group:'Rest of World',cities:[
-    {label:'Dubai / Abu Dhabi',cluster:'other'},
-    {label:'Singapore',cluster:'other'},
-    {label:'Tokyo',cluster:'other'},
-    {label:'Johannesburg',cluster:'other'},
-    {label:'Sao Paulo',cluster:'other'},
-  ]},
+  {group:'UK — South & London',cities:[{label:'London (Heathrow / Gatwick)',cluster:'uk-south'},{label:'London (Stansted / Luton / City)',cluster:'uk-south'},{label:'Southampton / Bournemouth',cluster:'uk-south'}]},
+  {group:'UK — Midlands & East',cities:[{label:'Birmingham',cluster:'uk-midlands'},{label:'East Midlands (Derby / Leicester / Nottingham)',cluster:'uk-midlands'},{label:'Norwich / Cambridge',cluster:'uk-midlands'}]},
+  {group:'UK — North England',cities:[{label:'Manchester',cluster:'uk-north'},{label:'Liverpool',cluster:'uk-north'},{label:'Leeds / Bradford',cluster:'uk-north'},{label:'Newcastle',cluster:'uk-north'},{label:'Sheffield / Doncaster',cluster:'uk-north'}]},
+  {group:'UK — Scotland & Northern Ireland',cities:[{label:'Edinburgh',cluster:'uk-scotland'},{label:'Glasgow',cluster:'uk-scotland'},{label:'Belfast',cluster:'uk-scotland'},{label:'Aberdeen / Inverness',cluster:'uk-scotland'}]},
+  {group:'UK — Wales & South West',cities:[{label:'Bristol',cluster:'uk-wales'},{label:'Cardiff',cluster:'uk-wales'},{label:'Exeter / Plymouth',cluster:'uk-wales'}]},
+  {group:'Ireland',cities:[{label:'Dublin',cluster:'ireland'},{label:'Cork',cluster:'ireland'},{label:'Shannon',cluster:'ireland'}]},
+  {group:'Western Europe',cities:[{label:'Amsterdam',cluster:'w-europe'},{label:'Paris',cluster:'w-europe'},{label:'Frankfurt / Munich',cluster:'w-europe'},{label:'Barcelona',cluster:'w-europe'},{label:'Madrid',cluster:'w-europe'},{label:'Rome / Milan',cluster:'w-europe'},{label:'Brussels',cluster:'w-europe'},{label:'Zurich / Geneva',cluster:'w-europe'},{label:'Lisbon',cluster:'w-europe'}]},
+  {group:'Central & Eastern Europe',cities:[{label:'Vienna',cluster:'e-europe'},{label:'Prague',cluster:'e-europe'},{label:'Warsaw',cluster:'e-europe'},{label:'Budapest',cluster:'e-europe'},{label:'Bucharest',cluster:'e-europe'},{label:'Athens',cluster:'e-europe'}]},
+  {group:'Scandinavia',cities:[{label:'Copenhagen',cluster:'scandinavia'},{label:'Stockholm',cluster:'scandinavia'},{label:'Oslo',cluster:'scandinavia'},{label:'Helsinki',cluster:'scandinavia'}]},
+  {group:'North America',cities:[{label:'New York',cluster:'n-america'},{label:'Los Angeles',cluster:'n-america'},{label:'Chicago',cluster:'n-america'},{label:'Toronto / Montreal',cluster:'n-america'},{label:'Miami',cluster:'n-america'},{label:'Dallas / Houston',cluster:'n-america'}]},
+  {group:'Australia & New Zealand',cities:[{label:'Sydney',cluster:'australia'},{label:'Melbourne',cluster:'australia'},{label:'Brisbane',cluster:'australia'},{label:'Auckland',cluster:'australia'},{label:'Perth',cluster:'australia'}]},
+  {group:'Rest of World',cities:[{label:'Dubai / Abu Dhabi',cluster:'other'},{label:'Singapore',cluster:'other'},{label:'Tokyo',cluster:'other'},{label:'Johannesburg',cluster:'other'},{label:'Sao Paulo',cluster:'other'}]},
 ]
 
 const passports = [
-  {id:'gb',label:'United Kingdom'},
-  {id:'us',label:'United States'},
-  {id:'au',label:'Australia'},
-  {id:'ca',label:'Canada'},
-  {id:'nz',label:'New Zealand'},
-  {id:'ie',label:'Ireland'},
-  {id:'de',label:'Germany'},
-  {id:'fr',label:'France'},
-  {id:'nl',label:'Netherlands'},
-  {id:'be',label:'Belgium'},
-  {id:'es',label:'Spain'},
-  {id:'it',label:'Italy'},
-  {id:'pt',label:'Portugal'},
-  {id:'se',label:'Sweden'},
-  {id:'no',label:'Norway'},
-  {id:'dk',label:'Denmark'},
-  {id:'fi',label:'Finland'},
-  {id:'ch',label:'Switzerland'},
-  {id:'at',label:'Austria'},
-  {id:'pl',label:'Poland'},
-  {id:'br',label:'Brazil'},
-  {id:'mx',label:'Mexico'},
-  {id:'jp',label:'Japan'},
-  {id:'sg',label:'Singapore'},
+  {id:'gb',label:'United Kingdom'},{id:'us',label:'United States'},{id:'au',label:'Australia'},
+  {id:'ca',label:'Canada'},{id:'nz',label:'New Zealand'},{id:'ie',label:'Ireland'},
+  {id:'de',label:'Germany'},{id:'fr',label:'France'},{id:'nl',label:'Netherlands'},
+  {id:'be',label:'Belgium'},{id:'es',label:'Spain'},{id:'it',label:'Italy'},
+  {id:'pt',label:'Portugal'},{id:'se',label:'Sweden'},{id:'no',label:'Norway'},
+  {id:'dk',label:'Denmark'},{id:'fi',label:'Finland'},{id:'ch',label:'Switzerland'},
+  {id:'at',label:'Austria'},{id:'pl',label:'Poland'},{id:'br',label:'Brazil'},
+  {id:'mx',label:'Mexico'},{id:'jp',label:'Japan'},{id:'sg',label:'Singapore'},
   {id:'za',label:'South Africa'},
 ]
 
@@ -175,7 +76,7 @@ function calcCost(race, est) {
   if (!est.departure) return null
   const fm = getFlightCost(race, est.departure)
   const fl = {mid:fm,low:fm===0?0:Math.round(fm*0.86),high:fm===0?0:Math.round(fm*1.16),included:est.incFlights,isLocal:fm===0}
-  const tm = race.tickets[est.ticketTier]
+  const tm = (est.ticketPriceOverride !== null && est.ticketPriceOverride !== undefined) ? est.ticketPriceOverride : race.tickets[est.ticketTier]
   const tk = {mid:tm,low:Math.round(tm*0.95),high:Math.round(tm*1.08),included:est.incTickets}
   const nm = race.accommodation[est.accumTier]*race.nights
   const ac = {mid:nm,low:Math.round(nm*0.88),high:Math.round(nm*1.14),included:est.incAccom,nights:race.nights}
@@ -189,7 +90,6 @@ function calcCost(race, est) {
 }
 
 const ArrowIcon = () => <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-const BackIcon = () => <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
 const CalIcon = () => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{opacity:0.4,flexShrink:0}}><rect x="1" y="1.5" width="12" height="11" rx="2" stroke="currentColor" strokeWidth="1.4"/><path d="M1 5h12" stroke="currentColor" strokeWidth="1.4"/><path d="M4.5 0v2M9.5 0v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
 
 function RaceCard({race, selected, onClick}) {
@@ -254,9 +154,7 @@ function TripInputs({trip, onSet}) {
             {departureCities.map(function(g) {
               return (
                 <optgroup key={g.group} label={g.group}>
-                  {g.cities.map(function(city) {
-                    return <option key={city.label} value={city.label}>{city.label}</option>
-                  })}
+                  {g.cities.map(function(city) { return <option key={city.label} value={city.label}>{city.label}</option> })}
                 </optgroup>
               )
             })}
@@ -314,6 +212,20 @@ function SectionNav({navRef}) {
   )
 }
 
+function PlanSectionHeading({number, icon, title, sub}) {
+  var num = number < 10 ? '0' + number : '' + number
+  return (
+    <div className="psh">
+      <span className="psh-num">{num}</span>
+      <span className="psh-icon">{icon}</span>
+      <div className="psh-text">
+        <div className="psh-title">{title}</div>
+        {sub && <div className="psh-sub">{sub}</div>}
+      </div>
+    </div>
+  )
+}
+
 function CostRow({color, label, sub, mid, low, high, included, noRange}) {
   return (
     <div className={'cost-row' + (!included ? ' excluded' : '')}>
@@ -332,12 +244,14 @@ function CostRow({color, label, sub, mid, low, high, included, noRange}) {
   )
 }
 
-function CostPanel({race, trip, onSet, c}) {
+function CostPanel({race, trip, onSet, c, selectedGrandstand, onClearGrandstand}) {
   var isUKHome = race.isUKRace && UK_CLUSTERS.includes(trip.departureCity ? trip.departureCity.cluster : '')
   var depLabel = trip.departureCity ? trip.departureCity.label : ''
   var tot = c ? Math.max(c.pct.flight + c.pct.ticket + c.pct.accom + c.pct.transport, 1) : 1
   var w = function(v, inc) { return inc ? (v / tot * 100).toFixed(1) : 0 }
   var partyLabel = trip.party === 1 ? 'per person' : 'for ' + trip.party + ' people'
+  var ticketLabel = selectedGrandstand ? selectedGrandstand.name : (['Standard','Advanced','Premium'][trip.ticketTier] + ' Tickets')
+  var ticketSub = selectedGrandstand ? 'Selected grandstand' : race.ticketLabels[trip.ticketTier]
   function toggleInc(key) {
     if (key === 'incFlights' && isUKHome) return
     onSet(key, !trip[key])
@@ -371,25 +285,12 @@ function CostPanel({race, trip, onSet, c}) {
           </div>
           <div className="cost-breakdown">
             <CostRow color="#3B82F6" label={isUKHome ? 'Local Travel' : 'Return Flights'} sub={isUKHome ? 'Local race — no flights needed' : ('From ' + depLabel)} mid={c.flight.mid} low={c.flight.low} high={c.flight.high} included={c.flight.included && !isUKHome}/>
-            <CostRow color="#E8002D" label={['Standard','Advanced','Premium'][trip.ticketTier] + ' Tickets'} sub={race.ticketLabels[trip.ticketTier]} mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high} included={c.ticket.included}/>
+            <CostRow color="#E8002D" label={ticketLabel} sub={ticketSub} mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high} included={c.ticket.included}/>
             <CostRow color="#F59E0B" label={'Accommodation (' + c.accom.nights + ' nights)'} sub={race.accumLabels[trip.accumTier]} mid={c.accom.mid} low={c.accom.low} high={c.accom.high} included={c.accom.included}/>
             <CostRow color="#22C55E" label="Local Transport" sub="Return travel to circuit" mid={c.transport.mid} low={c.transport.low} high={c.transport.high} included={true} noRange/>
           </div>
         </>
       )}
-      <div className="cost-panel-section">
-        <div className="cost-panel-section-label">Ticket tier</div>
-        <div className="cost-tier-stack">
-          {['Standard','Advanced','Premium'].map(function(t, i) {
-            return (
-              <button key={i} className={'cost-tier-btn' + (trip.ticketTier === i ? ' active' : '')} onClick={function() { onSet('ticketTier', i) }}>
-                <span className="cost-tier-name">{t}</span>
-                <span className="cost-tier-price">{fmt(race.tickets[i])}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
       <div className="cost-panel-section">
         <div className="cost-panel-section-label">Include in estimate</div>
         <div className="cost-toggles">
@@ -400,7 +301,7 @@ function CostPanel({race, trip, onSet, c}) {
             </div>
           ) : (
             <div className="cost-toggle-item" onClick={function() { toggleInc('incFlights') }}>
-              <div><div className="cost-toggle-label">Flights</div><div className="cost-toggle-sub">{'Return from ' + depLabel}</div></div>
+              <div><div className="cost-toggle-label">Flights</div><div className="cost-toggle-sub">{'Return from ' + (depLabel || 'departure city')}</div></div>
               <div className={'cost-toggle-switch' + (trip.incFlights ? ' on' : '')}/>
             </div>
           )}
@@ -426,6 +327,7 @@ function CostPanel({race, trip, onSet, c}) {
 export default function Plan() {
   const [activeFilter, setActiveFilter] = useState('all')
   const [selectedRound, setSelectedRound] = useState(null)
+  const [selectedGrandstand, setSelectedGrandstand] = useState(null)
   const [trip, setTripState] = useState({
     departureCity: null,
     passport: null,
@@ -440,10 +342,13 @@ export default function Plan() {
   const navRef = useRef(null)
   const selectedRace = races.find(function(r) { return r.round === selectedRound })
   function onSet(key, val) { setTripState(function(prev) { return Object.assign({}, prev, {[key]: val}) }) }
+  function handleGrandstandSelect(gs) { setSelectedGrandstand(gs) }
+  function handleGrandstandClear() { setSelectedGrandstand(null) }
   const est = {
     departure: trip.departureCity ? trip.departureCity.cluster : null,
     party: trip.party,
     ticketTier: trip.ticketTier,
+    ticketPriceOverride: selectedGrandstand ? selectedGrandstand.price : null,
     accumTier: trip.accumTier,
     incFlights: trip.incFlights,
     incTickets: trip.incTickets,
@@ -452,18 +357,15 @@ export default function Plan() {
   const c = selectedRace ? calcCost(selectedRace, est) : null
   function selectRace(round) {
     setSelectedRound(round)
+    setSelectedGrandstand(null)
     setTimeout(function() { if (detailRef.current) detailRef.current.scrollIntoView({behavior:'smooth',block:'start'}) }, 50)
   }
-  function closePanel() { setSelectedRound(null) }
+  function closePanel() { setSelectedRound(null); setSelectedGrandstand(null) }
   function scrollToNav() { if (navRef.current) navRef.current.scrollIntoView({behavior:'smooth',block:'start'}) }
   const filters = [
-    {id:'all',label:'All 22 Races'},
-    {id:'europe',label:'Europe'},
-    {id:'americas',label:'Americas'},
-    {id:'asia',label:'Asia & Pacific'},
-    {id:'middle-east',label:'Middle East'},
-    {id:'sprint',label:'Sprint Weekends'},
-    {id:'upcoming',label:'Upcoming Only'},
+    {id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},
+    {id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},
+    {id:'sprint',label:'Sprint Weekends'},{id:'upcoming',label:'Upcoming Only'},
   ]
   const filtered = races.filter(function(r) {
     if (activeFilter === 'all') return true
@@ -510,20 +412,36 @@ export default function Plan() {
               <div className="plan-content">
                 <TripInputs trip={trip} onSet={onSet}/>
                 <SectionNav navRef={navRef}/>
+
                 <div id="sec-grandstands" className="plan-section">
-                  <GrandstandPicker race={selectedRace} onBack={scrollToNav}/>
+                  <PlanSectionHeading number={1} icon="🏟️" title="Tickets & Grandstands" sub={'Compare every grandstand at ' + selectedRace.circuit}/>
+                  <div className="psh-tier-bar">
+                    <span className="psh-tier-label">Ticket estimate:</span>
+                    {!selectedGrandstand && ['Standard','Advanced','Premium'].map(function(t, i) {
+                      return (
+                        <button key={i} className={'psh-tier-btn' + (trip.ticketTier === i ? ' active' : '')} onClick={function() { onSet('ticketTier', i) }}>
+                          {t}<span className="psh-tier-price">{' ' + fmt(selectedRace.tickets[i])}</span>
+                        </button>
+                      )
+                    })}
+                    {selectedGrandstand && (
+                      <div className="psh-gs-selected">
+                        <span className="psh-gs-name">{selectedGrandstand.name}</span>
+                        <span className="psh-gs-price">{fmt(selectedGrandstand.price)}</span>
+                        <button className="psh-gs-clear" onClick={handleGrandstandClear}>clear selection</button>
+                      </div>
+                    )}
+                  </div>
+                  <GrandstandPicker race={selectedRace} onBack={scrollToNav} onSelect={handleGrandstandSelect}/>
                 </div>
+
                 <div id="sec-flights" className="plan-section">
+                  <PlanSectionHeading number={2} icon="✈️" title="Flights" sub={'Routes, airports and booking tips for ' + selectedRace.country}/>
                   <FlightGuide race={selectedRace} onBack={scrollToNav}/>
                 </div>
+
                 <div id="sec-accom" className="plan-section">
-                  <div className="est-topbar">
-                    <button className="est-back" onClick={scrollToNav}><BackIcon/>Back to options</button>
-                    <div style={{textAlign:'right'}}>
-                      <div className="est-title">Accommodation</div>
-                      <div className="est-subtitle">{selectedRace.nights + ' nights — select your level'}</div>
-                    </div>
-                  </div>
+                  <PlanSectionHeading number={3} icon="🏨" title="Accommodation" sub={selectedRace.nights + ' nights — select your level'}/>
                   <div className="accom-body">
                     <div className="accom-tier-grid">
                       {selectedRace.accumLabels.map(function(label, i) {
@@ -544,21 +462,28 @@ export default function Plan() {
                     <div className="accom-note">Your selection updates the cost estimate on the right. Specific hotel recommendations and booking links are coming soon.</div>
                   </div>
                 </div>
+
                 <div id="sec-transport" className="plan-section">
+                  <PlanSectionHeading number={4} icon="🗺️" title="Local Transport" sub={'Getting to and from ' + selectedRace.circuit}/>
                   <LocalTransport race={selectedRace} onBack={scrollToNav}/>
                 </div>
+
                 <div id="sec-itinerary" className="plan-section">
+                  <PlanSectionHeading number={5} icon="📋" title="Race Weekend Itinerary" sub={selectedRace.name}/>
                   <Itinerary race={selectedRace} onBack={scrollToNav}/>
                 </div>
+
                 <div id="sec-visa" className="plan-section">
-                  <VisaChecker race={selectedRace} onBack={scrollToNav}/>
+                  <PlanSectionHeading number={6} icon="🛂" title="Visa & Entry Requirements" sub={'Entry requirements for ' + selectedRace.country}/>
+                  <VisaChecker race={selectedRace} onBack={scrollToNav} passport={trip.passport}/>
                 </div>
+
                 <div className="tip-bar">
                   <p>{'💡 '}<strong style={{color:'var(--text)',fontWeight:500}}>Expert tip:</strong>{' ' + selectedRace.tip}</p>
                 </div>
               </div>
               <div className="plan-sidebar">
-                <CostPanel race={selectedRace} trip={trip} onSet={onSet} c={c}/>
+                <CostPanel race={selectedRace} trip={trip} onSet={onSet} c={c} selectedGrandstand={selectedGrandstand} onClearGrandstand={handleGrandstandClear}/>
               </div>
             </div>
           </div>
