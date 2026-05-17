@@ -237,7 +237,7 @@ export default function FlightGuide({ race, onBack }) {
     return (
       <div style={s.wrap}>
         <button onClick={onBack} style={s.backBtn}>
-          ← Back to modules
+          ← Back to options
         </button>
         <div style={s.noData}>
           <p>Flight guide for {race ? race.name : 'this race'} is coming soon.</p>
@@ -251,7 +251,7 @@ export default function FlightGuide({ race, onBack }) {
   return (
     <div style={s.wrap}>
       <button onClick={onBack} style={s.backBtn}>
-        ← Back to modules
+        ← Back to options
       </button>
 
       {/* Header */}
