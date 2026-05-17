@@ -267,7 +267,7 @@ export default function LocalTransport({ race, onBack }) {
       <div className="lt-wrap">
         <style dangerouslySetInnerHTML={{ __html: styles }} />
         <button className="lt-back" onClick={onBack}>
-          ← Back
+          ← Back to options
         </button>
         <div className="lt-no-data">
           <p className="lt-no-data-text">Transport information for this race is coming soon.</p>
@@ -281,7 +281,7 @@ export default function LocalTransport({ race, onBack }) {
       <style dangerouslySetInnerHTML={{ __html: styles }} />
 
       <button className="lt-back" onClick={onBack}>
-        ← Back
+        ← Back to options
       </button>
 
       <div className="lt-header">
