@@ -21,12 +21,13 @@ function RatingBar({ label, value, color }) {
 }
 
 const TIER_COLORS = {budget:'#22C55E',mid:'#F59E0B',premium:'#E8002D'}
-const TIER_LABELS = {budget:'Budget',mid:'Mid-Range',premium:'Premium'}
+const TIER_LABELS = {budget:'Standard',mid:'Advanced',premium:'Premium'}
+const TIER_INDEX = {budget:0,mid:1,premium:2}
 
 const TIER_OPTS = [
   {id:'all',label:'All Tiers'},
-  {id:'budget',label:'Budget'},
-  {id:'mid',label:'Mid-Range'},
+  {id:'budget',label:'Standard'},
+  {id:'mid',label:'Advanced'},
   {id:'premium',label:'Premium'},
 ]
 
@@ -1065,11 +1066,11 @@ const grandstandData = {
   }
 }
 
-function GrandstandCard({ gs }) {
+function GrandstandCard({ gs, onSelect, isSelected }) {
   const tierColor = TIER_COLORS[gs.priceTier]
   const tierLabel = TIER_LABELS[gs.priceTier]
   return (
-    <div style={{background:'var(--surface-2)',borderRadius:'12px',padding:'20px',border:'1px solid var(--surface-3)',display:'flex',flexDirection:'column',gap:'14px'}}>
+    <div style={{background:'var(--surface-2)',borderRadius:'12px',padding:'20px',border:'1px solid ' + (isSelected ? 'rgba(34,197,94,0.4)' : 'var(--surface-3)'),display:'flex',flexDirection:'column',gap:'14px',transition:'border-color 0.2s'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px'}}>
         <div style={{flex:1}}>
           <div style={{fontSize:'15px',fontWeight:700,color:'var(--text)',fontFamily:"'Barlow Condensed',sans-serif",textTransform:'uppercase',letterSpacing:'0.04em',lineHeight:1.2,marginBottom:'5px'}}>{gs.name}</div>
@@ -1078,6 +1079,7 @@ function GrandstandCard({ gs }) {
         <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'5px',flexShrink:0}}>
           <span style={{fontSize:'11px',fontWeight:700,color:tierColor,background:tierColor+'20',border:'1px solid '+tierColor+'50',borderRadius:'4px',padding:'3px 8px',textTransform:'uppercase',letterSpacing:'0.06em',fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:'nowrap'}}>{tierLabel}</span>
           {gs.covered && <span style={{fontSize:'10px',color:'#60A5FA',background:'#60A5FA15',border:'1px solid #60A5FA40',borderRadius:'4px',padding:'2px 6px',textTransform:'uppercase',letterSpacing:'0.05em',fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:'nowrap'}}>✓ Covered</span>}
+          {isSelected && <span style={{fontSize:'10px',color:'#22C55E',background:'rgba(34,197,94,0.12)',border:'1px solid rgba(34,197,94,0.4)',borderRadius:'4px',padding:'2px 6px',textTransform:'uppercase',letterSpacing:'0.05em',fontFamily:"'Barlow Condensed',sans-serif",whiteSpace:'nowrap'}}>✓ Selected</span>}
         </div>
       </div>
       <div>
@@ -1103,6 +1105,27 @@ function GrandstandCard({ gs }) {
         <div style={{fontSize:'10px',color:'var(--amber)',textTransform:'uppercase',letterSpacing:'0.1em',fontFamily:"'Barlow Condensed',sans-serif",fontWeight:700,marginBottom:'5px'}}>💡 Expert Tip</div>
         <div style={{fontSize:'13px',color:'var(--text)',lineHeight:1.55}}>{gs.expertTip}</div>
       </div>
+      {onSelect && (
+        <button
+          onClick={function() { if (!isSelected) onSelect({ name: gs.name, id: gs.id, tierIndex: TIER_INDEX[gs.priceTier] }) }}
+          style={{
+            width:'100%',
+            padding:'10px 16px',
+            background: isSelected ? 'rgba(34,197,94,0.1)' : 'rgba(232,0,45,0.08)',
+            border:'1px solid ' + (isSelected ? 'rgba(34,197,94,0.45)' : 'rgba(232,0,45,0.4)'),
+            borderRadius:'8px',
+            color: isSelected ? '#22C55E' : 'var(--red)',
+            fontFamily:"'Barlow',sans-serif",
+            fontSize:'13px',
+            fontWeight:600,
+            cursor: isSelected ? 'default' : 'pointer',
+            transition:'all 0.15s',
+            letterSpacing:'0.01em',
+          }}
+        >
+          {isSelected ? '✓ Selected for cost estimate' : 'Select this grandstand →'}
+        </button>
+      )}
       <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
         {gs.bestFor.filter(t => TAG_LABELS[t]).map(t => (
           <span key={t} style={{fontSize:'10px',color:'var(--text-dim)',background:'var(--surface-3)',border:'1px solid var(--text-dim)',borderRadius:'20px',padding:'2px 9px',fontFamily:"'Barlow Condensed',sans-serif",textTransform:'uppercase',letterSpacing:'0.05em'}}>{TAG_LABELS[t]}</span>
@@ -1113,7 +1136,7 @@ function GrandstandCard({ gs }) {
   )
 }
 
-export default function GrandstandPicker({ race, onBack }) {
+export default function GrandstandPicker({ race, onBack, onSelect, selectedId }) {
   const [tierFilter, setTierFilter] = useState('all')
   const [tagFilter, setTagFilter] = useState('all')
 
@@ -1147,19 +1170,22 @@ export default function GrandstandPicker({ race, onBack }) {
   const css = '.gps-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.gps-chips{display:flex;flex-wrap:wrap;gap:8px}@media(max-width:720px){.gps-grid{grid-template-columns:1fr}}'
 
   return (
-    <div>
+    <div style={{padding:'20px 28px 28px'}}>
       <style dangerouslySetInnerHTML={{__html:css}}/>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'24px',gap:'12px',flexWrap:'wrap'}}>
-        <button onClick={onBack} style={{display:'flex',alignItems:'center',gap:'8px',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',padding:'6px 0',fontSize:'14px',fontFamily:'Barlow,sans-serif'}}>
-          <BackIcon/>Back to options
-        </button>
-        <div style={{textAlign:'right'}}>
-          <div style={{fontSize:'16px',fontWeight:700,color:'var(--text)',fontFamily:"'Barlow Condensed',sans-serif",textTransform:'uppercase',letterSpacing:'0.06em'}}>Grandstand Picker</div>
-          <div style={{fontSize:'12px',color:'var(--text-muted)',marginTop:'2px'}}>{'Expert guide · ' + race.circuit}</div>
-        </div>
-      </div>
 
-      <div style={{background:'var(--surface-2)',borderRadius:'10px',padding:'14px 16px',marginBottom:'20px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:'16px',flexWrap:'wrap',border:'1px solid var(--surface-3)'}}>
+      {onBack && (
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'20px',gap:'12px',flexWrap:'wrap'}}>
+          <button onClick={onBack} style={{display:'flex',alignItems:'center',gap:'8px',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',padding:'6px 0',fontSize:'14px',fontFamily:'Barlow,sans-serif'}}>
+            <BackIcon/>Back to options
+          </button>
+          <div style={{textAlign:'right'}}>
+            <div style={{fontSize:'16px',fontWeight:700,color:'var(--text)',fontFamily:"'Barlow Condensed',sans-serif",textTransform:'uppercase',letterSpacing:'0.06em'}}>Grandstand Picker</div>
+            <div style={{fontSize:'12px',color:'var(--text-muted)',marginTop:'2px'}}>{'Expert guide · ' + race.circuit}</div>
+          </div>
+        </div>
+      )}
+
+      <div style={{background:'var(--surface-3)',borderRadius:'10px',padding:'14px 16px',marginBottom:'20px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:'16px',flexWrap:'wrap',border:'1px solid var(--border)'}}>
         <div>
           <div style={{fontSize:'14px',fontWeight:700,color:'var(--text)',fontFamily:"'Barlow Condensed',sans-serif",textTransform:'uppercase',letterSpacing:'0.04em'}}>{race.circuit}</div>
           <div style={{fontSize:'12px',color:'var(--text-muted)',marginTop:'2px'}}>{race.city + ', ' + race.country + ' · ' + race.dates}</div>
@@ -1200,7 +1226,14 @@ export default function GrandstandPicker({ race, onBack }) {
 
       {filtered.length > 0 ? (
         <div className="gps-grid">
-          {filtered.map(gs => <GrandstandCard key={gs.id} gs={gs}/>)}
+          {filtered.map(gs => (
+            <GrandstandCard
+              key={gs.id}
+              gs={gs}
+              onSelect={onSelect}
+              isSelected={selectedId === gs.id}
+            />
+          ))}
         </div>
       ) : data ? (
         <div style={{textAlign:'center',padding:'48px 20px',color:'var(--text-muted)'}}>
@@ -1217,7 +1250,7 @@ export default function GrandstandPicker({ race, onBack }) {
         </div>
       )}
 
-      <div style={{marginTop:'24px',padding:'14px 16px',background:'var(--surface-2)',borderRadius:'8px',border:'1px solid var(--surface-3)'}}>
+      <div style={{marginTop:'24px',padding:'14px 16px',background:'var(--surface-3)',borderRadius:'8px',border:'1px solid var(--border)'}}>
         <p style={{fontSize:'12px',color:'var(--text-dim)',margin:0,lineHeight:1.5}}>Grandstand data is based on official circuit information and expert fan knowledge. Ticket prices, availability and grandstand layouts can change — always verify with the official event ticketing site before purchasing.</p>
       </div>
     </div>
