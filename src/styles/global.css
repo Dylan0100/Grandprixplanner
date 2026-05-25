@@ -442,7 +442,12 @@ footer .nav-logo { font-size: 16px; }
   scroll-margin-top: 70px;
 }
 
-/* Hide all component-internal back bars — Plan.jsx section headings replace them */
+/* Alternating section backgrounds — creates visual rhythm in the left column */
+.plan-section-alt {
+  background: rgba(255, 255, 255, 0.028);
+}
+
+/* Hide all component-internal back bars and navigation — section headings replace them */
 .plan-section .est-topbar { display: none; }
 
 /* ─── TRIP INPUTS ─────────────────────────────────────────────────────────── */
