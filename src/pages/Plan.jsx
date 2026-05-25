@@ -96,11 +96,11 @@ function RaceCard({race, selected, onClick}) {
   return (
     <div className={['race-card',race.status,selected?'selected':''].filter(Boolean).join(' ')} onClick={()=>onClick(race.round)}>
       <div className="race-card-top">
-        <span className="race-round">Round {race.round}</span>
+        <span className="race-round">R{race.round}</span>
         <div className="race-badges">
-          {race.status==='next'&&<span className="race-badge next">Next Race</span>}
+          {race.status==='next'&&<span className="race-badge next">Next</span>}
           {race.sprint&&<span className="race-badge sprint">Sprint</span>}
-          {race.isNew&&<span className="race-badge new-circuit">New Circuit</span>}
+          {race.isNew&&<span className="race-badge new-circuit">New</span>}
           {race.status==='completed'&&<span className="race-badge done">Done</span>}
         </div>
       </div>
@@ -110,7 +110,7 @@ function RaceCard({race, selected, onClick}) {
       <div className="race-date"><CalIcon/>{race.dates}</div>
       <div className="race-card-footer">
         <span className="region-tag">{regionLabel(race.region)}</span>
-        <span className="plan-btn">{race.status==='completed'?'View info':'Plan this race'}<ArrowIcon/></span>
+        <span className="plan-btn">{race.status==='completed'?'View':'Plan'}<ArrowIcon/></span>
       </div>
     </div>
   )
@@ -180,7 +180,7 @@ function TripInputs({trip, onSet}) {
           </div>
         </div>
       </div>
-      <div className="trip-inputs-note">All fields optional — fill in what you know to personalise your planning across every section below</div>
+      <div className="trip-inputs-note">All fields optional — fill in what you know to personalise cost estimates and visa information</div>
     </div>
   )
 }
@@ -189,10 +189,10 @@ function SectionNav({navRef}) {
   var sections = [
     {id:'sec-grandstands',icon:'🏟️',label:'Grandstands'},
     {id:'sec-flights',icon:'✈️',label:'Flights'},
-    {id:'sec-accom',icon:'🏨',label:'Accommodation'},
+    {id:'sec-accom',icon:'🏨',label:'Hotels'},
     {id:'sec-transport',icon:'🗺️',label:'Transport'},
     {id:'sec-itinerary',icon:'📋',label:'Itinerary'},
-    {id:'sec-visa',icon:'🛂',label:'Visa Info'},
+    {id:'sec-visa',icon:'🛂',label:'Visa'},
   ]
   function scrollTo(id) {
     var el = document.getElementById(id)
@@ -259,20 +259,20 @@ function CostPanel({race, trip, onSet, c, selectedGrandstand, onClearGrandstand}
   return (
     <div className="cost-panel">
       <div className="cost-panel-header">
-        <div className="cost-panel-title">Trip Cost</div>
+        <div className="cost-panel-title">Trip Cost Estimate</div>
         <div className="cost-panel-sub">Updates live as you plan</div>
       </div>
       {!trip.departureCity ? (
         <div className="cost-panel-empty">
           <div className="cost-panel-empty-icon">✈️</div>
-          <p>Select your departure city in the trip details above to see your cost estimate</p>
+          <p>Select your departure city above to see your personalised cost estimate</p>
         </div>
       ) : (
         <>
           <div className="cost-panel-total">
             <div className="cost-panel-total-label">{'Estimated total ' + partyLabel}</div>
             <div className="cost-panel-total-amount">{fmt(c.totalMid)}</div>
-            <div className="cost-panel-total-range">{'Typically '}<span>{fmt(c.totalLow)}</span>{' – '}<span>{fmt(c.totalHigh)}</span></div>
+            <div className="cost-panel-total-range">{'Range: '}<span>{fmt(c.totalLow)}</span>{' – '}<span>{fmt(c.totalHigh)}</span></div>
             {trip.party > 1 && <div className="cost-panel-per-person">{'~' + fmt(c.ppMid) + ' per person'}</div>}
           </div>
           <div className="cost-bar-outer">
@@ -319,7 +319,7 @@ function CostPanel({race, trip, onSet, c, selectedGrandstand, onClearGrandstand}
         <a className="cost-cta-primary" href="https://www.skyscanner.net" target="_blank" rel="noopener noreferrer">Search Flights on Skyscanner ↗</a>
         <a className="cost-cta-secondary" href="https://www.booking.com" target="_blank" rel="noopener noreferrer">Browse Hotels on Booking.com ↗</a>
       </div>
-      <div className="cost-disclaimer">Estimates based on advance bookings (3+ months). Prices vary — always verify before booking.</div>
+      <div className="cost-disclaimer">Estimates based on advance bookings (3+ months). Always verify before purchasing.</div>
     </div>
   )
 }
@@ -342,12 +342,20 @@ export default function Plan() {
   const navRef = useRef(null)
   const selectedRace = races.find(function(r) { return r.round === selectedRound })
   function onSet(key, val) { setTripState(function(prev) { return Object.assign({}, prev, {[key]: val}) }) }
+
   function handleGrandstandSelect(gs) {
-    var price = selectedRace ? selectedRace.tickets[gs.tierIndex] : 0
-    setSelectedGrandstand({ name: gs.name, id: gs.id, price: price })
-    onSet('ticketTier', gs.tierIndex)
+    if (selectedGrandstand && selectedGrandstand.id === gs.id) {
+      setSelectedGrandstand(null)
+      onSet('ticketTier', 1)
+    } else {
+      var price = selectedRace ? selectedRace.tickets[gs.tierIndex] : 0
+      setSelectedGrandstand({ name: gs.name, id: gs.id, price: price })
+      onSet('ticketTier', gs.tierIndex)
+    }
   }
+
   function handleGrandstandClear() { setSelectedGrandstand(null) }
+
   const est = {
     departure: trip.departureCity ? trip.departureCity.cluster : null,
     party: trip.party,
@@ -359,6 +367,7 @@ export default function Plan() {
     incAccom: trip.incAccom,
   }
   const c = selectedRace ? calcCost(selectedRace, est) : null
+
   function selectRace(round) {
     setSelectedRound(round)
     setSelectedGrandstand(null)
@@ -366,6 +375,7 @@ export default function Plan() {
   }
   function closePanel() { setSelectedRound(null); setSelectedGrandstand(null) }
   function scrollToNav() { if (navRef.current) navRef.current.scrollIntoView({behavior:'smooth',block:'start'}) }
+
   const filters = [
     {id:'all',label:'All 22 Races'},{id:'europe',label:'Europe'},{id:'americas',label:'Americas'},
     {id:'asia',label:'Asia & Pacific'},{id:'middle-east',label:'Middle East'},
@@ -377,6 +387,7 @@ export default function Plan() {
     if (activeFilter === 'upcoming') return r.status !== 'completed'
     return r.region === activeFilter
   })
+
   return (
     <>
       <nav className="sticky-nav" style={{padding:'16px 40px'}}>
@@ -387,7 +398,7 @@ export default function Plan() {
         <div className="page-header-inner">
           <div className="breadcrumb"><Link to="/">Home</Link><span>›</span><span>Plan a Race</span></div>
           <h1>Choose Your<br/><em>2026 Grand Prix</em></h1>
-          <p>Select a race below to start building your perfect race weekend — tickets, travel, accommodation and everything in between.</p>
+          <p>Select a race to start building your perfect weekend — tickets, travel, accommodation and everything in between.</p>
           <div className="stats-row">
             <div className="stat-item"><span className="stat-dot next"/><span>Next race: Miami — 1–3 May</span></div>
             <div className="stat-item"><span className="stat-dot sprint"/><span>Sprint weekend</span></div>
@@ -432,7 +443,7 @@ export default function Plan() {
                       <div className="psh-gs-selected">
                         <span className="psh-gs-name">{selectedGrandstand.name}</span>
                         <span className="psh-gs-price">{fmt(selectedGrandstand.price)}</span>
-                        <button className="psh-gs-clear" onClick={handleGrandstandClear}>clear selection</button>
+                        <button className="psh-gs-clear" onClick={handleGrandstandClear}>clear</button>
                       </div>
                     )}
                   </div>
@@ -467,7 +478,7 @@ export default function Plan() {
                         )
                       })}
                     </div>
-                    <div className="accom-note">Your selection updates the cost estimate on the right. Specific hotel recommendations and booking links are coming soon.</div>
+                    <div className="accom-note">Your selection updates the cost estimate live. Hotel recommendations and booking links coming soon.</div>
                   </div>
                 </div>
 
@@ -487,7 +498,7 @@ export default function Plan() {
                 </div>
 
                 <div className="tip-bar">
-                  <p>{'💡 '}<strong style={{color:'var(--text)',fontWeight:500}}>Expert tip:</strong>{' ' + selectedRace.tip}</p>
+                  <p>{'💡 '}<strong style={{color:'var(--text)',fontWeight:600}}>Expert tip:</strong>{' ' + selectedRace.tip}</p>
                 </div>
               </div>
               <div className="plan-sidebar">
@@ -497,7 +508,7 @@ export default function Plan() {
           </div>
         )}
         <div>
-          <div className="section-heading"><h2>2026 Season Calendar</h2><span className="race-count">{filtered.length + ' race' + (filtered.length !== 1 ? 's' : '')}</span></div>
+          <div className="section-heading"><h2>2026 Season Calendar</h2><span className="race-count">{filtered.length + ' races'}</span></div>
           <div className="race-grid">
             {filtered.map(function(race) {
               return <RaceCard key={race.round} race={race} selected={selectedRound === race.round} onClick={selectRace}/>
