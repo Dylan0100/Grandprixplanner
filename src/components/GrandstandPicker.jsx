@@ -1107,7 +1107,7 @@ function GrandstandCard({ gs, onSelect, isSelected }) {
       </div>
       {onSelect && (
         <button
-          onClick={function() { if (!isSelected) onSelect({ name: gs.name, id: gs.id, tierIndex: TIER_INDEX[gs.priceTier] }) }}
+          onClick={function() { onSelect({ name: gs.name, id: gs.id, tierIndex: TIER_INDEX[gs.priceTier] }) }}
           style={{
             width:'100%',
             padding:'10px 16px',
