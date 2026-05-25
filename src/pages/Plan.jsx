@@ -342,7 +342,11 @@ export default function Plan() {
   const navRef = useRef(null)
   const selectedRace = races.find(function(r) { return r.round === selectedRound })
   function onSet(key, val) { setTripState(function(prev) { return Object.assign({}, prev, {[key]: val}) }) }
-  function handleGrandstandSelect(gs) { setSelectedGrandstand(gs) }
+  function handleGrandstandSelect(gs) {
+    var price = selectedRace ? selectedRace.tickets[gs.tierIndex] : 0
+    setSelectedGrandstand({ name: gs.name, id: gs.id, price: price })
+    onSet('ticketTier', gs.tierIndex)
+  }
   function handleGrandstandClear() { setSelectedGrandstand(null) }
   const est = {
     departure: trip.departureCity ? trip.departureCity.cluster : null,
@@ -432,10 +436,14 @@ export default function Plan() {
                       </div>
                     )}
                   </div>
-                  <GrandstandPicker race={selectedRace} onBack={scrollToNav} onSelect={handleGrandstandSelect}/>
+                  <GrandstandPicker
+                    race={selectedRace}
+                    onSelect={handleGrandstandSelect}
+                    selectedId={selectedGrandstand ? selectedGrandstand.id : null}
+                  />
                 </div>
 
-                <div id="sec-flights" className="plan-section">
+                <div id="sec-flights" className="plan-section plan-section-alt">
                   <PlanSectionHeading number={2} icon="✈️" title="Flights" sub={'Routes, airports and booking tips for ' + selectedRace.country}/>
                   <FlightGuide race={selectedRace} onBack={scrollToNav}/>
                 </div>
@@ -463,7 +471,7 @@ export default function Plan() {
                   </div>
                 </div>
 
-                <div id="sec-transport" className="plan-section">
+                <div id="sec-transport" className="plan-section plan-section-alt">
                   <PlanSectionHeading number={4} icon="🗺️" title="Local Transport" sub={'Getting to and from ' + selectedRace.circuit}/>
                   <LocalTransport race={selectedRace} onBack={scrollToNav}/>
                 </div>
@@ -473,7 +481,7 @@ export default function Plan() {
                   <Itinerary race={selectedRace} onBack={scrollToNav}/>
                 </div>
 
-                <div id="sec-visa" className="plan-section">
+                <div id="sec-visa" className="plan-section plan-section-alt">
                   <PlanSectionHeading number={6} icon="🛂" title="Visa & Entry Requirements" sub={'Entry requirements for ' + selectedRace.country}/>
                   <VisaChecker race={selectedRace} onBack={scrollToNav} passport={trip.passport}/>
                 </div>
