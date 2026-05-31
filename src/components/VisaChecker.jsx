@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const VC_PASSPORTS = [
   { id:'uk', label:'United Kingdom',  flag:'🇬🇧' },
@@ -67,7 +67,7 @@ const VC_HOME = {
 
 const VC_ROUND_NAMES = {
   1:'Australia',  2:'China',       3:'Japan',      4:'Miami',
-  5:'Canada',     6:'Monaco',      7:'Spain (BCN)',  8:'Austria',
+  5:'Canada',     6:'Monaco',      7:'Spain (BCN)', 8:'Austria',
   9:'Great Britain', 10:'Belgium', 11:'Hungary',   12:'Netherlands',
   13:'Italy',    14:'Spain (MAD)', 15:'Azerbaijan', 16:'Singapore',
   17:'USA (Austin)', 18:'Mexico City', 19:'Sao Paulo', 20:'Las Vegas',
@@ -80,6 +80,14 @@ const VC_STATUS = {
   eta:  { color:'#F59E0B', bg:'rgba(245,158,11,0.10)',  label:'eVisa / ETA Required',  emoji:'🟡' },
   vol:  { color:'#F97316', bg:'rgba(249,115,22,0.10)',  label:'Visa on Arrival',        emoji:'🟠' },
   req:  { color:'#E8002D', bg:'rgba(232,0,45,0.10)',    label:'Visa Required',          emoji:'🔴' },
+}
+
+const PLAN_TO_VC = {
+  'gb':'uk', 'us':'us', 'au':'au', 'ca':'ca', 'nz':'nz', 'ie':null,
+  'de':'de', 'fr':'fr', 'nl':'nl', 'be':'be', 'es':'es', 'it':'it',
+  'pt':null, 'se':'se', 'no':'no', 'dk':null, 'fi':null, 'ch':null,
+  'at':null, 'pl':'pl', 'br':'br', 'mx':'mx', 'jp':'jp', 'sg':null,
+  'za':'za'
 }
 
 function getVisaInfo(pid, dest) {
@@ -159,54 +167,331 @@ function getVisaInfo(pid, dest) {
   }
 }
 
-const VC_STYLES = [
-  '.vc-body{display:grid;grid-template-columns:300px 1fr;gap:28px;padding:28px 32px;align-items:start}',
-  '.vc-search{width:100%;box-sizing:border-box;background:var(--surface-3);border:1px solid var(--text-dim);border-radius:8px;padding:10px 14px;color:var(--text);font-family:Barlow,sans-serif;font-size:14px;outline:none;margin-bottom:10px}',
-  '.vc-search:focus{border-color:var(--red)}',
-  '.vc-search::placeholder{color:var(--text-muted)}',
-  '.vc-pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:380px;overflow-y:auto;padding-right:2px}',
-  '.vc-pp-grid::-webkit-scrollbar{width:4px}',
-  '.vc-pp-grid::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:2px}',
-  '.vc-pp-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--surface-3);border-radius:8px;cursor:pointer;color:var(--text-muted);text-align:left;transition:all 0.15s}',
-  '.vc-pp-btn:hover{background:var(--surface-3);color:var(--text)}',
-  '.vc-pp-btn.vc-active{background:rgba(232,0,45,0.10);border-color:var(--red);color:var(--text)}',
-  '.vc-pp-flag{font-size:18px;line-height:1;flex-shrink:0}',
-  '.vc-pp-label{font-size:12px;line-height:1.3;font-family:Barlow,sans-serif}',
-  '.vc-status-card{border-radius:12px;padding:20px 22px;margin-bottom:18px}',
-  '.vc-status-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:100px;font-size:13px;font-weight:700;font-family:Barlow Condensed,sans-serif;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px}',
-  '.vc-detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}',
-  '.vc-detail-item{background:var(--surface-2);border-radius:8px;padding:12px 14px}',
-  '.vc-detail-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);margin-bottom:5px;font-family:Barlow Condensed,sans-serif}',
-  '.vc-detail-value{font-size:13px;color:var(--text);font-weight:500;font-family:Barlow,sans-serif;line-height:1.3}',
-  '.vc-note{font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:16px;padding:12px 14px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--surface-3);font-family:Barlow,sans-serif}',
-  '.vc-apply-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--red);color:#fff;border-radius:8px;font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;text-decoration:none;transition:opacity 0.15s;margin-bottom:20px}',
-  '.vc-apply-btn:hover{opacity:0.86}',
-  '.vc-all-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--surface-2);border:1px solid var(--surface-3);border-radius:10px;padding:13px 16px;cursor:pointer;color:var(--text);font-family:Barlow,sans-serif;font-size:14px;transition:background 0.15s;margin-bottom:2px}',
-  '.vc-all-toggle:hover{background:var(--surface-3)}',
-  '.vc-all-grid{display:flex;flex-direction:column;gap:5px;margin-top:10px;margin-bottom:10px}',
-  '.vc-all-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface-2);border-radius:8px}',
-  '.vc-all-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}',
-  '.vc-all-dest-name{font-size:13px;color:var(--text);font-weight:500;font-family:Barlow,sans-serif}',
-  '.vc-all-races{font-size:11px;color:var(--text-muted);font-family:Barlow,sans-serif}',
-  '.vc-all-status{font-size:12px;font-weight:600;font-family:Barlow Condensed,sans-serif;letter-spacing:0.04em;white-space:nowrap}',
-  '.vc-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:14px;text-align:center}',
-  '.vc-prompt-icon{font-size:52px}',
-  '.vc-prompt-text{font-size:15px;color:var(--text-muted);font-family:Barlow,sans-serif;max-width:280px;line-height:1.5}',
-  '.vc-zone-note{font-size:12px;color:var(--text-muted);background:var(--surface-2);border-radius:6px;padding:8px 12px;margin-top:10px}',
-  '.vc-disclaimer{font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:16px;padding:12px 14px;background:var(--surface);border:1px solid var(--surface-3);border-radius:8px;font-family:Barlow,sans-serif}',
-  '@media(max-width:780px){.vc-body{grid-template-columns:1fr;padding:20px 16px;gap:20px}.vc-pp-grid{max-height:200px}.vc-detail-grid{grid-template-columns:1fr 1fr}}'
-].join('')
+const VC_CSS = `
+.vc-wrap {
+  font-family: 'Barlow', sans-serif;
+  color: var(--text);
+}
+.vc-body {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 0;
+  align-items: start;
+  min-height: 440px;
+}
+.vc-left {
+  padding: 20px 20px 24px;
+  border-right: 1px solid var(--border);
+}
+.vc-right {
+  padding: 20px 24px 24px;
+}
+.vc-left-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  display: block;
+}
+.vc-search {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface-3);
+  border: 1px solid var(--border-md);
+  border-radius: 7px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.vc-search:focus { border-color: rgba(232,0,45,0.5); }
+.vc-search::placeholder { color: var(--text-dim); }
+.vc-pp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.vc-pp-grid::-webkit-scrollbar { width: 3px; }
+.vc-pp-grid::-webkit-scrollbar-thumb { background: var(--surface-4); border-radius: 2px; }
+.vc-pp-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--text-muted);
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+.vc-pp-btn:hover {
+  background: var(--surface-3);
+  border-color: var(--border-md);
+  color: var(--text);
+}
+.vc-pp-btn.vc-active {
+  background: rgba(232,0,45,0.09);
+  border-color: rgba(232,0,45,0.4);
+  color: var(--text);
+}
+.vc-pp-flag { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.vc-pp-label { font-size: 11px; line-height: 1.3; font-family: 'Barlow', sans-serif; }
+.vc-no-results {
+  grid-column: 1 / -1;
+  padding: 14px;
+  color: var(--text-dim);
+  font-size: 12px;
+  text-align: center;
+  font-family: 'Barlow', sans-serif;
+}
+.vc-auto-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background: rgba(129,140,248,0.1);
+  border: 1px solid rgba(129,140,248,0.25);
+  border-radius: 100px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #818CF8;
+}
+.vc-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 340px;
+  gap: 14px;
+  text-align: center;
+  padding: 0 20px;
+}
+.vc-prompt-icon { font-size: 48px; opacity: 0.25; }
+.vc-prompt-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.vc-prompt-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 260px;
+  line-height: 1.6;
+}
+.vc-status-card {
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+.vc-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  border: 1px solid transparent;
+}
+.vc-passport-line {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  font-family: 'Barlow', sans-serif;
+}
+.vc-passport-line strong { font-weight: 600; }
+.vc-passport-line .muted { color: var(--text-muted); }
+.vc-zone-note {
+  margin-top: 10px;
+  padding: 9px 12px;
+  background: rgba(100,120,255,0.07);
+  border: 1px solid var(--border-md);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-family: 'Barlow', sans-serif;
+}
+.vc-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.vc-detail-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 13px;
+}
+.vc-detail-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  display: block;
+}
+.vc-detail-value {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+  font-family: 'Barlow', sans-serif;
+  line-height: 1.4;
+}
+.vc-note {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-md);
+  font-family: 'Barlow', sans-serif;
+}
+.vc-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--red);
+  color: #fff;
+  border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  margin-bottom: 18px;
+}
+.vc-apply-btn:hover { opacity: 0.86; }
+.vc-all-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-md);
+  border-radius: 9px;
+  padding: 12px 16px;
+  cursor: pointer;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s;
+  margin-bottom: 2px;
+}
+.vc-all-toggle:hover { background: var(--surface-3); }
+.vc-all-toggle-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.vc-all-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+.vc-all-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.vc-all-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.vc-all-dest-flag { font-size: 18px; flex-shrink: 0; }
+.vc-all-info { flex: 1; min-width: 0; }
+.vc-all-dest-name { font-size: 13px; color: var(--text); font-weight: 500; font-family: 'Barlow', sans-serif; }
+.vc-all-races { font-size: 11px; color: var(--text-muted); font-family: 'Barlow', sans-serif; margin-top: 1px; }
+.vc-all-status {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-align: right;
+}
+.vc-disclaimer {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.65;
+  margin-top: 14px;
+  padding: 11px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Barlow', sans-serif;
+}
+@media (max-width: 780px) {
+  .vc-body { grid-template-columns: 1fr; }
+  .vc-left { border-right: none; border-bottom: 1px solid var(--border); padding: 16px; }
+  .vc-right { padding: 16px; }
+  .vc-pp-grid { max-height: 180px; }
+  .vc-detail-grid { grid-template-columns: 1fr 1fr; }
+}
+`
 
-const BackIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-)
-
-export default function VisaChecker({ race, onBack }) {
+export default function VisaChecker({ race, onBack, passport: passportProp }) {
   const [passport, setPassport] = useState(null)
   const [search, setSearch] = useState('')
   const [showAll, setShowAll] = useState(false)
+  const [autoSelected, setAutoSelected] = useState(false)
+  const activeRef = useRef(null)
+
+  useEffect(function() {
+    if (!passportProp) return
+    var vcId = PLAN_TO_VC[passportProp]
+    if (!vcId) return
+    var match = VC_PASSPORTS.find(function(p) { return p.id === vcId })
+    if (match) {
+      setPassport(match)
+      setAutoSelected(true)
+      setShowAll(false)
+    }
+  }, [passportProp])
+
+  useEffect(function() {
+    if (autoSelected && activeRef.current) {
+      activeRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+  }, [autoSelected, passport])
 
   var filteredPP = VC_PASSPORTS.filter(function(p) {
     return p.label.toLowerCase().indexOf(search.toLowerCase()) !== -1
@@ -216,30 +501,31 @@ export default function VisaChecker({ race, onBack }) {
   var destInfo = VC_DEST_INFO[destId]
   var visaInfo = passport ? getVisaInfo(passport.id, destId) : null
   var sc       = visaInfo ? VC_STATUS[visaInfo.status] : null
+
   var allDests = []
   var seen = {}
   Object.values(VC_RACE_DEST).forEach(function(d) {
     if (!seen[d]) { seen[d] = true; allDests.push(d) }
   })
 
+  function handlePassportClick(p) {
+    if (passport && passport.id === p.id) {
+      setPassport(null)
+      setAutoSelected(false)
+    } else {
+      setPassport(p)
+      setAutoSelected(false)
+      setSearch('')
+      setShowAll(false)
+    }
+  }
+
   return (
-    <div className="estimator-wrap">
-      <style dangerouslySetInnerHTML={{ __html: VC_STYLES }} />
-
-      <div className="est-topbar">
-        <button className="est-back" onClick={onBack}>
-          <BackIcon /> Back to options
-        </button>
-        <div style={{ textAlign:'right' }}>
-          <div className="est-title">Visa Checker</div>
-          <div className="est-subtitle">{'Entry requirements for ' + destInfo.flag + ' ' + destInfo.name}</div>
-        </div>
-      </div>
-
+    <div className="vc-wrap">
+      <style dangerouslySetInnerHTML={{ __html: VC_CSS }} />
       <div className="vc-body">
-
-        <div>
-          <div className="est-section-label" style={{ marginBottom:'10px' }}>Select your passport</div>
+        <div className="vc-left">
+          <span className="vc-left-label">Your passport</span>
           <input
             className="vc-search"
             placeholder="Search nationality..."
@@ -248,11 +534,13 @@ export default function VisaChecker({ race, onBack }) {
           />
           <div className="vc-pp-grid">
             {filteredPP.map(function(p) {
+              var isActive = passport && passport.id === p.id
               return (
                 <button
                   key={p.id}
-                  className={passport && passport.id === p.id ? 'vc-pp-btn vc-active' : 'vc-pp-btn'}
-                  onClick={function() { setPassport(p); setSearch(''); setShowAll(false) }}
+                  ref={isActive ? activeRef : null}
+                  className={'vc-pp-btn' + (isActive ? ' vc-active' : '')}
+                  onClick={function() { handlePassportClick(p) }}
                 >
                   <span className="vc-pp-flag">{p.flag}</span>
                   <span className="vc-pp-label">{p.label}</span>
@@ -260,49 +548,52 @@ export default function VisaChecker({ race, onBack }) {
               )
             })}
             {filteredPP.length === 0 && (
-              <div style={{ gridColumn:'1/-1', padding:'16px', color:'var(--text-dim)', fontSize:'13px', textAlign:'center', fontFamily:'Barlow, sans-serif' }}>
-                No passport found
-              </div>
+              <div className="vc-no-results">No passport found</div>
             )}
           </div>
+          {autoSelected && passport && (
+            <div className="vc-auto-tag">⚡ From your trip settings</div>
+          )}
         </div>
 
-        <div>
+        <div className="vc-right">
           {!passport ? (
             <div className="vc-prompt">
               <div className="vc-prompt-icon">🛂</div>
+              <div className="vc-prompt-title">Select Your Passport</div>
               <div className="vc-prompt-text">
-                {'Select your passport to check entry requirements for ' + destInfo.flag + ' ' + destInfo.name}
+                {'Choose your nationality to check entry requirements for ' + destInfo.flag + ' ' + destInfo.name + '.'}
               </div>
             </div>
           ) : (
             <div>
-              <div className="vc-status-card" style={{ background: sc.bg, border: '1px solid ' + sc.color + '30' }}>
-                <div className="vc-status-badge" style={{ background: sc.color + '20', color: sc.color, border: '1px solid ' + sc.color + '40' }}>
-                  {sc.emoji + ' ' + sc.label}
+              <div className="vc-status-card" style={{ background: sc.bg, borderColor: sc.color + '28' }}>
+                <div className="vc-status-badge" style={{ background: sc.color + '20', color: sc.color, borderColor: sc.color + '45' }}>
+                  <span>{sc.emoji}</span>
+                  <span>{sc.label}</span>
                 </div>
-                <div style={{ fontSize:'14px', color:'var(--text)', lineHeight:'1.5', fontFamily:'Barlow, sans-serif' }}>
+                <div className="vc-passport-line">
                   <strong>{passport.flag + ' ' + passport.label}</strong>
-                  <span style={{ color:'var(--text-muted)' }}> passport visiting </span>
+                  <span className="muted"> passport visiting </span>
                   <strong>{destInfo.flag + ' ' + destInfo.name}</strong>
                 </div>
                 {destInfo.zoneNote && (
-                  <div className="vc-zone-note">{'Info: ' + destInfo.zoneNote}</div>
+                  <div className="vc-zone-note">{destInfo.zoneNote}</div>
                 )}
               </div>
 
               {visaInfo.status !== 'own' && (
                 <div className="vc-detail-grid">
                   <div className="vc-detail-item">
-                    <div className="vc-detail-label">Max Stay</div>
+                    <span className="vc-detail-label">Max Stay</span>
                     <div className="vc-detail-value">{visaInfo.duration}</div>
                   </div>
                   <div className="vc-detail-item">
-                    <div className="vc-detail-label">Cost</div>
+                    <span className="vc-detail-label">Cost</span>
                     <div className="vc-detail-value">{visaInfo.cost}</div>
                   </div>
                   <div className="vc-detail-item">
-                    <div className="vc-detail-label">Processing</div>
+                    <span className="vc-detail-label">Processing</span>
                     <div className="vc-detail-value">{visaInfo.processing}</div>
                   </div>
                 </div>
@@ -312,13 +603,13 @@ export default function VisaChecker({ race, onBack }) {
 
               {visaInfo.url && (
                 <a href={visaInfo.url} target="_blank" rel="noopener noreferrer" className="vc-apply-btn">
-                  Official Application / Info
+                  Official Application / Info ↗
                 </a>
               )}
 
               <button className="vc-all-toggle" onClick={function() { setShowAll(function(v) { return !v }) }}>
                 <span>Check all 2026 race countries</span>
-                <span style={{ color:'var(--text-dim)', fontSize:'12px' }}>{showAll ? 'Hide' : 'Show all 13 destinations'}</span>
+                <span className="vc-all-toggle-label">{showAll ? 'Hide ▲' : 'Show all 13 ▼'}</span>
               </button>
 
               {showAll && (
@@ -334,12 +625,14 @@ export default function VisaChecker({ race, onBack }) {
                     return (
                       <div key={dId} className="vc-all-row">
                         <div className="vc-all-dot" style={{ background: cfg.color }} />
-                        <span style={{ fontSize:'18px' }}>{dest2.flag}</span>
-                        <div style={{ flex:'1', minWidth:'0' }}>
+                        <span className="vc-all-dest-flag">{dest2.flag}</span>
+                        <div className="vc-all-info">
                           <div className="vc-all-dest-name">{dest2.name}</div>
                           <div className="vc-all-races">{raceNames}</div>
                         </div>
-                        <div className="vc-all-status" style={{ color: cfg.color }}>{cfg.emoji + ' ' + cfg.label}</div>
+                        <div className="vc-all-status" style={{ color: cfg.color }}>
+                          {cfg.emoji + ' ' + cfg.label}
+                        </div>
                       </div>
                     )
                   })}
