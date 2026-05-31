@@ -1,411 +1,450 @@
 import React from 'react';
 import flightData from './flightData';
 
-export default function FlightGuide({ race, onBack }) {
-  const data = flightData[race ? race.name : ''];
+const FG_CSS = `
+.fg-wrap {
+  font-family: 'Barlow', sans-serif;
+  color: var(--text);
+  padding: 0;
+}
+.fg-fare-hero {
+  padding: 20px 28px 18px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.fg-fare-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  display: block;
+}
+.fg-fare-amount {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  color: var(--text);
+}
+.fg-fare-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+.fg-direct-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.fg-direct-badge.yes {
+  background: rgba(34,197,94,0.1);
+  border-color: rgba(34,197,94,0.3);
+  color: #4ade80;
+}
+.fg-direct-badge.no {
+  background: var(--surface-4);
+  border-color: var(--border-md);
+  color: var(--text-muted);
+}
+.fg-direct-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.fg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.fg-cell {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.fg-cell:nth-child(odd) {
+  border-right: 1px solid var(--border);
+}
+.fg-cell-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+  display: block;
+}
+.fg-airport-code {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.fg-airport-name {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.fg-airport-time {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.fg-transfer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.fg-transfer-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  align-items: flex-start;
+}
+.fg-transfer-bullet {
+  color: var(--red);
+  flex-shrink: 0;
+  font-size: 10px;
+  margin-top: 3px;
+}
+.fg-avoid-box {
+  margin-top: 12px;
+  padding: 9px 12px;
+  background: rgba(232,0,45,0.08);
+  border: 1px solid rgba(232,0,45,0.22);
+  border-radius: 7px;
+  font-size: 12px;
+  color: #f87171;
+  line-height: 1.5;
+}
+.fg-secondary-box {
+  margin-top: 8px;
+  padding: 9px 12px;
+  background: var(--surface-3);
+  border: 1px solid var(--border-md);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.fg-route-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.fg-meta-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.fg-meta-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 2px;
+}
+.fg-meta-value {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.fg-hubs-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 6px;
+}
+.fg-hubs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.fg-hub-pill {
+  background: var(--surface-3);
+  border: 1px solid var(--border-md);
+  border-radius: 5px;
+  padding: 3px 9px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.fg-airlines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.fg-airline-pill {
+  background: var(--surface-2);
+  border: 1px solid var(--border-md);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 500;
+  font-family: 'Barlow', sans-serif;
+}
+.fg-booking-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.fg-booking-tier {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 13px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+}
+.fg-booking-tier.green { border-left-color: #22C55E; }
+.fg-booking-tier.amber { border-left-color: var(--amber); }
+.fg-booking-tier.red   { border-left-color: var(--red); }
+.fg-booking-tier-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.fg-booking-tier.green .fg-booking-tier-label { color: #22C55E; }
+.fg-booking-tier.amber .fg-booking-tier-label { color: var(--amber); }
+.fg-booking-tier.red   .fg-booking-tier-label { color: var(--red); }
+.fg-booking-tier-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.fg-tip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.fg-tip-item {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  align-items: flex-start;
+}
+.fg-tip-arrow {
+  color: var(--amber);
+  flex-shrink: 0;
+  font-size: 11px;
+  margin-top: 2px;
+}
+.fg-note-item {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  align-items: flex-start;
+}
+.fg-note-dot {
+  color: var(--text-dim);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.fg-no-data {
+  padding: 48px 28px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+@media (max-width: 700px) {
+  .fg-grid { grid-template-columns: 1fr; }
+  .fg-cell:nth-child(odd) { border-right: none; }
+  .fg-fare-hero { padding: 16px 20px; }
+  .fg-cell { padding: 16px 18px; }
+}
+`
 
-  const s = {
-    wrap: {
-      padding: '0',
-      fontFamily: "'Barlow', sans-serif",
-      color: 'var(--text)',
-    },
-    backBtn: {
-      background: 'none',
-      border: 'none',
-      color: 'var(--text-muted)',
-      cursor: 'pointer',
-      fontSize: '0.875rem',
-      padding: '0 0 1.25rem 0',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.375rem',
-      fontFamily: "'Barlow', sans-serif",
-    },
-    header: {
-      marginBottom: '1.5rem',
-    },
-    headerLabel: {
-      fontFamily: "'Barlow Condensed', sans-serif",
-      fontSize: '0.7rem',
-      fontWeight: '700',
-      letterSpacing: '0.12em',
-      textTransform: 'uppercase',
-      color: 'var(--text-muted)',
-      marginBottom: '0.25rem',
-    },
-    headerTitle: {
-      fontFamily: "'Barlow Condensed', sans-serif",
-      fontSize: '1.5rem',
-      fontWeight: '700',
-      textTransform: 'uppercase',
-      letterSpacing: '0.04em',
-      color: 'var(--text)',
-      margin: '0 0 0.2rem 0',
-    },
-    headerSub: {
-      fontSize: '0.875rem',
-      color: 'var(--text-muted)',
-      margin: '0',
-    },
-    fareTag: {
-      display: 'inline-block',
-      marginTop: '0.75rem',
-      background: 'var(--surface-3)',
-      border: '1px solid var(--surface-3)',
-      borderRadius: '6px',
-      padding: '0.4rem 0.75rem',
-      fontSize: '0.8rem',
-      color: 'var(--text)',
-      fontWeight: '600',
-    },
-    card: {
-      background: 'var(--surface-2)',
-      border: '1px solid var(--surface-3)',
-      borderRadius: '10px',
-      padding: '1rem 1.125rem',
-      marginBottom: '0.75rem',
-    },
-    cardTitle: {
-      fontFamily: "'Barlow Condensed', sans-serif",
-      fontSize: '0.7rem',
-      fontWeight: '700',
-      letterSpacing: '0.12em',
-      textTransform: 'uppercase',
-      color: 'var(--text-muted)',
-      marginBottom: '0.6rem',
-    },
-    airportCode: {
-      fontFamily: "'Barlow Condensed', sans-serif",
-      fontSize: '1.2rem',
-      fontWeight: '700',
-      color: 'var(--text)',
-      letterSpacing: '0.06em',
-    },
-    airportName: {
-      fontSize: '0.875rem',
-      color: 'var(--text)',
-      fontWeight: '500',
-      marginBottom: '0.25rem',
-    },
-    transferTime: {
-      fontSize: '0.8rem',
-      color: 'var(--text-muted)',
-      marginBottom: '0.75rem',
-    },
-    transferList: {
-      listStyle: 'none',
-      padding: '0',
-      margin: '0',
-    },
-    transferItem: {
-      fontSize: '0.82rem',
-      color: 'var(--text-muted)',
-      padding: '0.3rem 0',
-      borderBottom: '1px solid var(--surface-3)',
-      display: 'flex',
-      gap: '0.5rem',
-      alignItems: 'flex-start',
-    },
-    bullet: {
-      color: 'var(--red)',
-      flexShrink: '0',
-      marginTop: '1px',
-      fontSize: '0.7rem',
-    },
-    avoidBox: {
-      background: 'rgba(232,0,45,0.08)',
-      border: '1px solid rgba(232,0,45,0.25)',
-      borderRadius: '7px',
-      padding: '0.5rem 0.75rem',
-      fontSize: '0.8rem',
-      color: '#ff6b6b',
-      marginTop: '0.75rem',
-    },
-    secondaryBox: {
-      background: 'var(--surface-3)',
-      borderRadius: '7px',
-      padding: '0.5rem 0.75rem',
-      fontSize: '0.8rem',
-      color: 'var(--text-muted)',
-      marginTop: '0.75rem',
-      lineHeight: '1.5',
-    },
-    routeRow: {
-      fontSize: '0.875rem',
-      color: 'var(--text)',
-      marginBottom: '0.5rem',
-      lineHeight: '1.5',
-    },
-    routeLabel: {
-      fontSize: '0.75rem',
-      color: 'var(--text-muted)',
-      marginBottom: '0.15rem',
-      fontWeight: '500',
-    },
-    directBadge: {
-      display: 'inline-block',
-      padding: '0.2rem 0.55rem',
-      borderRadius: '4px',
-      fontSize: '0.72rem',
-      fontWeight: '700',
-      letterSpacing: '0.05em',
-      textTransform: 'uppercase',
-    },
-    hubPills: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '0.4rem',
-      marginTop: '0.3rem',
-    },
-    hubPill: {
-      background: 'var(--surface-3)',
-      borderRadius: '4px',
-      padding: '0.2rem 0.55rem',
-      fontSize: '0.75rem',
-      color: 'var(--text-muted)',
-    },
-    bookingGrid: {
-      display: 'grid',
-      gridTemplateColumns: '1fr',
-      gap: '0.5rem',
-    },
-    bookingRow: {
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: '0.625rem',
-    },
-    bookingDot: {
-      width: '10px',
-      height: '10px',
-      borderRadius: '50%',
-      flexShrink: '0',
-      marginTop: '4px',
-    },
-    bookingText: {
-      fontSize: '0.82rem',
-      lineHeight: '1.45',
-    },
-    bookingLabel: {
-      fontWeight: '600',
-      color: 'var(--text)',
-    },
-    bookingDesc: {
-      color: 'var(--text-muted)',
-      display: 'block',
-      marginTop: '0.1rem',
-    },
-    tipList: {
-      listStyle: 'none',
-      padding: '0',
-      margin: '0',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.45rem',
-    },
-    tipItem: {
-      display: 'flex',
-      gap: '0.5rem',
-      fontSize: '0.82rem',
-      color: 'var(--text-muted)',
-      lineHeight: '1.5',
-      alignItems: 'flex-start',
-    },
-    airlineList: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '0.4rem',
-    },
-    airlinePill: {
-      background: 'var(--surface-3)',
-      border: '1px solid rgba(244,244,246,0.08)',
-      borderRadius: '5px',
-      padding: '0.25rem 0.6rem',
-      fontSize: '0.78rem',
-      color: 'var(--text)',
-      fontWeight: '500',
-    },
-    noData: {
-      padding: '2rem 0',
-      textAlign: 'center',
-      color: 'var(--text-muted)',
-      fontSize: '0.875rem',
-    },
-  };
+export default function FlightGuide({ race, onBack }) {
+  var data = flightData[race ? race.name : '']
 
   if (!data) {
     return (
-      <div style={s.wrap}>
-        <button onClick={onBack} style={s.backBtn}>
-          ← Back to options
-        </button>
-        <div style={s.noData}>
-          <p>Flight guide for {race ? race.name : 'this race'} is coming soon.</p>
+      <div className="fg-wrap">
+        <style dangerouslySetInnerHTML={{ __html: FG_CSS }} />
+        <div className="fg-no-data">
+          <p>{'Flight guide for ' + (race ? race.name : 'this race') + ' is coming soon.'}</p>
         </div>
       </div>
-    );
+    )
   }
 
-  const isDirect = data.ukRouting.directAvailable;
+  var isDirect = data.ukRouting.directAvailable
 
   return (
-    <div style={s.wrap}>
-      <button onClick={onBack} style={s.backBtn}>
-        ← Back to options
-      </button>
+    <div className="fg-wrap">
+      <style dangerouslySetInnerHTML={{ __html: FG_CSS }} />
 
-      {/* Header */}
-      <div style={s.header}>
-        <div style={s.headerLabel}>✈ Flight Guide</div>
-        <h2 style={s.headerTitle}>{race.name}</h2>
-        <p style={s.headerSub}>{data.destination}</p>
-        {data.typicalFareRange && (
-          <div style={s.fareTag}>
-            {'Typical return from UK: ' + data.typicalFareRange}
-          </div>
-        )}
-      </div>
-
-      {/* Airport & Transfers */}
-      <div style={s.card}>
-        <div style={s.cardTitle}>Best Airport</div>
-        {data.primaryAirport.code && (
-          <div style={{ ...s.airportCode, marginBottom: '0.15rem' }}>
-            {data.primaryAirport.code}
-          </div>
-        )}
-        <div style={s.airportName}>{data.primaryAirport.name}</div>
-        <div style={s.transferTime}>{data.primaryAirport.transferTime}</div>
-        <ul style={s.transferList}>
-          {data.primaryAirport.transferOptions.map(function(opt, i) {
-            return (
-              <li key={i} style={s.transferItem}>
-                <span style={s.bullet}>›</span>
-                <span>{opt}</span>
-              </li>
-            );
-          })}
-        </ul>
-        {data.avoidAirport && (
-          <div style={s.avoidBox}>
-            {'⚠ ' + data.avoidAirport}
-          </div>
-        )}
-        {data.secondaryOption && (
-          <div style={s.secondaryBox}>
-            {'Also consider: ' + data.secondaryOption}
-          </div>
-        )}
-      </div>
-
-      {/* UK Routing */}
-      <div style={s.card}>
-        <div style={s.cardTitle}>Getting There from the UK</div>
-        <div style={{ marginBottom: '0.75rem' }}>
-          <div style={s.routeLabel}>Typical route</div>
-          <div style={s.routeRow}>{data.ukRouting.typicalRoute}</div>
+      <div className="fg-fare-hero">
+        <div>
+          <span className="fg-fare-eyebrow">Typical return fare from UK</span>
+          <div className="fg-fare-amount">{data.typicalFareRange || '—'}</div>
+          <div className="fg-fare-note">{data.destination}</div>
         </div>
-        <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
-          <div>
-            <div style={s.routeLabel}>Total travel time</div>
-            <div style={{ ...s.routeRow, marginBottom: '0' }}>{data.ukRouting.totalTravelTime}</div>
-          </div>
-          <div>
-            <div style={s.routeLabel}>Direct flight</div>
+        <div className={'fg-direct-badge ' + (isDirect ? 'yes' : 'no')}>
+          <div className="fg-direct-dot" style={{ background: isDirect ? '#4ade80' : 'var(--text-dim)' }} />
+          {isDirect ? 'Direct flights available' : 'Connection required'}
+        </div>
+      </div>
+
+      <div className="fg-grid">
+
+        <div className="fg-cell">
+          <span className="fg-cell-label">Best airport</span>
+          {data.primaryAirport.code && (
+            <div className="fg-airport-code">{data.primaryAirport.code}</div>
+          )}
+          <div className="fg-airport-name">{data.primaryAirport.name}</div>
+          <div className="fg-airport-time">{data.primaryAirport.transferTime}</div>
+          <ul className="fg-transfer-list">
+            {data.primaryAirport.transferOptions.map(function(opt, i) {
+              return (
+                <li key={i} className="fg-transfer-item">
+                  <span className="fg-transfer-bullet">›</span>
+                  <span>{opt}</span>
+                </li>
+              )
+            })}
+          </ul>
+          {data.avoidAirport && (
+            <div className="fg-avoid-box">{'⚠ ' + data.avoidAirport}</div>
+          )}
+          {data.secondaryOption && (
+            <div className="fg-secondary-box">{'Also consider: ' + data.secondaryOption}</div>
+          )}
+        </div>
+
+        <div className="fg-cell">
+          <span className="fg-cell-label">Getting there from the UK</span>
+          <div className="fg-route-text">{data.ukRouting.typicalRoute}</div>
+          <div className="fg-meta-row">
             <div>
-              <span style={{
-                ...s.directBadge,
-                background: isDirect ? 'rgba(34,197,94,0.12)' : 'rgba(107,107,128,0.15)',
-                color: isDirect ? '#4ade80' : 'var(--text-muted)',
-              }}>
-                {isDirect ? '✓ Available' : '✗ Connection required'}
-              </span>
+              <span className="fg-meta-label">Total travel time</span>
+              <span className="fg-meta-value">{data.ukRouting.totalTravelTime}</span>
             </div>
           </div>
+          {data.ukRouting.commonHubs && data.ukRouting.commonHubs.length > 0 && (
+            <div>
+              <span className="fg-hubs-label">
+                {isDirect ? 'Also via hub' : 'Common connecting hubs'}
+              </span>
+              <div className="fg-hubs">
+                {data.ukRouting.commonHubs.map(function(hub, i) {
+                  return <span key={i} className="fg-hub-pill">{hub}</span>
+                })}
+              </div>
+            </div>
+          )}
         </div>
-        {data.ukRouting.commonHubs && data.ukRouting.commonHubs.length > 0 && (
-          <div>
-            <div style={s.routeLabel}>{isDirect ? 'Also via hub' : 'Common connecting hubs'}</div>
-            <div style={s.hubPills}>
-              {data.ukRouting.commonHubs.map(function(hub, i) {
-                return <span key={i} style={s.hubPill}>{hub}</span>;
+
+        {data.recommendedAirlines && data.recommendedAirlines.length > 0 && (
+          <div className="fg-cell">
+            <span className="fg-cell-label">Recommended airlines</span>
+            <div className="fg-airlines">
+              {data.recommendedAirlines.map(function(airline, i) {
+                return <span key={i} className="fg-airline-pill">{airline}</span>
               })}
             </div>
           </div>
         )}
-      </div>
 
-      {/* Recommended Airlines */}
-      {data.recommendedAirlines && data.recommendedAirlines.length > 0 && (
-        <div style={s.card}>
-          <div style={s.cardTitle}>Recommended Airlines</div>
-          <div style={s.airlineList}>
-            {data.recommendedAirlines.map(function(airline, i) {
-              return <span key={i} style={s.airlinePill}>{airline}</span>;
+        <div className="fg-cell">
+          <span className="fg-cell-label">When to book</span>
+          <div className="fg-booking-tiers">
+            <div className="fg-booking-tier green">
+              <span className="fg-booking-tier-label">Ideal</span>
+              <span className="fg-booking-tier-text">{data.bookingWindow.ideal}</span>
+            </div>
+            <div className="fg-booking-tier amber">
+              <span className="fg-booking-tier-label">Acceptable</span>
+              <span className="fg-booking-tier-text">{data.bookingWindow.acceptable}</span>
+            </div>
+            <div className="fg-booking-tier red">
+              <span className="fg-booking-tier-label">Last minute</span>
+              <span className="fg-booking-tier-text">{data.bookingWindow.lastMinuteRisk}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="fg-cell" style={{gridColumn:'1/-1'}}>
+          <span className="fg-cell-label">Pricing tips</span>
+          <div className="fg-tip-list">
+            {data.pricingTips.map(function(tip, i) {
+              return (
+                <div key={i} className="fg-tip-item">
+                  <span className="fg-tip-arrow">→</span>
+                  <span>{tip}</span>
+                </div>
+              )
             })}
           </div>
         </div>
-      )}
 
-      {/* When to Book */}
-      <div style={s.card}>
-        <div style={s.cardTitle}>When to Book</div>
-        <div style={s.bookingGrid}>
-          <div style={s.bookingRow}>
-            <div style={{ ...s.bookingDot, background: '#4ade80' }} />
-            <div style={s.bookingText}>
-              <span style={s.bookingLabel}>Ideal: </span>
-              <span style={{ color: 'var(--text)' }}>{data.bookingWindow.ideal}</span>
-            </div>
-          </div>
-          <div style={s.bookingRow}>
-            <div style={{ ...s.bookingDot, background: 'var(--amber)' }} />
-            <div style={s.bookingText}>
-              <span style={s.bookingLabel}>Acceptable: </span>
-              <span style={{ color: 'var(--text)' }}>{data.bookingWindow.acceptable}</span>
-            </div>
-          </div>
-          <div style={s.bookingRow}>
-            <div style={{ ...s.bookingDot, background: 'var(--red)' }} />
-            <div style={s.bookingText}>
-              <span style={{ ...s.bookingLabel, color: 'var(--red)' }}>Last minute: </span>
-              <span style={{ color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem', fontSize: '0.82rem', lineHeight: '1.45' }}>
-                {data.bookingWindow.lastMinuteRisk}
-              </span>
-            </div>
+        <div className="fg-cell" style={{gridColumn:'1/-1', borderBottom:'none'}}>
+          <span className="fg-cell-label">On the ground</span>
+          <div className="fg-tip-list">
+            {data.destinationNotes.map(function(note, i) {
+              return (
+                <div key={i} className="fg-note-item">
+                  <span className="fg-note-dot">·</span>
+                  <span>{note}</span>
+                </div>
+              )
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Pricing Tips */}
-      <div style={s.card}>
-        <div style={s.cardTitle}>Pricing Tips</div>
-        <ul style={s.tipList}>
-          {data.pricingTips.map(function(tip, i) {
-            return (
-              <li key={i} style={s.tipItem}>
-                <span style={{ color: 'var(--amber)', flexShrink: '0' }}>→</span>
-                <span>{tip}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-
-      {/* Destination Notes */}
-      <div style={s.card}>
-        <div style={s.cardTitle}>Destination Notes</div>
-        <ul style={s.tipList}>
-          {data.destinationNotes.map(function(note, i) {
-            return (
-              <li key={i} style={s.tipItem}>
-                <span style={{ color: 'var(--text-dim)', flexShrink: '0' }}>·</span>
-                <span>{note}</span>
-              </li>
-            );
-          })}
-        </ul>
       </div>
     </div>
-  );
+  )
 }
