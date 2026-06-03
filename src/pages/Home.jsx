@@ -34,7 +34,7 @@ function EmailForm({ buttonText }) {
   }
 
   if (success) {
-    return <div className="success-msg">✓ &nbsp;You're on the list — we'll be in touch soon.</div>
+    return <div className="success-msg">✓ &nbsp;You're on the list — race guides and planning tips on their way.</div>
   }
 
   return (
@@ -51,14 +51,14 @@ const features = [
   { icon: '💷', title: 'Real-Time Cost Tracker', desc: 'See your full trip budget broken down as you build it. No surprises. Adjust until the numbers work for you.' },
   { icon: '🛂', title: 'Visa & Entry Checker', desc: 'Instant guidance on visa requirements based on your passport. Know before you book, not after.' },
   { icon: '🗺️', title: 'Local Transport Guide', desc: 'Getting to and from the circuit is half the battle. We map out every option — shuttle, train, walk, and more.' },
-  { icon: '📋', title: 'Itinerary Builder', desc: 'Export a beautiful, shareable race weekend plan. Everything in one document, ready to go offline.' },
+  { icon: '📋', title: 'Itinerary Builder', desc: 'Build a complete race weekend plan covering every session, with notes and a copy-ready summary to take offline.' },
 ]
 
 const stats = [
   { num: '12+', label: 'Websites visited when planning a typical race trip' },
   { num: '8h', label: 'Average time spent researching before making a single booking' },
   { num: '£400+', label: 'Typically overpaid due to poor timing and fragmented information' },
-  { num: '1', label: 'Place to plan your entire race weekend — coming very soon' },
+  { num: '1', label: 'Place to plan your entire race weekend — free, right now' },
 ]
 
 const venues = ['Silverstone', 'Monza', 'Spa', 'Monaco', 'Singapore', 'Suzuka']
@@ -73,7 +73,7 @@ export default function Home() {
 
       <div className="hero">
         <div className="circuit-bg" />
-        <div className="badge"><span className="badge-dot" />Now accepting early access signups</div>
+        <div className="badge"><span className="badge-dot" />Free to use — no account needed</div>
         <h1>Your F1 Race Weekend.<br /><span className="accent">Planned Perfectly.</span></h1>
         <p>Stop spending days across dozens of websites. Grand Prix Planner is the only tool that handles flights, hotels, tickets, grandstands, visas, and local transport — all in one place.</p>
 
@@ -109,8 +109,8 @@ export default function Home() {
           gap: '12px',
           position: 'relative',
         }}>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Or join the waitlist for launch updates</p>
-          <EmailForm buttonText="Get Early Access" />
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Get race guides and planning tips delivered to your inbox</p>
+          <EmailForm buttonText="Send Me the Guides" />
         </div>
       </div>
 
@@ -155,10 +155,10 @@ export default function Home() {
       <hr className="divider" />
 
       <div className="cta-section" id="signup">
-        <div className="section-label">Get early access</div>
-        <h2 className="section-title" style={{ maxWidth: '700px', margin: '0 auto 20px' }}>Be first when we launch</h2>
-        <p className="section-sub" style={{ margin: '0 auto 40px' }}>Join the waitlist and get early access before we open to the public. Help shape the product and never overpay for an F1 trip again.</p>
-        <EmailForm buttonText="Join the Waitlist" />
+        <div className="section-label">Stay in the loop</div>
+        <h2 className="section-title" style={{ maxWidth: '700px', margin: '0 auto 20px' }}>Race guides straight to your inbox</h2>
+        <p className="section-sub" style={{ margin: '0 auto 40px' }}>Get grandstand tips, planning guides, and travel advice for every 2026 Grand Prix — delivered before each race weekend.</p>
+        <EmailForm buttonText="Send Me the Guides" />
         <p className="form-note" style={{ marginTop: '14px', color: 'var(--text-muted)' }}>No spam. Unsubscribe any time.</p>
       </div>
 
