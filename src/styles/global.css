@@ -1239,3 +1239,62 @@ footer .nav-logo { font-size: 16px; }
   .trip-inputs-row { flex-direction: column; }
   .trip-input-wide { min-width: 0; width: 100%; }
 }
+/* Accommodation CTA */
+.accom-cta-row {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--surface-3);
+  border: 1px solid var(--border-md);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accom-cta-context {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.accom-cta-nights {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface-4);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.accom-cta-city {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.accom-cta-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--surface-4);
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.accom-cta-btn:hover {
+  background: var(--surface-3);
+  border-color: rgba(100,120,255,0.3);
+}
+
+.accom-cta-note {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
