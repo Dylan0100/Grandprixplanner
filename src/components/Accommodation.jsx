@@ -1,10 +1,18 @@
 import { fmt, buildBookingComUrl } from '../utils/costCalc'
 
-// Booking.com affiliate ID — add here once account is approved
 const BOOKING_AFFILIATE_ID = null
 
-export default function Accommodation({ race, trip, onSet }) {
-  const bookingUrl = buildBookingComUrl(race, trip.party, BOOKING_AFFILIATE_ID)
+export default function Accommodation(props) {
+  var race = props.race
+  var trip = props.trip
+  var onSet = props.onSet
+  var bookingUrl = buildBookingComUrl(race, trip.party, BOOKING_AFFILIATE_ID)
+
+  var hotelBtn = (
+    <a className="accom-cta-btn" href={bookingUrl} target="_blank" rel="noopener noreferrer">
+      Find Hotels for This Race Weekend ↗
+    </a>
+  )
 
   return (
     <div className="accom-body">
@@ -33,22 +41,14 @@ export default function Accommodation({ race, trip, onSet }) {
           )
         })}
       </div>
-
       <div className="accom-cta-row">
         <div className="accom-cta-context">
           <span className="accom-cta-nights">{race.nights} nights</span>
           <span className="accom-cta-city">near {race.city}</span>
         </div>
-        
-          className="accom-cta-btn"
-          href={bookingUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Find Hotels for This Race Weekend ↗
-        </a>
+        {hotelBtn}
         <div className="accom-cta-note">
-          Opens Booking.com pre-filtered for {race.city} · {race.nights} nights · {trip.party} {trip.party === 1 ? 'guest' : 'guests'}
+          {'Opens Booking.com pre-filtered for ' + race.city + ' · ' + race.nights + ' nights · ' + trip.party + (trip.party === 1 ? ' guest' : ' guests')}
         </div>
       </div>
     </div>
