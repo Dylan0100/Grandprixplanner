@@ -1,23 +1,8 @@
 import { fmt, buildBookingComUrl } from '../utils/costCalc'
 import { UK_CLUSTERS } from '../data/racesData'
 
-// Drop your affiliate IDs here the moment accounts are approved
 const SKYSCANNER_AFFILIATE_ID = null
 const BOOKING_AFFILIATE_ID = null
-
-function buildSkyscannerUrl(race, departureCluster, party) {
-  if (!race || !departureCluster) return 'https://www.skyscanner.net'
-  const dest = race.destinationIATA || ''
-  const origin = clusterToIATA(departureCluster)
-  const checkIn = parseSkyDate(race.dates)
-  const checkOut = parseSkyDateOut(race.dates, race.nights)
-  const adults = party || 2
-  const base = dest && origin && checkIn && checkOut
-    ? `https://www.skyscanner.net/transport/flights/${origin}/${dest}/${checkIn}/${checkOut}/`
-    : 'https://www.skyscanner.net'
-  const affiliate = SKYSCANNER_AFFILIATE_ID ? `?adults=${adults}&affilid=${SKYSCANNER_AFFILIATE_ID}` : `?adults=${adults}`
-  return base + affiliate
-}
 
 function clusterToIATA(cluster) {
   const map = {
@@ -38,7 +23,6 @@ function clusterToIATA(cluster) {
 }
 
 function parseSkyDate(dateStr) {
-  // Returns YYMMDD for Skyscanner deep links
   const months = {
     Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',
     Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'
@@ -64,24 +48,32 @@ function parseSkyDateOut(dateStr, nights) {
   const crossMonth = dateStr.match(/(\d+)\s+(\w+)–(\d+)\s+(\w+)\s+(\d{4})/)
   if (crossMonth) {
     const [, dayIn, monIn, , , year] = crossMonth
-    const d = new Date(`${year}-${months[monIn]}-${dayIn.padStart(2,'0')}`)
+    const d = new Date(year + '-' + months[monIn] + '-' + dayIn.padStart(2,'0'))
     d.setDate(d.getDate() + nights)
-    const y = d.getFullYear().toString().slice(2)
-    const m = String(d.getMonth()+1).padStart(2,'0')
-    const dy = String(d.getDate()).padStart(2,'0')
-    return y + m + dy
+    return d.getFullYear().toString().slice(2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0')
   }
   const sameMonth = dateStr.match(/(\d+)–\d+\s+(\w+)\s+(\d{4})/)
   if (sameMonth) {
     const [, dayIn, mon, year] = sameMonth
-    const d = new Date(`${year}-${months[mon]}-${dayIn.padStart(2,'0')}`)
+    const d = new Date(year + '-' + months[mon] + '-' + dayIn.padStart(2,'0'))
     d.setDate(d.getDate() + nights)
-    const y = d.getFullYear().toString().slice(2)
-    const m = String(d.getMonth()+1).padStart(2,'0')
-    const dy = String(d.getDate()).padStart(2,'0')
-    return y + m + dy
+    return d.getFullYear().toString().slice(2) + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0')
   }
   return ''
+}
+
+function buildSkyscannerUrl(race, departureCluster, party) {
+  if (!race || !departureCluster) return 'https://www.skyscanner.net'
+  const dest = race.destinationIATA || ''
+  const origin = clusterToIATA(departureCluster)
+  const checkIn = parseSkyDate(race.dates)
+  const checkOut = parseSkyDateOut(race.dates, race.nights)
+  const adults = party || 2
+  if (dest && origin && checkIn && checkOut) {
+    const affiliate = SKYSCANNER_AFFILIATE_ID ? '&affilid=' + SKYSCANNER_AFFILIATE_ID : ''
+    return 'https://www.skyscanner.net/transport/flights/' + origin + '/' + dest + '/' + checkIn + '/' + checkOut + '/?adults=' + adults + affiliate
+  }
+  return 'https://www.skyscanner.net'
 }
 
 function CostRow({ color, label, sub, mid, low, high, included, noRange }) {
@@ -110,7 +102,7 @@ export default function CostPanel({ race, trip, onSet, c, selectedGrandstand, on
   const depLabel = trip.departureCity ? trip.departureCity.label : ''
 
   const tot = c ? Math.max(c.pct.flight + c.pct.ticket + c.pct.accom + c.pct.transport, 1) : 1
-  const w = (v, inc) => inc ? (v / tot * 100).toFixed(1) : 0
+  const w = function(v, inc) { return inc ? (v / tot * 100).toFixed(1) : 0 }
 
   const partyLabel = trip.party === 1 ? 'per person' : 'for ' + trip.party + ' people'
   const ticketLabel = selectedGrandstand ? selectedGrandstand.name : (['Standard', 'Advanced', 'Premium'][trip.ticketTier] + ' Tickets')
@@ -137,7 +129,7 @@ export default function CostPanel({ race, trip, onSet, c, selectedGrandstand, on
           <p>Select your departure city above to see your personalised cost estimate</p>
         </div>
       ) : (
-        <>
+        <div>
           <div className="cost-panel-total">
             <div className="cost-panel-total-label">{'Estimated total ' + partyLabel}</div>
             <div className="cost-panel-total-amount">{fmt(c.totalMid)}</div>
@@ -189,7 +181,7 @@ export default function CostPanel({ race, trip, onSet, c, selectedGrandstand, on
               noRange
             />
           </div>
-        </>
+        </div>
       )}
 
       <div className="cost-panel-section">
@@ -204,7 +196,7 @@ export default function CostPanel({ race, trip, onSet, c, selectedGrandstand, on
               <div className="cost-toggle-switch on" />
             </div>
           ) : (
-            <div className="cost-toggle-item" onClick={() => toggleInc('incFlights')}>
+            <div className="cost-toggle-item" onClick={function() { toggleInc('incFlights') }}>
               <div>
                 <div className="cost-toggle-label">Flights</div>
                 <div className="cost-toggle-sub">{'Return from ' + (depLabel || 'departure city')}</div>
@@ -212,14 +204,14 @@ export default function CostPanel({ race, trip, onSet, c, selectedGrandstand, on
               <div className={'cost-toggle-switch' + (trip.incFlights ? ' on' : '')} />
             </div>
           )}
-          <div className="cost-toggle-item" onClick={() => toggleInc('incTickets')}>
+          <div className="cost-toggle-item" onClick={function() { toggleInc('incTickets') }}>
             <div>
               <div className="cost-toggle-label">Race Tickets</div>
               <div className="cost-toggle-sub">Already have tickets? Toggle off</div>
             </div>
             <div className={'cost-toggle-switch' + (trip.incTickets ? ' on' : '')} />
           </div>
-          <div className="cost-toggle-item" onClick={() => toggleInc('incAccom')}>
+          <div className="cost-toggle-item" onClick={function() { toggleInc('incAccom') }}>
             <div>
               <div className="cost-toggle-label">Accommodation</div>
               <div className="cost-toggle-sub">Already booked? Toggle off</div>
