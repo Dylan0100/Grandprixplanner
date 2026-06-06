@@ -1,97 +1,124 @@
-import { useState, useEffect } from 'react'
-
-const cardStyles = `
-  .rc-card {
+const styles = `
+  .rc {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 16px 24px;
-    border-radius: 10px;
+    gap: 16px;
+    padding: 13px 20px;
+    border-radius: 8px;
     border: 1px solid var(--border);
     background: var(--surface);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: border-color 0.15s, background 0.15s;
     position: relative;
     overflow: hidden;
   }
-  .rc-card:hover { border-color: var(--border-md); background: var(--surface-2); }
-  .rc-card.is-next {
+  .rc:hover {
+    border-color: var(--border-md);
+    background: var(--surface-2);
+  }
+  .rc-next {
     border-color: var(--red);
-    background: var(--surface-2);
-    box-shadow: 0 0 0 1px var(--red) inset;
   }
-  .rc-card.is-live {
+  .rc-live {
     border-color: #22c55e;
-    background: var(--surface-2);
-    box-shadow: 0 0 0 1px #22c55e inset;
   }
-  .rc-card.is-done {
-    opacity: 0.42;
+  .rc-done {
+    opacity: 0.32;
     cursor: default;
-    background: var(--surface);
+    pointer-events: none;
   }
-  .rc-card.is-done:hover { border-color: var(--border); background: var(--surface); }
+  .rc-accent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 0;
+  }
+  .rc-accent-next { background: var(--red); }
+  .rc-accent-live { background: #22c55e; }
   .rc-round {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.08em;
     color: var(--text-dim);
-    width: 28px;
-    flex-shrink: 0;
+    width: 22px;
     text-align: center;
-  }
-  .rc-flag {
-    font-size: 26px;
     flex-shrink: 0;
-    width: 36px;
-    text-align: center;
+    text-transform: uppercase;
   }
-  .rc-main { flex: 1; min-width: 0; }
+  .rc-main {
+    flex: 1;
+    min-width: 0;
+  }
   .rc-name {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 19px;
     color: var(--text);
     line-height: 1;
-    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .rc-circuit {
     font-family: 'Barlow', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .rc-badges {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .rcb {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+  }
+  .rcb-next {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
+  .rcb-live {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: #fff;
+  }
+  .rcb-sprint {
+    background: transparent;
+    border-color: #F59E0B;
+    color: #F59E0B;
+  }
+  .rcb-new {
+    background: transparent;
+    border-color: #22c55e;
+    color: #22c55e;
+  }
+  .rcb-done {
+    background: transparent;
+    border-color: var(--border-md);
+    color: var(--text-dim);
   }
   .rc-dates {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
-    text-align: right;
     flex-shrink: 0;
     white-space: nowrap;
+    text-align: right;
+    min-width: 108px;
   }
-  .rc-badges { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .rc-badge {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 4px;
-  }
-  .badge-next { background: var(--red); color: #fff; }
-  .badge-live { background: #22c55e; color: #fff; }
-  .badge-sprint { background: var(--amber); color: var(--black); }
-  .badge-done {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-  }
-  .rc-action {
+  .rc-plan {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     font-size: 12px;
@@ -99,85 +126,48 @@ const cardStyles = `
     text-transform: uppercase;
     color: var(--red);
     flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    min-width: 52px;
-    justify-content: flex-end;
+    min-width: 48px;
+    text-align: right;
   }
-  .rc-card.is-done .rc-action { display: none; }
-  .rc-left-bar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-  }
-  .rc-left-bar.next { background: var(--red); }
-  .rc-left-bar.live { background: #22c55e; }
 `
 
-const FLAG_MAP = {
-  australia: '🇦🇺', china: '🇨🇳', japan: '🇯🇵', miami: '🇺🇸',
-  canada: '🇨🇦', monaco: '🇲🇨', spain: '🇪🇸', austria: '🇦🇹',
-  britain: '🇬🇧', belgium: '🇧🇪', hungary: '🇭🇺', netherlands: '🇳🇱',
-  italy: '🇮🇹', madrid: '🇪🇸', azerbaijan: '🇦🇿', singapore: '🇸🇬',
-  usa: '🇺🇸', mexico: '🇲🇽', brazil: '🇧🇷', lasvegas: '🇺🇸',
-  qatar: '🇶🇦', abudhabi: '🇦🇪',
-}
-
-export default function RaceCard({ race, isNext, isLive, onSelect }) {
-  const [styleInjected, setStyleInjected] = useState(false)
-
-  useEffect(() => { setStyleInjected(true) }, [])
-
-  const raceDate = new Date(race.raceDate)
-  const isPast = raceDate < new Date() && !isNext && !isLive
-
+export default function RaceCard({ race, isComplete, isLive, isNext, onSelect }) {
   const cardClass = [
-    'rc-card',
-    isNext ? 'is-next' : '',
-    isLive ? 'is-live' : '',
-    isPast ? 'is-done' : '',
+    'rc',
+    isNext ? 'rc-next' : '',
+    isLive ? 'rc-live' : '',
+    isComplete ? 'rc-done' : '',
   ].filter(Boolean).join(' ')
-
-  const flag = FLAG_MAP[race.id] || '🏁'
-
-  const handleClick = () => {
-    if (!isPast) onSelect()
-  }
 
   return (
     <>
-      {styleInjected && (
-        <style dangerouslySetInnerHTML={{ __html: cardStyles }} />
-      )}
-      <div className={cardClass} onClick={handleClick}>
-        {isNext && <div className="rc-left-bar next" />}
-        {isLive && <div className="rc-left-bar live" />}
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <div className={cardClass} onClick={onSelect}>
+
+        {isNext && !isLive && <div className="rc-accent rc-accent-next" />}
+        {isLive && <div className="rc-accent rc-accent-live" />}
 
         <div className="rc-round">R{race.round}</div>
-        <div className="rc-flag">{flag}</div>
 
         <div className="rc-main">
-          <div className="rc-name">{race.name}</div>
+          <div className="rc-name">{race.name} {race.flag}</div>
           <div className="rc-circuit">{race.circuit}</div>
+        </div>
+
+        <div className="rc-badges">
+          {isLive && <span className="rcb rcb-live">Live</span>}
+          {isNext && !isLive && <span className="rcb rcb-next">Next Race</span>}
+          {race.sprint && <span className="rcb rcb-sprint">Sprint</span>}
+          {race.isNew && <span className="rcb rcb-new">New</span>}
+          {isComplete && <span className="rcb rcb-done">Done</span>}
         </div>
 
         <div className="rc-dates">{race.dates}</div>
 
-        <div className="rc-badges">
-          {isLive && <span className="rc-badge badge-live">Live</span>}
-          {isNext && !isLive && <span className="rc-badge badge-next">Next Race</span>}
-          {race.sprint && <span className="rc-badge badge-sprint">Sprint</span>}
-          {isPast && <span className="rc-badge badge-done">Done</span>}
+        <div className="rc-plan">
+          {!isComplete ? 'Plan →' : ''}
         </div>
 
-        <div className="rc-action">
-          {!isPast && (
-            <>Plan <span>→</span></>
-          )}
-        </div>
       </div>
     </>
   )
