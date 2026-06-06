@@ -487,12 +487,6 @@ export default function VisaChecker({ race, onBack, passport: passportProp }) {
     }
   }, [passportProp])
 
-  useEffect(function() {
-    if (autoSelected && activeRef.current) {
-      activeRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-    }
-  }, [autoSelected, passport])
-
   var filteredPP = VC_PASSPORTS.filter(function(p) {
     return p.label.toLowerCase().indexOf(search.toLowerCase()) !== -1
   })
