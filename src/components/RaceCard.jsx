@@ -1,3 +1,24 @@
+import { useEffect, useRef } from 'react'
+
+const TWEMOJI_ID = 'twemoji-script'
+const TWEMOJI_SRC = 'https://unpkg.com/twemoji@14.0.2/dist/twemoji.min.js'
+
+function loadTwemoji(callback) {
+  if (document.getElementById(TWEMOJI_ID)) {
+    if (window.twemoji) { callback() }
+    else {
+      document.getElementById(TWEMOJI_ID).addEventListener('load', callback)
+    }
+    return
+  }
+  var script = document.createElement('script')
+  script.id = TWEMOJI_ID
+  script.src = TWEMOJI_SRC
+  script.crossOrigin = 'anonymous'
+  script.onload = callback
+  document.head.appendChild(script)
+}
+
 const styles = `
   .rc {
     display: flex;
@@ -46,16 +67,19 @@ const styles = `
     text-transform: uppercase;
   }
   .rc-flag {
-    font-size: 22px;
     flex-shrink: 0;
-    line-height: 1;
     width: 28px;
-    text-align: center;
-    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', sans-serif;
-    font-style: normal;
-    font-weight: normal;
-    letter-spacing: normal;
-    text-transform: none;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0;
+  }
+  .rc-flag img {
+    width: 22px;
+    height: 22px;
+    display: block;
+    object-fit: contain;
   }
   .rc-main {
     flex: 1;
@@ -121,7 +145,21 @@ const styles = `
 `
 
 export default function RaceCard({ race, isComplete, isLive, isNext, onSelect }) {
-  const cardClass = [
+  var flagRef = useRef(null)
+
+  useEffect(function() {
+    loadTwemoji(function() {
+      if (flagRef.current && window.twemoji) {
+        window.twemoji.parse(flagRef.current, {
+          folder: 'svg',
+          ext: '.svg',
+          base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
+        })
+      }
+    })
+  }, [race.flag])
+
+  var cardClass = [
     'rc',
     isNext ? 'rc-next' : '',
     isLive ? 'rc-live' : '',
@@ -137,7 +175,7 @@ export default function RaceCard({ race, isComplete, isLive, isNext, onSelect })
         {isLive && <div className="rc-accent rc-accent-live" />}
 
         <div className="rc-round">R{race.round}</div>
-        <div className="rc-flag">{race.flag}</div>
+        <div className="rc-flag" ref={flagRef}>{race.flag}</div>
 
         <div className="rc-main">
           <div className="rc-name">{race.name}</div>
