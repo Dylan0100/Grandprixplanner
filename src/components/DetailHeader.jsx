@@ -18,6 +18,16 @@ function loadTwemoji(callback) {
   document.head.appendChild(script)
 }
 
+const styles = `
+  .detail-flag img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+    margin-bottom: 14px;
+  }
+`
+
 export default function DetailHeader({ race, onClose }) {
   var flagRef = useRef(null)
 
@@ -34,33 +44,36 @@ export default function DetailHeader({ race, onClose }) {
   }, [race.flag])
 
   return (
-    <div className="detail-header">
-      <div>
-        <div className="detail-flag" ref={flagRef}>{race.flag}</div>
-        <div className="detail-title">{race.name}</div>
-        <div className="detail-sub">
-          {race.circuit + ' · ' + race.city + ', ' + race.country}
+    <>
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <div className="detail-header">
+        <div>
+          <div className="detail-flag" ref={flagRef}>{race.flag}</div>
+          <div className="detail-title">{race.name}</div>
+          <div className="detail-sub">
+            {race.circuit + ' · ' + race.city + ', ' + race.country}
+          </div>
+          <div className="detail-meta">
+            <div className="detail-meta-item">
+              <span className="detail-meta-label">Race Weekend</span>
+              <span className="detail-meta-value">{race.dates}</span>
+            </div>
+            <div className="detail-meta-item">
+              <span className="detail-meta-label">Round</span>
+              <span className="detail-meta-value">{race.round + ' of 22'}</span>
+            </div>
+            <div className="detail-meta-item">
+              <span className="detail-meta-label">Tickets from</span>
+              <span className="detail-meta-value">{fmt(race.tickets[0])}</span>
+            </div>
+            <div className="detail-meta-item">
+              <span className="detail-meta-label">Nearest Airport</span>
+              <span className="detail-meta-value">{race.airport.split('—')[0].trim()}</span>
+            </div>
+          </div>
         </div>
-        <div className="detail-meta">
-          <div className="detail-meta-item">
-            <span className="detail-meta-label">Race Weekend</span>
-            <span className="detail-meta-value">{race.dates}</span>
-          </div>
-          <div className="detail-meta-item">
-            <span className="detail-meta-label">Round</span>
-            <span className="detail-meta-value">{race.round + ' of 22'}</span>
-          </div>
-          <div className="detail-meta-item">
-            <span className="detail-meta-label">Tickets from</span>
-            <span className="detail-meta-value">{fmt(race.tickets[0])}</span>
-          </div>
-          <div className="detail-meta-item">
-            <span className="detail-meta-label">Nearest Airport</span>
-            <span className="detail-meta-value">{race.airport.split('—')[0].trim()}</span>
-          </div>
-        </div>
+        <button className="close-btn" onClick={onClose}>✕</button>
       </div>
-      <button className="close-btn" onClick={onClose}>✕</button>
-    </div>
+    </>
   )
 }
