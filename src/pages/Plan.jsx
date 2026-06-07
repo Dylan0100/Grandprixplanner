@@ -6,6 +6,7 @@ import RaceCard from '../components/RaceCard'
 import DetailHeader from '../components/DetailHeader'
 import TripInputs from '../components/TripInputs'
 import SectionNav from '../components/SectionNav'
+import SectionHeading from '../components/SectionHeading'
 import CostPanel from '../components/CostPanel'
 import GrandstandPicker from '../components/GrandstandPicker'
 import Accommodation from '../components/Accommodation'
@@ -292,28 +293,71 @@ export default function Plan() {
                   <DetailHeader race={selectedRace} onClose={handleBack} />
                   <TripInputs trip={trip} onSet={handleSet} />
                   <SectionNav />
+
                   <div className="plan-section" id="sec-grandstands">
+                    <SectionHeading
+                      num={1}
+                      icon="🏟️"
+                      title="Grandstand Picker"
+                      sub="Expert guide to every viewing area"
+                    />
                     <GrandstandPicker
                       race={selectedRace}
                       onSelect={handleGrandstandSelect}
                       selectedId={selectedGrandstand ? selectedGrandstand.id : null}
                     />
                   </div>
+
                   <div className="plan-section plan-section-alt" id="sec-flights">
+                    <SectionHeading
+                      num={2}
+                      icon="✈️"
+                      title="Flight Guide"
+                      sub="Routes, airports and booking windows"
+                    />
                     <FlightGuide race={selectedRace} trip={trip} />
                   </div>
+
                   <div className="plan-section" id="sec-accom">
+                    <SectionHeading
+                      num={3}
+                      icon="🏨"
+                      title="Accommodation"
+                      sub="Nightly rates across three tiers"
+                    />
                     <Accommodation race={selectedRace} trip={trip} onSet={handleSet} />
                   </div>
+
                   <div className="plan-section plan-section-alt" id="sec-transport">
+                    <SectionHeading
+                      num={4}
+                      icon="🗺️"
+                      title="Local Transport"
+                      sub="Getting to and from the circuit"
+                    />
                     <LocalTransport race={selectedRace} />
                   </div>
+
                   <div className="plan-section" id="sec-itinerary">
+                    <SectionHeading
+                      num={5}
+                      icon="📋"
+                      title="Weekend Itinerary"
+                      sub="Build and export your race schedule"
+                    />
                     <Itinerary race={selectedRace} grandstand={selectedGrandstand} />
                   </div>
+
                   <div className="plan-section plan-section-alt" id="sec-visa">
+                    <SectionHeading
+                      num={6}
+                      icon="🛂"
+                      title="Visa Checker"
+                      sub="Entry requirements by passport"
+                    />
                     <VisaChecker race={selectedRace} passport={trip.passport} />
                   </div>
+
                 </div>
               </div>
               <div className="plan-sidebar">
