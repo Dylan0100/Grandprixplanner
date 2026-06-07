@@ -292,26 +292,26 @@ export default function Plan() {
                   <DetailHeader race={selectedRace} onClose={handleBack} />
                   <TripInputs trip={trip} onSet={handleSet} />
                   <SectionNav />
-                  <div className="plan-section" id="grandstands">
+                  <div className="plan-section" id="sec-grandstands">
                     <GrandstandPicker
                       race={selectedRace}
                       onSelect={handleGrandstandSelect}
                       selectedId={selectedGrandstand ? selectedGrandstand.id : null}
                     />
                   </div>
-                  <div className="plan-section plan-section-alt" id="flights">
+                  <div className="plan-section plan-section-alt" id="sec-flights">
                     <FlightGuide race={selectedRace} trip={trip} />
                   </div>
-                  <div className="plan-section" id="hotels">
+                  <div className="plan-section" id="sec-accom">
                     <Accommodation race={selectedRace} trip={trip} onSet={handleSet} />
                   </div>
-                  <div className="plan-section plan-section-alt" id="transport">
+                  <div className="plan-section plan-section-alt" id="sec-transport">
                     <LocalTransport race={selectedRace} />
                   </div>
-                  <div className="plan-section" id="itinerary">
+                  <div className="plan-section" id="sec-itinerary">
                     <Itinerary race={selectedRace} grandstand={selectedGrandstand} />
                   </div>
-                  <div className="plan-section plan-section-alt" id="visa">
+                  <div className="plan-section plan-section-alt" id="sec-visa">
                     <VisaChecker race={selectedRace} passport={trip.passport} />
                   </div>
                 </div>
