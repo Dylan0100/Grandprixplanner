@@ -16,24 +16,25 @@ const styles = `
     border-color: var(--border-md);
     background: var(--surface-2);
   }
-  .rc-next {
-    border-color: var(--red);
-  }
-  .rc-live {
-    border-color: #22c55e;
-  }
+  .rc-next { border-color: var(--red); }
+  .rc-live { border-color: #22c55e; }
   .rc-done {
-    opacity: 0.32;
+    opacity: 0.28;
     cursor: default;
     pointer-events: none;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .rc-done .rc-name {
+    font-size: 14px;
+  }
+  .rc-done .rc-circuit {
+    display: none;
   }
   .rc-accent {
     position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    left: 0; top: 0; bottom: 0;
     width: 3px;
-    border-radius: 0;
   }
   .rc-accent-next { background: var(--red); }
   .rc-accent-live { background: #22c55e; }
@@ -57,7 +58,6 @@ const styles = `
     font-size: 19px;
     color: var(--text);
     line-height: 1;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -83,31 +83,11 @@ const styles = `
     border-radius: 3px;
     border: 1px solid transparent;
   }
-  .rcb-next {
-    background: var(--red);
-    border-color: var(--red);
-    color: #fff;
-  }
-  .rcb-live {
-    background: #22c55e;
-    border-color: #22c55e;
-    color: #fff;
-  }
-  .rcb-sprint {
-    background: transparent;
-    border-color: #F59E0B;
-    color: #F59E0B;
-  }
-  .rcb-new {
-    background: transparent;
-    border-color: #22c55e;
-    color: #22c55e;
-  }
-  .rcb-done {
-    background: transparent;
-    border-color: var(--border-md);
-    color: var(--text-dim);
-  }
+  .rcb-next { background: var(--red); border-color: var(--red); color: #fff; }
+  .rcb-live { background: #22c55e; border-color: #22c55e; color: #fff; }
+  .rcb-sprint { background: transparent; border-color: #F59E0B; color: #F59E0B; }
+  .rcb-new { background: transparent; border-color: #22c55e; color: #22c55e; }
+  .rcb-done { background: transparent; border-color: var(--border-md); color: var(--text-dim); }
   .rc-dates {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
@@ -164,9 +144,7 @@ export default function RaceCard({ race, isComplete, isLive, isNext, onSelect })
 
         <div className="rc-dates">{race.dates}</div>
 
-        <div className="rc-plan">
-          {!isComplete ? 'Plan →' : ''}
-        </div>
+        <div className="rc-plan">{!isComplete ? 'Plan →' : ''}</div>
 
       </div>
     </>
