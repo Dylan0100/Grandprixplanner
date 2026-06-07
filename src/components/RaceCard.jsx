@@ -46,11 +46,16 @@ const styles = `
     text-transform: uppercase;
   }
   .rc-flag {
-    font-size: 20px;
+    font-size: 22px;
     flex-shrink: 0;
     line-height: 1;
-    width: 24px;
+    width: 28px;
     text-align: center;
+    font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: normal;
+    text-transform: none;
   }
   .rc-main {
     flex: 1;
