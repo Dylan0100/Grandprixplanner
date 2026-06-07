@@ -22,15 +22,11 @@ const styles = `
     opacity: 0.28;
     cursor: default;
     pointer-events: none;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 7px;
+    padding-bottom: 7px;
   }
-  .rc-done .rc-name {
-    font-size: 14px;
-  }
-  .rc-done .rc-circuit {
-    display: none;
-  }
+  .rc-done .rc-circuit { display: none; }
+  .rc-done .rc-name { font-size: 14px; }
   .rc-accent {
     position: absolute;
     left: 0; top: 0; bottom: 0;
@@ -49,6 +45,13 @@ const styles = `
     flex-shrink: 0;
     text-transform: uppercase;
   }
+  .rc-flag {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+    width: 24px;
+    text-align: center;
+  }
   .rc-main {
     flex: 1;
     min-width: 0;
@@ -58,6 +61,7 @@ const styles = `
     font-size: 19px;
     color: var(--text);
     line-height: 1;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -128,9 +132,10 @@ export default function RaceCard({ race, isComplete, isLive, isNext, onSelect })
         {isLive && <div className="rc-accent rc-accent-live" />}
 
         <div className="rc-round">R{race.round}</div>
+        <div className="rc-flag">{race.flag}</div>
 
         <div className="rc-main">
-          <div className="rc-name">{race.name} {race.flag}</div>
+          <div className="rc-name">{race.name}</div>
           <div className="rc-circuit">{race.circuit}</div>
         </div>
 
@@ -144,7 +149,7 @@ export default function RaceCard({ race, isComplete, isLive, isNext, onSelect })
 
         <div className="rc-dates">{race.dates}</div>
 
-        <div className="rc-plan">{!isComplete ? 'Plan →' : ''}</div>
+        <div className="rc-plan">{!isComplete ? 'Plan \u2192' : ''}</div>
 
       </div>
     </>
