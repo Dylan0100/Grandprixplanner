@@ -1,10 +1,42 @@
+import { useEffect, useRef } from 'react'
 import { fmt } from '../utils/costCalc'
 
+const TWEMOJI_ID = 'twemoji-script'
+const TWEMOJI_SRC = 'https://unpkg.com/twemoji@14.0.2/dist/twemoji.min.js'
+
+function loadTwemoji(callback) {
+  if (document.getElementById(TWEMOJI_ID)) {
+    if (window.twemoji) { callback() }
+    else { document.getElementById(TWEMOJI_ID).addEventListener('load', callback) }
+    return
+  }
+  var script = document.createElement('script')
+  script.id = TWEMOJI_ID
+  script.src = TWEMOJI_SRC
+  script.crossOrigin = 'anonymous'
+  script.onload = callback
+  document.head.appendChild(script)
+}
+
 export default function DetailHeader({ race, onClose }) {
+  var flagRef = useRef(null)
+
+  useEffect(function() {
+    loadTwemoji(function() {
+      if (flagRef.current && window.twemoji) {
+        window.twemoji.parse(flagRef.current, {
+          folder: 'svg',
+          ext: '.svg',
+          base: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/'
+        })
+      }
+    })
+  }, [race.flag])
+
   return (
     <div className="detail-header">
       <div>
-        <div className="detail-flag">{race.flag}</div>
+        <div className="detail-flag" ref={flagRef}>{race.flag}</div>
         <div className="detail-title">{race.name}</div>
         <div className="detail-sub">
           {race.circuit + ' · ' + race.city + ', ' + race.country}
