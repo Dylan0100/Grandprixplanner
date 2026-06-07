@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { races } from '../data/racesData'
 import { calcCost } from '../utils/costCalc'
 import RaceCard from '../components/RaceCard'
@@ -58,16 +59,15 @@ function getSeasonStatus() {
 }
 
 function isRaceComplete(round) {
-  var now = new Date()
   var session = SESSIONS.find(function(s) { return s.round === round })
   if (!session) return false
-  return now > new Date(session.raceEnd)
+  return new Date() > new Date(session.raceEnd)
 }
 
 function isRaceLive(round) {
-  var now = new Date()
   var session = SESSIONS.find(function(s) { return s.round === round })
   if (!session) return false
+  var now = new Date()
   return now >= new Date(session.fp1) && now <= new Date(session.raceEnd)
 }
 
@@ -84,49 +84,51 @@ function formatCountdown(target) {
 
 function pad(n) { return String(n).padStart(2, '0') }
 
-const styles = `
-  .gp-page { min-height:100vh; background:var(--black); }
-  .gp-hero { background:var(--surface); border-bottom:1px solid var(--border-md); }
-  .hero-inner { max-width:1200px; margin:0 auto; padding:28px 40px 0; }
-  .hero-top { display:flex; align-items:flex-start; gap:40px; }
-  .hero-left { flex:1; }
-  .hero-eyebrow { display:flex; align-items:center; gap:8px; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.12em; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px; }
-  .eyebrow-dot { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
-  .hero-title { font-family:'Bebas Neue',sans-serif; font-size:56px; line-height:0.92; color:var(--text); margin:0 0 10px; }
-  .hero-title-red { color:var(--red); display:block; }
-  .hero-sub { font-size:14px; color:var(--text-muted); margin:0 0 18px; line-height:1.5; max-width:400px; }
-  .hero-pills { display:flex; gap:7px; flex-wrap:wrap; }
-  .hero-pill { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.07em; text-transform:uppercase; padding:4px 10px; border-radius:4px; background:rgba(100,120,255,0.07); border:1px solid var(--border-md); color:var(--text-muted); }
-  .hero-pill-hot { background:rgba(232,0,45,0.1); border-color:rgba(232,0,45,0.25); color:var(--red); }
-  .hero-right { flex-shrink:0; width:276px; }
-  .cd-card { background:var(--surface-2); border:1px solid var(--border-md); border-radius:10px; padding:20px; }
-  .cd-label { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px; }
-  .cd-race-name { font-family:'Bebas Neue',sans-serif; font-size:22px; color:var(--text); line-height:1; margin-bottom:2px; }
-  .cd-race-dates { font-size:12px; color:var(--text-muted); margin-bottom:14px; font-family:'Barlow',sans-serif; }
-  .cd-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; }
-  .cd-cell { background:var(--surface-3); border-radius:6px; padding:8px 4px; text-align:center; }
-  .cd-num { font-family:'Bebas Neue',sans-serif; font-size:26px; color:var(--text); line-height:1; }
-  .cd-unit { font-family:'Barlow Condensed',sans-serif; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; }
-  .cd-btn { width:100%; background:var(--red); color:#fff; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; border:none; border-radius:6px; padding:10px; cursor:pointer; }
-  .cd-btn:hover { background:var(--red-dark); }
-  .cd-live-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:4px; padding:4px 10px; margin-bottom:10px; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.1em; color:#22c55e; text-transform:uppercase; }
-  .live-dot { width:6px; height:6px; border-radius:50%; background:#22c55e; animation:livepulse 1s infinite; }
-  @keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  .hero-ticker { border-top:1px solid var(--border); margin-top:22px; padding:11px 0; display:flex; gap:26px; overflow:hidden; }
-  .ticker-item { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap; flex-shrink:0; }
-  .ticker-item span { color:var(--text-muted); margin-left:4px; }
-  .ticker-item-live { color:var(--red); }
-  .ticker-item-live span { color:var(--red); }
-  .hero-filters { max-width:1200px; margin:0 auto; padding:14px 40px; display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
-  .filter-lbl { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; margin-right:4px; }
-  .fchip { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:5px 12px; border-radius:20px; border:1px solid var(--border-md); background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
-  .fchip:hover { color:var(--text); border-color:rgba(100,120,255,0.3); }
-  .fchip-active { background:var(--red); border-color:var(--red); color:#fff; }
-  .calendar-list { max-width:1200px; margin:0 auto; padding:16px 40px 60px; display:flex; flex-direction:column; gap:5px; }
-  .overlay-back { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; overflow-y:auto; padding:20px; box-sizing:border-box; }
-  .overlay-box { background:var(--surface); border-radius:16px; width:100%; max-width:1300px; margin:0 auto; display:flex; min-height:calc(100vh - 40px); position:relative; }
-  .overlay-main { flex:1; min-width:0; overflow-y:auto; max-height:calc(100vh - 40px); }
-  .overlay-side { width:360px; flex-shrink:0; border-left:1px solid var(--border); position:sticky; top:0; height:calc(100vh - 40px); overflow-y:auto; }
+const heroStyles = `
+  .gp-hero-wrap { background: var(--surface); border-bottom: 1px solid var(--border-md); margin-top: 65px; }
+  .gp-hero-inner { max-width: 1200px; margin: 0 auto; padding: 32px 40px 0; }
+  .gp-hero-top { display: flex; align-items: flex-start; gap: 40px; }
+  .gp-hero-left { flex: 1; }
+  .gp-eyebrow { display: flex; align-items: center; gap: 8px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.12em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
+  .gp-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+  .gp-hero-title { font-family: 'Bebas Neue', sans-serif; font-size: 56px; line-height: 0.92; color: var(--text); margin: 0 0 10px; }
+  .gp-hero-title-red { color: var(--red); display: block; }
+  .gp-hero-sub { font-size: 14px; color: var(--text-muted); margin: 0 0 18px; line-height: 1.5; max-width: 400px; }
+  .gp-hero-pills { display: flex; gap: 7px; flex-wrap: wrap; }
+  .gp-pill { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; background: rgba(100,120,255,0.07); border: 1px solid var(--border-md); color: var(--text-muted); }
+  .gp-pill-hot { background: rgba(232,0,45,0.1); border-color: rgba(232,0,45,0.25); color: var(--red); }
+  .gp-hero-right { flex-shrink: 0; width: 276px; }
+  .gp-cd-card { background: var(--surface-2); border: 1px solid var(--border-md); border-radius: 10px; padding: 20px; }
+  .gp-cd-label { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .gp-cd-race { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--text); line-height: 1; margin-bottom: 2px; }
+  .gp-cd-dates { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; font-family: 'Barlow', sans-serif; }
+  .gp-cd-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 14px; }
+  .gp-cd-cell { background: var(--surface-3); border-radius: 6px; padding: 8px 4px; text-align: center; }
+  .gp-cd-num { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--text); line-height: 1; }
+  .gp-cd-unit { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .gp-cd-btn { width: 100%; background: var(--red); color: #fff; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: none; border-radius: 6px; padding: 10px; cursor: pointer; }
+  .gp-cd-btn:hover { background: var(--red-dark); }
+  .gp-live-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); border-radius: 4px; padding: 4px 10px; margin-bottom: 10px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.1em; color: #22c55e; text-transform: uppercase; }
+  .gp-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: gplivepulse 1s infinite; }
+  @keyframes gplivepulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .gp-ticker { border-top: 1px solid var(--border); margin-top: 24px; padding: 11px 0; display: flex; gap: 26px; overflow: hidden; }
+  .gp-ticker-item { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; flex-shrink: 0; }
+  .gp-ticker-item span { color: var(--text-muted); margin-left: 4px; }
+  .gp-ticker-live { color: var(--red); }
+  .gp-ticker-live span { color: var(--red); }
+  .gp-filters-wrap { border-top: 1px solid var(--border); }
+  .gp-filters { max-width: 1200px; margin: 0 auto; padding: 14px 40px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .gp-filter-lbl { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-right: 4px; }
+  .gp-chip { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-md); background: transparent; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+  .gp-chip:hover { color: var(--text); border-color: rgba(100,120,255,0.3); }
+  .gp-chip-active { background: var(--red); border-color: var(--red); color: #fff; }
+  .gp-calendar { max-width: 1200px; margin: 0 auto; padding: 16px 40px 80px; display: flex; flex-direction: column; gap: 5px; }
+  .gp-detail-wrap { margin-top: 65px; }
+  .gp-breadcrumb { max-width: 1280px; margin: 0 auto; padding: 14px 40px 0; display: flex; align-items: center; gap: 8px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .gp-breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+  .gp-breadcrumb a:hover { color: var(--text); }
+  .gp-back-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border-md); color: var(--text-muted); padding: 7px 14px; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; margin: 12px 40px 0; max-width: fit-content; }
+  .gp-back-btn:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface-3); }
 `
 
 export default function Plan() {
@@ -180,14 +182,17 @@ export default function Plan() {
 
   useEffect(function() {
     if (!seasonStatus || seasonStatus.type === 'finished' || !seasonStatus.session) return
-    var target = seasonStatus.type === 'live' ? seasonStatus.session.raceEnd : seasonStatus.session.fp1
+    var target = seasonStatus.type === 'live'
+      ? seasonStatus.session.raceEnd
+      : seasonStatus.session.fp1
     var tick = function() {
       setCountdown(formatCountdown(target))
-      var newStatus = getSeasonStatus()
-      if (newStatus.type !== seasonStatus.type || (newStatus.session && seasonStatus.session && newStatus.session.round !== seasonStatus.session.round)) {
-        setSeasonStatus(newStatus)
-        if (newStatus.session) {
-          var matched = races.find(function(r) { return r.round === newStatus.session.round })
+      var fresh = getSeasonStatus()
+      var roundChanged = fresh.session && seasonStatus.session && fresh.session.round !== seasonStatus.session.round
+      if (fresh.type !== seasonStatus.type || roundChanged) {
+        setSeasonStatus(fresh)
+        if (fresh.session) {
+          var matched = races.find(function(r) { return r.round === fresh.session.round })
           setNextRace(matched || null)
         }
       }
@@ -205,9 +210,32 @@ export default function Plan() {
   }, [])
 
   useEffect(function() {
-    document.body.style.overflow = selectedRace ? 'hidden' : ''
-    return function() { document.body.style.overflow = '' }
+    window.scrollTo(0, 0)
   }, [selectedRace])
+
+  function handleSelectRace(race) {
+    if (isRaceComplete(race.round)) return
+    setSelectedRace(race)
+    setSelectedGrandstand(null)
+    setTrip(function(prev) {
+      return Object.assign({}, prev, {
+        ticketTier: 1, accumTier: 1,
+        incFlights: true, incTickets: true, incAccom: true,
+      })
+    })
+  }
+
+  function handleBack() {
+    setSelectedRace(null)
+    setSelectedGrandstand(null)
+  }
+
+  function handleGrandstandSelect(gs) {
+    setSelectedGrandstand(gs)
+    if (gs && gs.tierIndex !== undefined) {
+      handleSet('ticketTier', gs.tierIndex)
+    }
+  }
 
   var filters = [
     { key:'all', label:'All 22 Races' },
@@ -229,104 +257,157 @@ export default function Plan() {
     return true
   })
 
-  function handleSelectRace(race) {
-    if (isRaceComplete(race.round)) return
-    setSelectedRace(race)
-    setSelectedGrandstand(null)
-    setTrip(function(prev) {
-      return Object.assign({}, prev, { ticketTier:1, accumTier:1, incFlights:true, incTickets:true, incAccom:true })
-    })
-  }
-
-  function handleClose() {
-    setSelectedRace(null)
-    setSelectedGrandstand(null)
-  }
-
-  function handleGrandstandSelect(gs) {
-    setSelectedGrandstand(gs)
-    if (gs && gs.tierIndex !== undefined) {
-      handleSet('ticketTier', gs.tierIndex)
-    }
-  }
-
   var tickerRaces = races.slice(0, 9)
 
-  return (
-    <div className="gp-page">
-      <style dangerouslySetInnerHTML={{ __html: styles }} />
+  var navEl = (
+    <nav>
+      <Link to="/" className="nav-logo">
+        <div className="logo-mark">GP</div>
+        Grand Prix Planner
+      </Link>
+      <Link to="/" className="nav-link">Home</Link>
+    </nav>
+  )
 
-      <div className="gp-hero">
-        <div className="hero-inner">
-          <div className="hero-top">
-            <div className="hero-left">
-              <div className="hero-eyebrow">
-                <span className="eyebrow-dot" />
+  if (selectedRace) {
+    return (
+      <>
+        <style dangerouslySetInnerHTML={{ __html: heroStyles }} />
+        {navEl}
+        <div className="gp-detail-wrap">
+          <div className="gp-breadcrumb">
+            <a href="#" onClick={function(e){ e.preventDefault(); handleBack() }}>Home</a>
+            <span>›</span>
+            <a href="#" onClick={function(e){ e.preventDefault(); handleBack() }}>Plan a Race</a>
+            <span>›</span>
+            <span style={{color:'var(--text-muted)'}}>{selectedRace.name}</span>
+          </div>
+          <button className="gp-back-btn" onClick={handleBack}>
+            ← Back to Calendar
+          </button>
+          <div className="main">
+            <div className="plan-layout">
+              <div className="plan-content">
+                <div className="detail-panel">
+                  <DetailHeader race={selectedRace} onClose={handleBack} />
+                  <TripInputs trip={trip} onSet={handleSet} />
+                  <SectionNav />
+                  <div className="plan-section" id="grandstands">
+                    <GrandstandPicker
+                      race={selectedRace}
+                      onSelect={handleGrandstandSelect}
+                      selectedId={selectedGrandstand ? selectedGrandstand.id : null}
+                    />
+                  </div>
+                  <div className="plan-section plan-section-alt" id="flights">
+                    <FlightGuide race={selectedRace} trip={trip} />
+                  </div>
+                  <div className="plan-section" id="hotels">
+                    <Accommodation race={selectedRace} trip={trip} onSet={handleSet} />
+                  </div>
+                  <div className="plan-section plan-section-alt" id="transport">
+                    <LocalTransport race={selectedRace} />
+                  </div>
+                  <div className="plan-section" id="itinerary">
+                    <Itinerary race={selectedRace} grandstand={selectedGrandstand} />
+                  </div>
+                  <div className="plan-section plan-section-alt" id="visa">
+                    <VisaChecker race={selectedRace} passport={trip.passport} />
+                  </div>
+                </div>
+              </div>
+              <div className="plan-sidebar">
+                <CostPanel
+                  race={selectedRace}
+                  trip={trip}
+                  onSet={handleSet}
+                  c={costData}
+                  selectedGrandstand={selectedGrandstand}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: heroStyles }} />
+      {navEl}
+
+      <div className="gp-hero-wrap">
+        <div className="gp-hero-inner">
+          <div className="gp-hero-top">
+            <div className="gp-hero-left">
+              <div className="gp-eyebrow">
+                <span className="gp-eyebrow-dot" />
                 Formula 1 · 2026 Season
               </div>
-              <div className="hero-title">
+              <div className="gp-hero-title">
                 Plan Your
-                <span className="hero-title-red">Grand Prix</span>
+                <span className="gp-hero-title-red">Grand Prix</span>
               </div>
-              <div className="hero-sub">{TAGLINES[taglineIdx]}</div>
-              <div className="hero-pills">
+              <div className="gp-hero-sub">{TAGLINES[taglineIdx]}</div>
+              <div className="gp-hero-pills">
                 {['Tickets & Grandstands','Flights','Hotels','Local Transport','Visa Checker','Cost Estimator'].map(function(p, i) {
-                  return <span key={p} className={'hero-pill' + (i === 0 ? ' hero-pill-hot' : '')}>{p}</span>
+                  return <span key={p} className={'gp-pill' + (i === 0 ? ' gp-pill-hot' : '')}>{p}</span>
                 })}
               </div>
             </div>
 
-            <div className="hero-right">
-              <div className="cd-card">
+            <div className="gp-hero-right">
+              <div className="gp-cd-card">
                 {seasonStatus && seasonStatus.type === 'live' && nextRace && (
                   <div>
-                    <div className="cd-live-badge"><span className="live-dot" />Live This Weekend</div>
-                    <div className="cd-race-name">{nextRace.name}</div>
-                    <div className="cd-race-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
+                    <div className="gp-live-badge"><span className="gp-live-dot" />Live This Weekend</div>
+                    <div className="gp-cd-race">{nextRace.name}</div>
+                    <div className="gp-cd-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
                     {countdown && (
-                      <div className="cd-grid">
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.hours)}</div><div className="cd-unit">Hrs</div></div>
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.mins)}</div><div className="cd-unit">Min</div></div>
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.secs)}</div><div className="cd-unit">Sec</div></div>
-                        <div className="cd-cell"><div className="cd-num" style={{fontSize:12,paddingTop:7}}>ends</div><div className="cd-unit">Race</div></div>
+                      <div className="gp-cd-grid">
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.hours)}</div><div className="gp-cd-unit">Hrs</div></div>
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.mins)}</div><div className="gp-cd-unit">Min</div></div>
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.secs)}</div><div className="gp-cd-unit">Sec</div></div>
+                        <div className="gp-cd-cell"><div className="gp-cd-num" style={{fontSize:12,paddingTop:7}}>ends</div><div className="gp-cd-unit">Race</div></div>
                       </div>
                     )}
-                    <button className="cd-btn" onClick={function() { handleSelectRace(nextRace) }}>Open Race Planner</button>
+                    <button className="gp-cd-btn" onClick={function(){ handleSelectRace(nextRace) }}>Open Race Planner</button>
                   </div>
                 )}
                 {seasonStatus && seasonStatus.type === 'next' && nextRace && (
                   <div>
-                    <div className="cd-label">Next Race Weekend</div>
-                    <div className="cd-race-name">{nextRace.name}</div>
-                    <div className="cd-race-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
+                    <div className="gp-cd-label">Next Race Weekend</div>
+                    <div className="gp-cd-race">{nextRace.name}</div>
+                    <div className="gp-cd-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
                     {countdown && (
-                      <div className="cd-grid">
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.days)}</div><div className="cd-unit">Days</div></div>
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.hours)}</div><div className="cd-unit">Hrs</div></div>
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.mins)}</div><div className="cd-unit">Min</div></div>
-                        <div className="cd-cell"><div className="cd-num">{pad(countdown.secs)}</div><div className="cd-unit">Sec</div></div>
+                      <div className="gp-cd-grid">
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.days)}</div><div className="gp-cd-unit">Days</div></div>
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.hours)}</div><div className="gp-cd-unit">Hrs</div></div>
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.mins)}</div><div className="gp-cd-unit">Min</div></div>
+                        <div className="gp-cd-cell"><div className="gp-cd-num">{pad(countdown.secs)}</div><div className="gp-cd-unit">Sec</div></div>
                       </div>
                     )}
-                    <button className="cd-btn" onClick={function() { handleSelectRace(nextRace) }}>Plan This Race</button>
+                    <button className="gp-cd-btn" onClick={function(){ handleSelectRace(nextRace) }}>Plan This Race</button>
                   </div>
                 )}
                 {seasonStatus && seasonStatus.type === 'finished' && (
                   <div>
-                    <div className="cd-label">2026 Season</div>
-                    <div className="cd-race-name">Season Complete</div>
-                    <div className="cd-race-dates">Browse the full calendar below.</div>
+                    <div className="gp-cd-label">2026 Season</div>
+                    <div className="gp-cd-race">Season Complete</div>
+                    <div className="gp-cd-dates">Browse the full calendar below.</div>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="hero-ticker">
+          <div className="gp-ticker">
             {tickerRaces.map(function(r) {
               var done = isRaceComplete(r.round)
               var live = isRaceLive(r.round)
               var isNext = seasonStatus && seasonStatus.type === 'next' && seasonStatus.session && seasonStatus.session.round === r.round
-              var cls = (live || isNext) ? 'ticker-item ticker-item-live' : 'ticker-item'
+              var cls = (live || isNext) ? 'gp-ticker-item gp-ticker-live' : 'gp-ticker-item'
               var label = live ? 'Live Now →' : isNext ? 'Next →' : done ? 'Done' : r.dates.split('–')[1] || r.dates
               return (
                 <div key={r.round} className={cls}>
@@ -337,15 +418,15 @@ export default function Plan() {
           </div>
         </div>
 
-        <div style={{borderTop:'1px solid var(--border)'}}>
-          <div className="hero-filters">
-            <span className="filter-lbl">Filter:</span>
+        <div className="gp-filters-wrap">
+          <div className="gp-filters">
+            <span className="gp-filter-lbl">Filter:</span>
             {filters.map(function(f) {
               return (
                 <button
                   key={f.key}
-                  className={'fchip' + (filter === f.key ? ' fchip-active' : '')}
-                  onClick={function() { setFilter(f.key) }}
+                  className={'gp-chip' + (filter === f.key ? ' gp-chip-active' : '')}
+                  onClick={function(){ setFilter(f.key) }}
                 >
                   {f.label}
                 </button>
@@ -355,7 +436,7 @@ export default function Plan() {
         </div>
       </div>
 
-      <div className="calendar-list">
+      <div className="gp-calendar">
         {filteredRaces.map(function(race) {
           return (
             <RaceCard
@@ -364,45 +445,11 @@ export default function Plan() {
               isComplete={isRaceComplete(race.round)}
               isLive={isRaceLive(race.round)}
               isNext={seasonStatus && seasonStatus.type === 'next' && seasonStatus.session && seasonStatus.session.round === race.round}
-              onSelect={function() { handleSelectRace(race) }}
+              onSelect={function(){ handleSelectRace(race) }}
             />
           )
         })}
       </div>
-
-      {selectedRace && (
-        <div
-          className="overlay-back"
-          onClick={function(e) { if (e.target.classList.contains('overlay-back')) handleClose() }}
-        >
-          <div className="overlay-box">
-            <div className="overlay-main">
-              <DetailHeader race={selectedRace} onClose={handleClose} />
-              <TripInputs trip={trip} onSet={handleSet} />
-              <SectionNav />
-              <GrandstandPicker
-                race={selectedRace}
-                onSelect={handleGrandstandSelect}
-                selectedId={selectedGrandstand ? selectedGrandstand.id : null}
-              />
-              <FlightGuide race={selectedRace} trip={trip} />
-              <Accommodation race={selectedRace} trip={trip} onSet={handleSet} />
-              <LocalTransport race={selectedRace} />
-              <Itinerary race={selectedRace} grandstand={selectedGrandstand} />
-              <VisaChecker race={selectedRace} passport={trip.passport} />
-            </div>
-            <div className="overlay-side">
-              <CostPanel
-                race={selectedRace}
-                trip={trip}
-                onSet={handleSet}
-                c={costData}
-                selectedGrandstand={selectedGrandstand}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   )
 }
