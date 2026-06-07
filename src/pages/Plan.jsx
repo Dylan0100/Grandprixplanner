@@ -11,6 +11,7 @@ import FlightGuide from '../components/FlightGuide'
 import LocalTransport from '../components/LocalTransport'
 import Itinerary from '../components/Itinerary'
 import VisaChecker from '../components/VisaChecker'
+import { calcCost } from '../utils/costCalc'
 
 const SESSIONS = [
   { round:1,  fp1:'2026-03-06T01:30Z', raceEnd:'2026-03-08T08:00Z' },
@@ -47,9 +48,9 @@ const TAGLINES = [
 
 function getSeasonStatus() {
   const now = new Date()
-  for (let i = 0; i < SESSIONS.length; i++) {
-    const fp1 = new Date(SESSIONS[i].fp1)
-    const raceEnd = new Date(SESSIONS[i].raceEnd)
+  for (var i = 0; i < SESSIONS.length; i++) {
+    var fp1 = new Date(SESSIONS[i].fp1)
+    var raceEnd = new Date(SESSIONS[i].raceEnd)
     if (now >= fp1 && now <= raceEnd) return { type: 'live', session: SESSIONS[i] }
     if (now < fp1) return { type: 'next', session: SESSIONS[i] }
   }
@@ -57,27 +58,28 @@ function getSeasonStatus() {
 }
 
 function isRaceComplete(round) {
-  const now = new Date()
-  const session = SESSIONS.find(s => s.round === round)
+  var now = new Date()
+  var session = SESSIONS.find(function(s) { return s.round === round })
   if (!session) return false
   return now > new Date(session.raceEnd)
 }
 
 function isRaceLive(round) {
-  const now = new Date()
-  const session = SESSIONS.find(s => s.round === round)
+  var now = new Date()
+  var session = SESSIONS.find(function(s) { return s.round === round })
   if (!session) return false
   return now >= new Date(session.fp1) && now <= new Date(session.raceEnd)
 }
 
 function formatCountdown(target) {
-  const diff = new Date(target) - new Date()
+  var diff = new Date(target) - new Date()
   if (diff <= 0) return null
-  const days = Math.floor(diff / 86400000)
-  const hours = Math.floor((diff % 86400000) / 3600000)
-  const mins = Math.floor((diff % 3600000) / 60000)
-  const secs = Math.floor((diff % 60000) / 1000)
-  return { days, hours, mins, secs }
+  return {
+    days: Math.floor(diff / 86400000),
+    hours: Math.floor((diff % 86400000) / 3600000),
+    mins: Math.floor((diff % 3600000) / 60000),
+    secs: Math.floor((diff % 60000) / 1000),
+  }
 }
 
 function pad(n) { return String(n).padStart(2, '0') }
@@ -130,62 +132,78 @@ const styles = `
 export default function Plan() {
   const [selectedRace, setSelectedRace] = useState(null)
   const [filter, setFilter] = useState('all')
-  const [departure, setDeparture] = useState('')
-  const [passport, setPassport] = useState('')
-  const [partySize, setPartySize] = useState(2)
   const [selectedGrandstand, setSelectedGrandstand] = useState(null)
   const [countdown, setCountdown] = useState(null)
   const [taglineIdx, setTaglineIdx] = useState(0)
   const [seasonStatus, setSeasonStatus] = useState(null)
   const [nextRace, setNextRace] = useState(null)
 
-  useEffect(() => {
-    const status = getSeasonStatus()
+  const [trip, setTrip] = useState({
+    departureCity: null,
+    passport: null,
+    party: 2,
+    ticketTier: 1,
+    accumTier: 1,
+    incFlights: true,
+    incTickets: true,
+    incAccom: true,
+  })
+
+  function handleSet(key, val) {
+    setTrip(function(prev) {
+      var next = Object.assign({}, prev)
+      next[key] = val
+      return next
+    })
+  }
+
+  var costData = selectedRace ? calcCost(selectedRace, trip) : null
+
+  useEffect(function() {
+    var status = getSeasonStatus()
     setSeasonStatus(status)
     if (status.session) {
-      const matched = races.find(r => r.round === status.session.round)
+      var matched = races.find(function(r) { return r.round === status.session.round })
       setNextRace(matched || null)
     }
   }, [])
 
-  useEffect(() => {
+  useEffect(function() {
     if (!seasonStatus || seasonStatus.type === 'finished' || !seasonStatus.session) return
-    const tick = () => {
-      const target = seasonStatus.type === 'live'
-        ? seasonStatus.session.raceEnd
-        : seasonStatus.session.fp1
+    var target = seasonStatus.type === 'live' ? seasonStatus.session.raceEnd : seasonStatus.session.fp1
+    var tick = function() {
       setCountdown(formatCountdown(target))
-      const newStatus = getSeasonStatus()
-      if (newStatus.type !== seasonStatus.type || newStatus.session?.round !== seasonStatus.session?.round) {
+      var newStatus = getSeasonStatus()
+      if (newStatus.type !== seasonStatus.type || (newStatus.session && seasonStatus.session && newStatus.session.round !== seasonStatus.session.round)) {
         setSeasonStatus(newStatus)
         if (newStatus.session) {
-          const matched = races.find(r => r.round === newStatus.session.round)
+          var matched = races.find(function(r) { return r.round === newStatus.session.round })
           setNextRace(matched || null)
         }
       }
     }
     tick()
-    const interval = setInterval(tick, 1000)
-    return () => clearInterval(interval)
+    var interval = setInterval(tick, 1000)
+    return function() { clearInterval(interval) }
   }, [seasonStatus])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTaglineIdx(i => (i + 1) % TAGLINES.length)
+  useEffect(function() {
+    var interval = setInterval(function() {
+      setTaglineIdx(function(i) { return (i + 1) % TAGLINES.length })
     }, 4000)
-    return () => clearInterval(interval)
+    return function() { clearInterval(interval) }
   }, [])
 
-  useEffect(() => {
+  useEffect(function() {
     if (selectedRace) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
-    return () => { document.body.style.overflow = '' }
+    return function() { document.body.style.overflow = '' }
   }, [selectedRace])
 
-  const filters = [
+  var filters = [
     { key:'all', label:'All 22 Races' },
     { key:'europe', label:'Europe' },
     { key:'americas', label:'Americas' },
@@ -195,7 +213,7 @@ export default function Plan() {
     { key:'upcoming', label:'Upcoming Only' },
   ]
 
-  const filteredRaces = races.filter(r => {
+  var filteredRaces = races.filter(function(r) {
     if (filter === 'europe') return r.region === 'europe'
     if (filter === 'americas') return r.region === 'americas'
     if (filter === 'asia') return r.region === 'asia'
@@ -205,18 +223,27 @@ export default function Plan() {
     return true
   })
 
-  const handleSelectRace = (race) => {
+  function handleSelectRace(race) {
     if (isRaceComplete(race.round)) return
     setSelectedRace(race)
     setSelectedGrandstand(null)
+    setTrip(function(prev) {
+      return Object.assign({}, prev, {
+        ticketTier: 1,
+        accumTier: 1,
+        incFlights: true,
+        incTickets: true,
+        incAccom: true,
+      })
+    })
   }
 
-  const handleClose = () => {
+  function handleClose() {
     setSelectedRace(null)
     setSelectedGrandstand(null)
   }
 
-  const tickerRaces = races.slice(0, 9)
+  var tickerRaces = races.slice(0, 9)
 
   return (
     <div className="gp-page">
@@ -236,39 +263,41 @@ export default function Plan() {
               </div>
               <div className="hero-sub">{TAGLINES[taglineIdx]}</div>
               <div className="hero-pills">
-                {['Tickets & Grandstands','Flights','Hotels','Local Transport','Visa Checker','Cost Estimator'].map((p, i) => (
-                  <span key={p} className={'hero-pill' + (i === 0 ? ' hero-pill-hot' : '')}>{p}</span>
-                ))}
+                {['Tickets & Grandstands','Flights','Hotels','Local Transport','Visa Checker','Cost Estimator'].map(function(p, i) {
+                  return (
+                    <span key={p} className={'hero-pill' + (i === 0 ? ' hero-pill-hot' : '')}>{p}</span>
+                  )
+                })}
               </div>
             </div>
 
             <div className="hero-right">
               <div className="cd-card">
-                {seasonStatus?.type === 'live' && nextRace && (
-                  <>
+                {seasonStatus && seasonStatus.type === 'live' && nextRace && (
+                  <div>
                     <div className="cd-live-badge">
                       <span className="live-dot" />
                       Live This Weekend
                     </div>
                     <div className="cd-race-name">{nextRace.name}</div>
-                    <div className="cd-race-dates">{nextRace.circuit} · {nextRace.dates}</div>
+                    <div className="cd-race-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
                     {countdown && (
                       <div className="cd-grid">
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.hours)}</div><div className="cd-unit">Hrs</div></div>
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.mins)}</div><div className="cd-unit">Min</div></div>
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.secs)}</div><div className="cd-unit">Sec</div></div>
-                        <div className="cd-cell"><div className="cd-num" style={{fontSize:14,paddingTop:6}}>ends</div><div className="cd-unit">Race</div></div>
+                        <div className="cd-cell"><div className="cd-num" style={{fontSize:13,paddingTop:7}}>ends</div><div className="cd-unit">Race</div></div>
                       </div>
                     )}
-                    <button className="cd-btn" onClick={() => handleSelectRace(nextRace)}>Open Race Planner</button>
-                  </>
+                    <button className="cd-btn" onClick={function() { handleSelectRace(nextRace) }}>Open Race Planner</button>
+                  </div>
                 )}
 
-                {seasonStatus?.type === 'next' && nextRace && (
-                  <>
+                {seasonStatus && seasonStatus.type === 'next' && nextRace && (
+                  <div>
                     <div className="cd-label">Next Race Weekend</div>
                     <div className="cd-race-name">{nextRace.name}</div>
-                    <div className="cd-race-dates">{nextRace.circuit} · {nextRace.dates}</div>
+                    <div className="cd-race-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
                     {countdown && (
                       <div className="cd-grid">
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.days)}</div><div className="cd-unit">Days</div></div>
@@ -277,31 +306,31 @@ export default function Plan() {
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.secs)}</div><div className="cd-unit">Sec</div></div>
                       </div>
                     )}
-                    <button className="cd-btn" onClick={() => handleSelectRace(nextRace)}>Plan This Race</button>
-                  </>
+                    <button className="cd-btn" onClick={function() { handleSelectRace(nextRace) }}>Plan This Race</button>
+                  </div>
                 )}
 
-                {seasonStatus?.type === 'finished' && (
-                  <>
+                {seasonStatus && seasonStatus.type === 'finished' && (
+                  <div>
                     <div className="cd-label">2026 Season</div>
                     <div className="cd-race-name">Season Complete</div>
-                    <div className="cd-race-dates" style={{marginBottom:0}}>Browse the full calendar below.</div>
-                  </>
+                    <div className="cd-race-dates">Browse the full calendar below.</div>
+                  </div>
                 )}
               </div>
             </div>
           </div>
 
           <div className="hero-ticker">
-            {tickerRaces.map(r => {
-              const done = isRaceComplete(r.round)
-              const live = isRaceLive(r.round)
-              const isNext = seasonStatus?.type === 'next' && seasonStatus.session?.round === r.round
-              const cls = (live || isNext) ? 'ticker-item ticker-item-live' : 'ticker-item'
-              const label = live ? 'Live Now →' : isNext ? 'Next →' : done ? 'Done' : r.dates.split('–')[1] || r.dates
+            {tickerRaces.map(function(r) {
+              var done = isRaceComplete(r.round)
+              var live = isRaceLive(r.round)
+              var isNext = seasonStatus && seasonStatus.type === 'next' && seasonStatus.session && seasonStatus.session.round === r.round
+              var cls = (live || isNext) ? 'ticker-item ticker-item-live' : 'ticker-item'
+              var label = live ? 'Live Now →' : isNext ? 'Next →' : done ? 'Done' : r.dates.split('–')[1] || r.dates
               return (
                 <div key={r.round} className={cls}>
-                  R{r.round} {r.short} <span>{label}</span>
+                  {'R' + r.round + ' ' + r.short} <span>{label}</span>
                 </div>
               )
             })}
@@ -311,55 +340,59 @@ export default function Plan() {
         <div style={{borderTop:'1px solid var(--border)'}}>
           <div className="hero-filters">
             <span className="filter-lbl">Filter:</span>
-            {filters.map(f => (
-              <button
-                key={f.key}
-                className={'fchip' + (filter === f.key ? ' fchip-active' : '')}
-                onClick={() => setFilter(f.key)}
-              >
-                {f.label}
-              </button>
-            ))}
+            {filters.map(function(f) {
+              return (
+                <button
+                  key={f.key}
+                  className={'fchip' + (filter === f.key ? ' fchip-active' : '')}
+                  onClick={function() { setFilter(f.key) }}
+                >
+                  {f.label}
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
 
       <div className="calendar-list">
-        {filteredRaces.map(race => (
-          <RaceCard
-            key={race.round}
-            race={race}
-            isComplete={isRaceComplete(race.round)}
-            isLive={isRaceLive(race.round)}
-            isNext={seasonStatus?.type === 'next' && seasonStatus.session?.round === race.round}
-            onSelect={() => handleSelectRace(race)}
-          />
-        ))}
+        {filteredRaces.map(function(race) {
+          return (
+            <RaceCard
+              key={race.round}
+              race={race}
+              isComplete={isRaceComplete(race.round)}
+              isLive={isRaceLive(race.round)}
+              isNext={seasonStatus && seasonStatus.type === 'next' && seasonStatus.session && seasonStatus.session.round === race.round}
+              onSelect={function() { handleSelectRace(race) }}
+            />
+          )
+        })}
       </div>
 
       {selectedRace && (
-        <div className="overlay-back" onClick={e => { if (e.target.classList.contains('overlay-back')) handleClose() }}>
+        <div
+          className="overlay-back"
+          onClick={function(e) { if (e.target.classList.contains('overlay-back')) handleClose() }}
+        >
           <div className="overlay-box">
             <div className="overlay-main">
               <DetailHeader race={selectedRace} onBack={handleClose} />
-              <TripInputs
-                departure={departure} setDeparture={setDeparture}
-                passport={passport} setPassport={setPassport}
-                partySize={partySize} setPartySize={setPartySize}
-              />
+              <TripInputs trip={trip} onSet={handleSet} />
               <SectionNav />
-              <GrandstandPicker race={selectedRace} onSelect={setSelectedGrandstand} />
-              <FlightGuide race={selectedRace} departure={departure} />
-              <Accommodation race={selectedRace} partySize={partySize} />
+              <GrandstandPicker race={selectedRace} trip={trip} onSet={handleSet} onSelect={setSelectedGrandstand} />
+              <FlightGuide race={selectedRace} trip={trip} />
+              <Accommodation race={selectedRace} trip={trip} onSet={handleSet} />
               <LocalTransport race={selectedRace} />
               <Itinerary race={selectedRace} grandstand={selectedGrandstand} />
-              <VisaChecker race={selectedRace} passport={passport} />
+              <VisaChecker race={selectedRace} passport={trip.passport} />
             </div>
             <div className="overlay-side">
               <CostPanel
                 race={selectedRace}
-                departure={departure}
-                partySize={partySize}
+                trip={trip}
+                onSet={handleSet}
+                c={costData}
                 selectedGrandstand={selectedGrandstand}
               />
             </div>
