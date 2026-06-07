@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { races } from '../data/racesData'
+import { calcCost } from '../utils/costCalc'
 import RaceCard from '../components/RaceCard'
 import DetailHeader from '../components/DetailHeader'
 import TripInputs from '../components/TripInputs'
@@ -11,7 +12,6 @@ import FlightGuide from '../components/FlightGuide'
 import LocalTransport from '../components/LocalTransport'
 import Itinerary from '../components/Itinerary'
 import VisaChecker from '../components/VisaChecker'
-import { calcCost } from '../utils/costCalc'
 
 const SESSIONS = [
   { round:1,  fp1:'2026-03-06T01:30Z', raceEnd:'2026-03-08T08:00Z' },
@@ -47,7 +47,7 @@ const TAGLINES = [
 ]
 
 function getSeasonStatus() {
-  const now = new Date()
+  var now = new Date()
   for (var i = 0; i < SESSIONS.length; i++) {
     var fp1 = new Date(SESSIONS[i].fp1)
     var raceEnd = new Date(SESSIONS[i].raceEnd)
@@ -112,7 +112,7 @@ const styles = `
   .cd-live-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:4px; padding:4px 10px; margin-bottom:10px; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.1em; color:#22c55e; text-transform:uppercase; }
   .live-dot { width:6px; height:6px; border-radius:50%; background:#22c55e; animation:livepulse 1s infinite; }
   @keyframes livepulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  .hero-ticker { border-top:1px solid var(--border); margin-top:22px; padding:11px 0; display:flex; gap:26px; overflow:hidden; max-width:100%; }
+  .hero-ticker { border-top:1px solid var(--border); margin-top:22px; padding:11px 0; display:flex; gap:26px; overflow:hidden; }
   .ticker-item { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap; flex-shrink:0; }
   .ticker-item span { color:var(--text-muted); margin-left:4px; }
   .ticker-item-live { color:var(--red); }
@@ -124,9 +124,9 @@ const styles = `
   .fchip-active { background:var(--red); border-color:var(--red); color:#fff; }
   .calendar-list { max-width:1200px; margin:0 auto; padding:16px 40px 60px; display:flex; flex-direction:column; gap:5px; }
   .overlay-back { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; overflow-y:auto; padding:20px; box-sizing:border-box; }
-  .overlay-box { background:var(--surface); border-radius:16px; width:100%; max-width:1300px; margin:0 auto; display:flex; min-height:calc(100vh - 40px); }
-  .overlay-main { flex:1; padding:32px 40px; overflow-y:auto; }
-  .overlay-side { width:360px; flex-shrink:0; border-left:1px solid var(--border); }
+  .overlay-box { background:var(--surface); border-radius:16px; width:100%; max-width:1300px; margin:0 auto; display:flex; min-height:calc(100vh - 40px); position:relative; }
+  .overlay-main { flex:1; min-width:0; overflow-y:auto; max-height:calc(100vh - 40px); }
+  .overlay-side { width:360px; flex-shrink:0; border-left:1px solid var(--border); position:sticky; top:0; height:calc(100vh - 40px); overflow-y:auto; }
 `
 
 export default function Plan() {
@@ -157,7 +157,17 @@ export default function Plan() {
     })
   }
 
-  var costData = selectedRace ? calcCost(selectedRace, trip) : null
+  var costTrip = {
+    departure: trip.departureCity ? trip.departureCity.cluster : null,
+    party: trip.party,
+    ticketTier: trip.ticketTier,
+    accumTier: trip.accumTier,
+    incFlights: trip.incFlights,
+    incTickets: trip.incTickets,
+    incAccom: trip.incAccom,
+    ticketPriceOverride: selectedGrandstand ? selectedGrandstand.price : null,
+  }
+  var costData = selectedRace ? calcCost(selectedRace, costTrip) : null
 
   useEffect(function() {
     var status = getSeasonStatus()
@@ -195,11 +205,7 @@ export default function Plan() {
   }, [])
 
   useEffect(function() {
-    if (selectedRace) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
+    document.body.style.overflow = selectedRace ? 'hidden' : ''
     return function() { document.body.style.overflow = '' }
   }, [selectedRace])
 
@@ -228,19 +234,20 @@ export default function Plan() {
     setSelectedRace(race)
     setSelectedGrandstand(null)
     setTrip(function(prev) {
-      return Object.assign({}, prev, {
-        ticketTier: 1,
-        accumTier: 1,
-        incFlights: true,
-        incTickets: true,
-        incAccom: true,
-      })
+      return Object.assign({}, prev, { ticketTier:1, accumTier:1, incFlights:true, incTickets:true, incAccom:true })
     })
   }
 
   function handleClose() {
     setSelectedRace(null)
     setSelectedGrandstand(null)
+  }
+
+  function handleGrandstandSelect(gs) {
+    setSelectedGrandstand(gs)
+    if (gs && gs.tierIndex !== undefined) {
+      handleSet('ticketTier', gs.tierIndex)
+    }
   }
 
   var tickerRaces = races.slice(0, 9)
@@ -264,9 +271,7 @@ export default function Plan() {
               <div className="hero-sub">{TAGLINES[taglineIdx]}</div>
               <div className="hero-pills">
                 {['Tickets & Grandstands','Flights','Hotels','Local Transport','Visa Checker','Cost Estimator'].map(function(p, i) {
-                  return (
-                    <span key={p} className={'hero-pill' + (i === 0 ? ' hero-pill-hot' : '')}>{p}</span>
-                  )
+                  return <span key={p} className={'hero-pill' + (i === 0 ? ' hero-pill-hot' : '')}>{p}</span>
                 })}
               </div>
             </div>
@@ -275,10 +280,7 @@ export default function Plan() {
               <div className="cd-card">
                 {seasonStatus && seasonStatus.type === 'live' && nextRace && (
                   <div>
-                    <div className="cd-live-badge">
-                      <span className="live-dot" />
-                      Live This Weekend
-                    </div>
+                    <div className="cd-live-badge"><span className="live-dot" />Live This Weekend</div>
                     <div className="cd-race-name">{nextRace.name}</div>
                     <div className="cd-race-dates">{nextRace.circuit + ' · ' + nextRace.dates}</div>
                     {countdown && (
@@ -286,13 +288,12 @@ export default function Plan() {
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.hours)}</div><div className="cd-unit">Hrs</div></div>
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.mins)}</div><div className="cd-unit">Min</div></div>
                         <div className="cd-cell"><div className="cd-num">{pad(countdown.secs)}</div><div className="cd-unit">Sec</div></div>
-                        <div className="cd-cell"><div className="cd-num" style={{fontSize:13,paddingTop:7}}>ends</div><div className="cd-unit">Race</div></div>
+                        <div className="cd-cell"><div className="cd-num" style={{fontSize:12,paddingTop:7}}>ends</div><div className="cd-unit">Race</div></div>
                       </div>
                     )}
                     <button className="cd-btn" onClick={function() { handleSelectRace(nextRace) }}>Open Race Planner</button>
                   </div>
                 )}
-
                 {seasonStatus && seasonStatus.type === 'next' && nextRace && (
                   <div>
                     <div className="cd-label">Next Race Weekend</div>
@@ -309,7 +310,6 @@ export default function Plan() {
                     <button className="cd-btn" onClick={function() { handleSelectRace(nextRace) }}>Plan This Race</button>
                   </div>
                 )}
-
                 {seasonStatus && seasonStatus.type === 'finished' && (
                   <div>
                     <div className="cd-label">2026 Season</div>
@@ -377,10 +377,14 @@ export default function Plan() {
         >
           <div className="overlay-box">
             <div className="overlay-main">
-              <DetailHeader race={selectedRace} onBack={handleClose} />
+              <DetailHeader race={selectedRace} onClose={handleClose} />
               <TripInputs trip={trip} onSet={handleSet} />
               <SectionNav />
-              <GrandstandPicker race={selectedRace} trip={trip} onSet={handleSet} onSelect={setSelectedGrandstand} />
+              <GrandstandPicker
+                race={selectedRace}
+                onSelect={handleGrandstandSelect}
+                selectedId={selectedGrandstand ? selectedGrandstand.id : null}
+              />
               <FlightGuide race={selectedRace} trip={trip} />
               <Accommodation race={selectedRace} trip={trip} onSet={handleSet} />
               <LocalTransport race={selectedRace} />
