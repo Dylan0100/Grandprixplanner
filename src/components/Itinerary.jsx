@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const ITIN_CSS = `
 .itin-wrap {
@@ -10,20 +10,27 @@ const ITIN_CSS = `
   flex-direction: column;
   gap: 0;
 }
+.itin-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+}
+.itin-section-header-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 .itin-inputs-section {
   padding: 20px 28px;
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
-}
-.itin-section-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  display: block;
-  margin-bottom: 12px;
 }
 .itin-fields {
   display: grid;
@@ -58,6 +65,20 @@ const ITIN_CSS = `
 }
 .itin-input:focus { border-color: rgba(232,0,45,0.5); }
 .itin-input::placeholder { color: var(--text-dim); }
+.itin-input.prefilled {
+  border-color: rgba(34,197,94,0.35);
+  background: rgba(34,197,94,0.05);
+  color: var(--text);
+}
+.itin-prefilled-note {
+  font-size: 11px;
+  color: #22C55E;
+  margin-top: 3px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .itin-meta-row {
   display: flex;
   align-items: center;
@@ -95,17 +116,6 @@ const ITIN_CSS = `
   color: var(--red);
 }
 .itin-days-section { padding: 0; }
-.itin-days-label {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  display: block;
-  padding: 14px 28px 10px;
-  background: var(--surface);
-}
 .itin-day-card {
   background: var(--surface-2);
   border-bottom: 1px solid var(--border);
@@ -210,6 +220,10 @@ const ITIN_CSS = `
 .itin-generate-wrap {
   padding: 20px 28px;
   background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 .itin-generate-btn {
   background: var(--red);
@@ -229,6 +243,11 @@ const ITIN_CSS = `
   gap: 8px;
 }
 .itin-generate-btn:hover { opacity: 0.88; }
+.itin-generate-note {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
 .itin-preview {
   padding: 24px 28px;
   display: flex;
@@ -243,11 +262,11 @@ const ITIN_CSS = `
   background: var(--surface-2);
   border: 1px solid var(--border-md);
   border-radius: 10px;
-  padding: 20px 22px;
+  padding: 22px 24px;
   font-family: 'Barlow', sans-serif;
   font-size: 12px;
   color: var(--text);
-  line-height: 1.8;
+  line-height: 1.85;
   white-space: pre-wrap;
   overflow-x: auto;
   margin: 0;
@@ -297,7 +316,7 @@ const ITIN_CSS = `
   .itin-notes-wrap { padding: 11px 18px 13px; }
   .itin-generate-wrap { padding: 16px 18px; }
   .itin-disclaimer { padding: 12px 18px; }
-  .itin-days-label { padding: 12px 18px 8px; }
+  .itin-section-header { padding: 10px 18px; }
   .itin-meta-row { padding: 10px 18px; }
   .itin-preview { padding: 18px; }
 }
@@ -386,39 +405,77 @@ function getSchedule(race) {
 }
 
 function buildText(race, grandstand, accom, notes, schedule) {
-  var div = '─'.repeat(42)
+  var line = '─'.repeat(48)
   var lines = []
-  lines.push('🏁 ' + race.name.toUpperCase() + ' — RACE WEEKEND ITINERARY')
-  lines.push(race.circuit + ' · ' + race.city + ', ' + race.country + ' · ' + race.dates)
-  if (grandstand) lines.push('Grandstand / Seating: ' + grandstand)
-  if (accom)      lines.push('Accommodation: ' + accom)
+
+  lines.push('🏁  ' + race.name.toUpperCase())
+  lines.push('    ' + race.circuit + '  ·  ' + race.city + ', ' + race.country)
+  lines.push('    ' + race.dates)
   lines.push('')
-  lines.push(div)
-  schedule.forEach(function(dayObj, i) {
+  lines.push(line)
+
+  if (grandstand || accom) {
     lines.push('')
-    lines.push(dayObj.day.toUpperCase() + ' — ' + dayObj.label.toUpperCase())
+    lines.push('MY TRIP')
+    if (grandstand) lines.push('  Grandstand / Seating  →  ' + grandstand)
+    if (accom)      lines.push('  Accommodation         →  ' + accom)
+    lines.push('')
+    lines.push(line)
+  }
+
+  lines.push('')
+  lines.push('WEEKEND SCHEDULE')
+  lines.push('')
+
+  schedule.forEach(function(dayObj, i) {
+    lines.push('  ' + dayObj.day.toUpperCase() + '  —  ' + dayObj.label.toUpperCase())
     dayObj.sessions.forEach(function(s) {
-      lines.push('  🕐 ' + s.time + ' · ' + s.name)
+      lines.push('  ' + s.time + '  ·  ' + s.name)
     })
     if (notes[i] && notes[i].trim()) {
-      lines.push('  📝 Notes: ' + notes[i].trim())
+      lines.push('')
+      lines.push('  Notes:')
+      notes[i].trim().split('\n').forEach(function(noteLine) {
+        lines.push('  ' + noteLine)
+      })
     }
+    if (i < schedule.length - 1) lines.push('')
   })
+
   lines.push('')
-  lines.push(div)
-  lines.push('Nearest airport: ' + race.airport)
-  lines.push('Session times are approximate — confirm exact times on the official F1 app or formula1.com.')
-  lines.push('Generated by Grand Prix Planner · grandprixplanner.com')
+  lines.push(line)
+  lines.push('')
+  lines.push('CIRCUIT INFO')
+  lines.push('  Nearest airport  →  ' + race.airport)
+  lines.push('  Session times are approximate — confirm on the official F1 app or formula1.com')
+  lines.push('')
+  lines.push(line)
+  lines.push('')
+  lines.push('  Generated by Grand Prix Planner  ·  grandprixplanner.com')
+
   return lines.join('\n')
 }
 
-export default function Itinerary({ race, onBack }) {
+export default function Itinerary({ race, grandstand }) {
   var schedule = getSchedule(race)
-  var [grandstand, setGrandstand] = useState('')
+
+  var grandstandName = grandstand ? grandstand.name : ''
+
+  var [grandstandInput, setGrandstandInput] = useState(grandstandName)
   var [accom, setAccom] = useState('')
-  var [notes, setNotes] = useState(function() { return schedule.map(function() { return '' }) })
+  var [notes, setNotes] = useState(function() {
+    return schedule.map(function() { return '' })
+  })
   var [phase, setPhase] = useState('build')
   var [copied, setCopied] = useState(false)
+  var [grandstandPrefilled, setGrandstandPrefilled] = useState(!!grandstand)
+
+  useEffect(function() {
+    if (grandstand && grandstand.name) {
+      setGrandstandInput(grandstand.name)
+      setGrandstandPrefilled(true)
+    }
+  }, [grandstand])
 
   var isMonaco = race.nights === 4
 
@@ -431,10 +488,10 @@ export default function Itinerary({ race, onBack }) {
   }
 
   function handleCopy() {
-    var text = buildText(race, grandstand, accom, notes, schedule)
+    var text = buildText(race, grandstandInput, accom, notes, schedule)
     navigator.clipboard.writeText(text).then(function() {
       setCopied(true)
-      setTimeout(function() { setCopied(false) }, 2000)
+      setTimeout(function() { setCopied(false) }, 2500)
     })
   }
 
@@ -444,18 +501,28 @@ export default function Itinerary({ race, onBack }) {
 
       {phase === 'build' ? (
         <div className="itin-body">
+
+          <div className="itin-section-header">
+            <span className="itin-section-header-text">Your trip details</span>
+          </div>
+
           <div className="itin-inputs-section">
-            <span className="itin-section-label">Your trip details</span>
             <div className="itin-fields">
               <div className="itin-field">
                 <label className="itin-field-label">Grandstand / seating area</label>
                 <input
-                  className="itin-input"
+                  className={'itin-input' + (grandstandPrefilled ? ' prefilled' : '')}
                   type="text"
-                  value={grandstand}
-                  onChange={function(e) { setGrandstand(e.target.value) }}
+                  value={grandstandInput}
+                  onChange={function(e) {
+                    setGrandstandInput(e.target.value)
+                    setGrandstandPrefilled(false)
+                  }}
                   placeholder={'e.g. ' + (race.ticketLabels ? race.ticketLabels[1] : 'Main Grandstand')}
                 />
+                {grandstandPrefilled && (
+                  <span className="itin-prefilled-note">✓ From your grandstand selection</span>
+                )}
               </div>
               <div className="itin-field">
                 <label className="itin-field-label">Accommodation</label>
@@ -471,13 +538,15 @@ export default function Itinerary({ race, onBack }) {
           </div>
 
           <div className="itin-meta-row">
-            <span className="itin-meta-item">{'✈️ ' + race.airport}</span>
+            <span className="itin-meta-item">{'✈️  ' + race.airport}</span>
             {race.sprint && <span className="itin-badge sprint">Sprint Weekend</span>}
             {isMonaco && <span className="itin-badge four-day">4-Day Weekend</span>}
           </div>
 
           <div className="itin-days-section">
-            <span className="itin-days-label">Your weekend schedule</span>
+            <div className="itin-section-header">
+              <span className="itin-section-header-text">Weekend schedule</span>
+            </div>
             {schedule.map(function(dayObj, i) {
               return (
                 <div key={dayObj.key} className="itin-day-card">
@@ -520,20 +589,24 @@ export default function Itinerary({ race, onBack }) {
             <button className="itin-generate-btn" onClick={function() { setPhase('preview') }}>
               Generate My Itinerary →
             </button>
+            <span className="itin-generate-note">Creates a formatted itinerary you can copy and share</span>
           </div>
+
         </div>
       ) : (
         <div className="itin-preview">
-          <div className="itin-preview-label">Your race weekend itinerary — ready to copy and share</div>
+          <div className="itin-preview-label">
+            Your race weekend itinerary — ready to copy and share
+          </div>
           <pre className="itin-preview-block">
-            {buildText(race, grandstand, accom, notes, schedule)}
+            {buildText(race, grandstandInput, accom, notes, schedule)}
           </pre>
           <div className="itin-preview-actions">
             <button
               className={'itin-copy-btn' + (copied ? ' copied' : '')}
               onClick={handleCopy}
             >
-              {copied ? '✓ Copied' : 'Copy to Clipboard'}
+              {copied ? '✓ Copied to clipboard' : 'Copy to Clipboard'}
             </button>
             <button className="itin-edit-btn" onClick={function() { setPhase('build') }}>
               ← Edit Itinerary
