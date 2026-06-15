@@ -1,5 +1,5 @@
-import React from 'react';
-import flightData from './flightData';
+import React from 'react'
+import flightData from './flightData'
 
 const FG_CSS = `
 .fg-wrap {
@@ -39,6 +39,25 @@ const FG_CSS = `
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 3px;
+}
+.fg-personalised-fare {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  color: var(--red);
+}
+.fg-personalised-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--red);
+  opacity: 0.7;
+  margin-bottom: 4px;
+  display: block;
 }
 .fg-direct-badge {
   display: inline-flex;
@@ -291,6 +310,31 @@ const FG_CSS = `
   flex-shrink: 0;
   margin-top: 2px;
 }
+.fg-personalised-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 28px;
+  background: rgba(232,0,45,0.06);
+  border-bottom: 1px solid rgba(232,0,45,0.15);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.fg-personalised-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+}
+.fg-personalised-city {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
 .fg-no-data {
   padding: 48px 28px;
   text-align: center;
@@ -302,11 +346,39 @@ const FG_CSS = `
   .fg-cell:nth-child(odd) { border-right: none; }
   .fg-fare-hero { padding: 16px 20px; }
   .fg-cell { padding: 16px 18px; }
+  .fg-personalised-banner { padding: 10px 18px; }
 }
 `
 
-export default function FlightGuide({ race, onBack }) {
+function getPersonalisedFare(race, departureCity) {
+  if (!departureCity || !departureCity.cluster) return null
+  var cluster = departureCity.cluster
+  var clusterMults = {
+    'uk-south': 1.00, 'uk-midlands': 1.08, 'uk-north': 1.12,
+    'uk-scotland': 1.15, 'uk-wales': 1.10, 'ireland': 0.97,
+    'w-europe': 0.60, 'e-europe': 0.70, 'scandinavia': 0.82,
+    'n-america': null, 'australia': null, 'other': 0.95
+  }
+  var ukClusters = ['uk-south','uk-midlands','uk-north','uk-scotland','uk-wales','ireland']
+  if (race.isUKRace && ukClusters.includes(cluster)) return 0
+  if (cluster === 'n-america') {
+    var mid = race.flightNA
+    return { low: Math.round(mid * 0.86), high: Math.round(mid * 1.16) }
+  }
+  if (cluster === 'australia') {
+    var mid = race.flightAUS
+    return { low: Math.round(mid * 0.86), high: Math.round(mid * 1.16) }
+  }
+  var mult = clusterMults[cluster]
+  if (!mult) return null
+  var mid = Math.round(race.flightBase * mult)
+  return { low: Math.round(mid * 0.86), high: Math.round(mid * 1.16) }
+}
+
+export default function FlightGuide({ race, trip }) {
   var data = flightData[race ? race.name : '']
+  var departureCity = trip ? trip.departureCity : null
+  var personalisedFare = race ? getPersonalisedFare(race, departureCity) : null
 
   if (!data) {
     return (
@@ -325,11 +397,41 @@ export default function FlightGuide({ race, onBack }) {
     <div className="fg-wrap">
       <style dangerouslySetInnerHTML={{ __html: FG_CSS }} />
 
+      {departureCity && (
+        <div className="fg-personalised-banner">
+          <div className="fg-personalised-dot" />
+          <span>Showing estimates for</span>
+          <span className="fg-personalised-city">{departureCity.label}</span>
+        </div>
+      )}
+
       <div className="fg-fare-hero">
         <div>
-          <span className="fg-fare-eyebrow">Typical return fare from UK</span>
-          <div className="fg-fare-amount">{data.typicalFareRange || '—'}</div>
-          <div className="fg-fare-note">{data.destination}</div>
+          {personalisedFare !== null ? (
+            <>
+              {personalisedFare === 0 ? (
+                <>
+                  <span className="fg-personalised-label">Your flight cost</span>
+                  <div className="fg-personalised-fare">No flight needed</div>
+                  <div className="fg-fare-note">This is your home race</div>
+                </>
+              ) : (
+                <>
+                  <span className="fg-personalised-label">Estimated return fare</span>
+                  <div className="fg-personalised-fare">
+                    {'£' + personalisedFare.low.toLocaleString('en-GB') + ' – £' + personalisedFare.high.toLocaleString('en-GB')}
+                  </div>
+                  <div className="fg-fare-note">{'from ' + departureCity.label + ' · return'}</div>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <span className="fg-fare-eyebrow">Typical return fare from UK</span>
+              <div className="fg-fare-amount">{data.typicalFareRange || '—'}</div>
+              <div className="fg-fare-note">{data.destination}</div>
+            </>
+          )}
         </div>
         <div className={'fg-direct-badge ' + (isDirect ? 'yes' : 'no')}>
           <div className="fg-direct-dot" style={{ background: isDirect ? '#4ade80' : 'var(--text-dim)' }} />
@@ -365,7 +467,9 @@ export default function FlightGuide({ race, onBack }) {
         </div>
 
         <div className="fg-cell">
-          <span className="fg-cell-label">Getting there from the UK</span>
+          <span className="fg-cell-label">
+            {departureCity ? 'Getting there from ' + departureCity.label.split(' ')[0] : 'Getting there from the UK'}
+          </span>
           <div className="fg-route-text">{data.ukRouting.typicalRoute}</div>
           <div className="fg-meta-row">
             <div>
