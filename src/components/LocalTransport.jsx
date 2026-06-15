@@ -22,7 +22,7 @@ const LT_CSS = `
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 13px 20px;
+  padding: 13px 28px;
   background: rgba(232,0,45,0.08);
   border-bottom: 1px solid rgba(232,0,45,0.2);
   font-size: 13px;
@@ -38,16 +38,22 @@ const LT_CSS = `
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
 }
-.lt-section-label {
+.lt-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 28px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+}
+.lt-section-header-text {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-dim);
-  padding: 14px 28px 10px;
-  display: block;
-  background: var(--surface);
+  color: var(--text-muted);
 }
 .lt-modes {
   display: flex;
@@ -87,7 +93,7 @@ const LT_CSS = `
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   flex-wrap: wrap;
 }
 .lt-mode-name {
@@ -111,16 +117,34 @@ const LT_CSS = `
 }
 .lt-mode-meta {
   display: flex;
-  gap: 16px;
-  margin-bottom: 7px;
-  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 8px;
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: hidden;
 }
 .lt-mode-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  flex: 1;
+  border-right: 1px solid var(--border);
+}
+.lt-mode-meta-item:last-child { border-right: none; }
+.lt-mode-meta-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.lt-mode-meta-value {
   font-size: 12px;
   color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  line-height: 1.4;
 }
 .lt-mode-notes {
   font-size: 12px;
@@ -159,11 +183,13 @@ const LT_CSS = `
   border-bottom-color: var(--red);
 }
 .lt-day-content {
-  padding: 16px 28px 18px;
+  padding: 18px 28px;
+  background: var(--surface);
+}
+.lt-day-content-text {
   font-size: 13px;
   color: var(--text-muted);
-  line-height: 1.7;
-  background: var(--surface);
+  line-height: 1.75;
 }
 .lt-tips-section { padding-bottom: 4px; }
 .lt-tips-list {
@@ -202,7 +228,7 @@ const LT_CSS = `
 }
 @media (max-width: 640px) {
   .lt-mode-card { padding: 14px 18px; }
-  .lt-section-label { padding: 12px 18px 8px; }
+  .lt-section-header { padding: 10px 18px; }
   .lt-day-tabs { padding: 0 18px; }
   .lt-day-content { padding: 14px 18px; }
   .lt-tips-list { padding: 0 18px 16px; }
@@ -211,7 +237,7 @@ const LT_CSS = `
 }
 `
 
-export default function LocalTransport({ race, onBack }) {
+export default function LocalTransport({ race }) {
   var [activeDay, setActiveDay] = useState('sunday')
   var data = transportData[race.name]
 
@@ -239,7 +265,10 @@ export default function LocalTransport({ race, onBack }) {
 
       <div className="lt-overview">{data.overview}</div>
 
-      <span className="lt-section-label">Getting there</span>
+      <div className="lt-section-header">
+        <span className="lt-section-header-text">Getting there</span>
+      </div>
+
       <div className="lt-modes">
         {data.modes.map(function(mode, i) {
           var cfg = RATING_CFG[mode.rating] || RATING_CFG.good
@@ -257,8 +286,14 @@ export default function LocalTransport({ race, onBack }) {
                   </span>
                 </div>
                 <div className="lt-mode-meta">
-                  <span className="lt-mode-meta-item">💰 {mode.cost}</span>
-                  <span className="lt-mode-meta-item">⏱ {mode.time}</span>
+                  <div className="lt-mode-meta-item">
+                    <span className="lt-mode-meta-label">Cost</span>
+                    <span className="lt-mode-meta-value">{mode.cost}</span>
+                  </div>
+                  <div className="lt-mode-meta-item">
+                    <span className="lt-mode-meta-label">Journey time</span>
+                    <span className="lt-mode-meta-value">{mode.time}</span>
+                  </div>
                 </div>
                 <div className="lt-mode-notes">{mode.notes}</div>
               </div>
@@ -268,7 +303,9 @@ export default function LocalTransport({ race, onBack }) {
       </div>
 
       <div className="lt-day-section">
-        <span className="lt-section-label">Day by day</span>
+        <div className="lt-section-header">
+          <span className="lt-section-header-text">Day by day</span>
+        </div>
         <div className="lt-day-tabs">
           {DAYS.map(function(d) {
             return (
@@ -282,11 +319,15 @@ export default function LocalTransport({ race, onBack }) {
             )
           })}
         </div>
-        <div className="lt-day-content">{data.byDay[activeDay]}</div>
+        <div className="lt-day-content">
+          <p className="lt-day-content-text">{data.byDay[activeDay]}</p>
+        </div>
       </div>
 
       <div className="lt-tips-section">
-        <span className="lt-section-label">Tips &amp; quirks</span>
+        <div className="lt-section-header">
+          <span className="lt-section-header-text">Tips &amp; quirks</span>
+        </div>
         <div className="lt-tips-list">
           {data.tips.map(function(tip, i) {
             return (
@@ -298,6 +339,7 @@ export default function LocalTransport({ race, onBack }) {
           })}
         </div>
       </div>
+
     </div>
   )
 }
