@@ -130,6 +130,19 @@ const heroStyles = `
   .gp-breadcrumb a:hover { color: var(--text); }
   .gp-back-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--surface-2); border: 1px solid var(--border-md); color: var(--text-muted); padding: 7px 14px; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; margin: 12px 40px 0; max-width: fit-content; }
   .gp-back-btn:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface-3); }
+
+  @media (max-width: 640px) {
+    .gp-hero-inner { padding: 20px 16px 0; }
+    .gp-hero-top { flex-direction: column; gap: 20px; }
+    .gp-hero-title { font-size: 38px; margin: 0 0 8px; }
+    .gp-hero-sub { max-width: 100%; margin: 0 0 14px; }
+    .gp-hero-right { width: 100%; }
+    .gp-cd-card { padding: 16px; }
+    .gp-cd-num { font-size: 22px; }
+    .gp-ticker { gap: 16px; padding: 9px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .gp-filters { padding: 12px 16px; gap: 6px; }
+    .gp-calendar { padding: 14px 16px 60px; }
+  }
 `
 
 export default function Plan() {
