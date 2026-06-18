@@ -100,6 +100,9 @@ const styles = `
     color: var(--text-muted);
     margin-top: 1px;
   }
+  .rc-meta {
+    display: contents;
+  }
   .rc-badges {
     display: flex;
     align-items: center;
@@ -142,6 +145,34 @@ const styles = `
     min-width: 48px;
     text-align: right;
   }
+
+  @media (max-width: 640px) {
+    .rc {
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      padding: 12px 14px;
+    }
+    .rc-circuit {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rc-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1 0 100%;
+    }
+    .rc-dates {
+      min-width: 0;
+      text-align: left;
+    }
+    .rc-plan {
+      min-width: 0;
+      text-align: right;
+      margin-left: auto;
+    }
+  }
 `
 
 export default function RaceCard({ race, isComplete, isLive, isNext, onSelect }) {
@@ -182,17 +213,19 @@ export default function RaceCard({ race, isComplete, isLive, isNext, onSelect })
           <div className="rc-circuit">{race.circuit}</div>
         </div>
 
-        <div className="rc-badges">
-          {isLive && <span className="rcb rcb-live">Live</span>}
-          {isNext && !isLive && <span className="rcb rcb-next">Next Race</span>}
-          {race.sprint && <span className="rcb rcb-sprint">Sprint</span>}
-          {race.isNew && <span className="rcb rcb-new">New</span>}
-          {isComplete && <span className="rcb rcb-done">Done</span>}
+        <div className="rc-meta">
+          <div className="rc-badges">
+            {isLive && <span className="rcb rcb-live">Live</span>}
+            {isNext && !isLive && <span className="rcb rcb-next">Next Race</span>}
+            {race.sprint && <span className="rcb rcb-sprint">Sprint</span>}
+            {race.isNew && <span className="rcb rcb-new">New</span>}
+            {isComplete && <span className="rcb rcb-done">Done</span>}
+          </div>
+
+          <div className="rc-dates">{race.dates}</div>
+
+          <div className="rc-plan">{!isComplete ? 'Plan \u2192' : ''}</div>
         </div>
-
-        <div className="rc-dates">{race.dates}</div>
-
-        <div className="rc-plan">{!isComplete ? 'Plan \u2192' : ''}</div>
 
       </div>
     </>
