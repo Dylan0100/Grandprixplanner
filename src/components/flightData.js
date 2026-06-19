@@ -476,7 +476,7 @@ const flightData = {
       acceptable: "Tickets should be secured as soon as they release — grandstands sell out quickly",
       lastMinuteRisk: "Very high for accommodation — options within 30 minutes of the circuit are gone within days of ticket sales"
     },
-    typicalFareRange: "No flights needed. Train or coach from ~£30–£80 return depending on origin.",
+    typicalFareRange: "~£30 – £80 return by train or coach",
     pricingTips: [
       "The direct Silverstone Central train is by far the most stress-free option — runs from Milton Keynes throughout the weekend",
       "On-site camping (Club, Village, and Woodlands camping) is excellent and removes the transfer problem entirely",
