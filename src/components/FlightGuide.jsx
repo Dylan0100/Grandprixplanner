@@ -29,10 +29,10 @@ const FG_CSS = `
 }
 .fg-fare-amount {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 44px;
+  font-size: 26px;
   font-weight: 400;
   letter-spacing: 0.03em;
-  line-height: 1;
+  line-height: 1.15;
   color: var(--text);
 }
 .fg-fare-note {
@@ -42,10 +42,10 @@ const FG_CSS = `
 }
 .fg-personalised-fare {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 44px;
+  font-size: 26px;
   font-weight: 400;
   letter-spacing: 0.03em;
-  line-height: 1;
+  line-height: 1.15;
   color: var(--red);
 }
 .fg-personalised-label {
