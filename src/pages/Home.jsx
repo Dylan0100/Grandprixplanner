@@ -1,18 +1,16 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import Footer from '../components/Footer'
 
-const BREVO_API_KEY = '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'
-
-async function submitToBrevo(email) {
-  const response = await fetch('https://api.brevo.com/v3/contacts', {
+async function subscribeEmail(email) {
+  const response = await fetch('/api/subscribe', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'api-key': BREVO_API_KEY },
-    body: JSON.stringify({ email, listIds: [2], updateEnabled: true })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
   })
-  if (response.ok || response.status === 204) return true
-  const errorData = await response.json()
-  if (response.status === 400 && errorData.message?.includes('already exists')) return true
-  throw new Error(`Brevo API error: ${response.status}`)
+  if (response.ok) return true
+  const errorData = await response.json().catch(() => ({}))
+  throw new Error(errorData.error || `Signup error: ${response.status}`)
 }
 
 function EmailForm({ buttonText }) {
@@ -24,7 +22,7 @@ function EmailForm({ buttonText }) {
     e.preventDefault()
     setLoading(true)
     try {
-      await submitToBrevo(email)
+      await subscribeEmail(email)
       setSuccess(true)
     } catch (err) {
       console.error(err)
@@ -162,15 +160,7 @@ export default function Home() {
         <p className="form-note" style={{ marginTop: '14px', color: 'var(--text-muted)' }}>No spam. Unsubscribe any time.</p>
       </div>
 
-      <footer>
-        <Link to="/" className="nav-logo"><div className="logo-mark">GP</div>Grand Prix Planner</Link>
-        <div className="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms</a>
-          <a href="mailto:hello@grandprixplanner.com">Contact</a>
-        </div>
-        <p className="footer-copy">© 2026 Grand Prix Planner. All rights reserved.</p>
-      </footer>
+      <Footer />
     </>
   )
 }
