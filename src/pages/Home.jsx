@@ -52,9 +52,32 @@ const compactFeatures = [
   { icon: '📋', label: 'Itinerary' },
 ]
 
-const routeDots = [0, 5, 10, 14, 19, 24, 29, 33, 38, 43, 48, 52, 57, 62, 67, 71, 76, 81, 86, 90, 95, 100]
+const routeStops = [
+  { pos: 0, label: 'Australia', side: 'above' },
+  { pos: 3, label: null },
+  { pos: 8, label: 'Suzuka', side: 'below', minor: true },
+  { pos: 21, label: null },
+  { pos: 28, label: null },
+  { pos: 34, label: 'Monaco', side: 'above', minor: true },
+  { pos: 36, label: null },
+  { pos: 41, label: null },
+  { pos: 44, label: 'Silverstone', side: 'below' },
+  { pos: 49, label: 'Spa', side: 'above', minor: true },
+  { pos: 51, label: null },
+  { pos: 61, label: null },
+  { pos: 67, label: 'Monza', side: 'below', minor: true },
+  { pos: 70, label: null },
+  { pos: 72, label: null },
+  { pos: 77, label: 'Singapore', side: 'above' },
+  { pos: 85, label: null },
+  { pos: 87, label: null },
+  { pos: 90, label: null },
+  { pos: 95, label: null },
+  { pos: 97, label: null },
+  { pos: 100, label: 'Abu Dhabi', side: 'below' },
+]
 
-const circuitPath = 'M50,180 C30,120 90,60 180,55 C260,50 290,90 260,130 C235,162 245,195 300,205 C380,218 460,205 500,160 C535,122 510,70 450,60 C400,52 370,85 340,100 C290,123 230,95 190,70 C150,46 90,55 70,90 C55,115 55,150 50,180 Z'
+const circuitPath = 'M100,90 C140,65 160,75 185,62 C220,45 250,52 270,58 C300,66 295,78 320,75 C345,72 340,58 360,65 C385,73 392,88 388,100 C383,120 395,128 400,142 L158,255 C140,263 120,265 108,278 C92,295 85,305 80,320 C75,335 90,335 100,322 C112,308 108,295 95,290 C82,285 75,300 78,318 C68,335 65,360 75,385 C82,403 78,415 82,425 C92,448 130,455 160,450 C220,440 270,442 320,432 C370,422 410,425 450,415 C500,402 540,398 560,365 C578,335 585,310 575,285 C565,260 545,265 535,248 C525,230 535,210 525,195 C512,175 495,165 478,150 C455,130 430,120 405,100 C390,87 392,75 380,65 C360,48 335,55 315,48 C290,40 265,42 245,38 C210,32 175,40 145,52 C115,64 105,75 100,90 Z'
 
 const styles = `
 /* ─── HERO ─── */
@@ -65,7 +88,14 @@ const styles = `
   overflow: hidden;
   background: radial-gradient(ellipse 75% 60% at 50% -10%, rgba(232,0,45,0.18) 0%, transparent 60%);
 }
-.lp-hero-line { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lp-hero-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 560px;
+  height: 513px;
+  transform: translate(-50%, -50%);
+}
 .lp-hero-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
 .lp-lights { display: flex; gap: 12px; justify-content: center; margin-bottom: 22px; }
 .lp-light {
@@ -269,8 +299,26 @@ const styles = `
 .lp-coverage { text-align: center; }
 .lp-coverage .lp-label, .lp-coverage .lp-title { justify-content: center; }
 .lp-coverage .lp-sub { margin: 0 auto; }
-.lp-route { position: relative; height: 2px; background: var(--border-md); margin: 64px 8px 0; }
+.lp-route { position: relative; height: 2px; background: var(--border-md); margin: 56px 8px; }
 .lp-route-dot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+.lp-route-dot.marquee { width: 9px; height: 9px; background: var(--red); }
+.lp-route-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.lp-route-label.above { bottom: 14px; }
+.lp-route-label.below { top: 14px; }
+@media (max-width: 600px) {
+  .lp-route-label.minor { display: none; }
+}
 
 /* ─── CTA ─── */
 .lp-cta { position: relative; text-align: center; padding: 100px 24px; overflow: hidden; }
@@ -328,6 +376,7 @@ const styles = `
 }
 @media (max-width: 600px) {
   .lp-hero { padding: 130px 20px 80px; }
+  .lp-hero-line { width: 320px; height: 293px; }
   .lp-section { padding: 70px 20px; }
   .lp-feature-hero { padding: 28px; gap: 28px; }
   .lp-tabs-visual { gap: 14px; }
@@ -350,8 +399,8 @@ export default function Home() {
       </nav>
 
       <div className="lp-hero">
-        <svg className="lp-hero-line" viewBox="0 0 700 280" preserveAspectRatio="none" aria-hidden="true">
-          <path d={circuitPath} fill="none" stroke="rgba(140,160,255,0.12)" strokeWidth="2" />
+        <svg className="lp-hero-line" viewBox="0 0 600 550" aria-hidden="true">
+          <path d={circuitPath} fill="none" stroke="rgba(140,160,255,0.16)" strokeWidth="3" />
         </svg>
         <div className="lp-hero-inner">
           <div className="lp-lights" aria-hidden="true">
@@ -438,8 +487,12 @@ export default function Home() {
         <h2 className="lp-title">All 22 races. One season, fully mapped.</h2>
         <p className="lp-sub">Every round on the calendar — not just the headline circuits like Silverstone, Monaco, and Monza.</p>
         <div className="lp-route" aria-hidden="true">
-          {routeDots.map((pos, i) => (
-            <span key={i} className="lp-route-dot" style={{ left: pos + '%' }} />
+          {routeStops.map((stop, i) => (
+            <span key={i} className={stop.label ? 'lp-route-dot marquee' : 'lp-route-dot'} style={{ left: stop.pos + '%' }}>
+              {stop.label && (
+                <span className={'lp-route-label ' + stop.side + (stop.minor ? ' minor' : '')}>{stop.label}</span>
+              )}
+            </span>
           ))}
         </div>
       </section>
@@ -447,8 +500,8 @@ export default function Home() {
       <hr className="lp-divider" />
 
       <div className="lp-cta" id="signup">
-        <svg className="lp-hero-line" style={{ opacity: 0.6 }} viewBox="0 0 700 280" preserveAspectRatio="none" aria-hidden="true">
-          <path d={circuitPath} fill="none" stroke="rgba(140,160,255,0.07)" strokeWidth="2" />
+        <svg className="lp-hero-line" style={{ opacity: 0.6 }} viewBox="0 0 600 550" aria-hidden="true">
+          <path d={circuitPath} fill="none" stroke="rgba(140,160,255,0.16)" strokeWidth="3" />
         </svg>
         <div className="lp-cta-inner">
           <div className="lp-label" style={{ justifyContent: 'center' }}>Stay in the loop</div>
