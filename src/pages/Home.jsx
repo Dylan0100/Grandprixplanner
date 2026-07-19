@@ -17,17 +17,20 @@ function EmailForm({ buttonText }) {
   const [email, setEmail] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
+    setError(null)
     try {
       await subscribeEmail(email)
       setSuccess(true)
     } catch (err) {
       console.error(err)
+      setError('There was an issue signing you up. Please try again, or email hello@grandprixplanner.com.')
+    } finally {
       setLoading(false)
-      alert('There was an issue signing you up. Please try again or email hello@grandprixplanner.com.')
     }
   }
 
@@ -36,10 +39,13 @@ function EmailForm({ buttonText }) {
   }
 
   return (
-    <form className="lp-signup-form" onSubmit={handleSubmit}>
-      <input type="email" placeholder="your@email.com" required aria-label="Email address" value={email} onChange={e => setEmail(e.target.value)} />
-      <button type="submit" disabled={loading}>{loading ? 'Signing up...' : buttonText}</button>
-    </form>
+    <div>
+      <form className="lp-signup-form" onSubmit={handleSubmit}>
+        <input type="email" placeholder="your@email.com" required aria-label="Email address" value={email} onChange={e => setEmail(e.target.value)} />
+        <button type="submit" disabled={loading}>{loading ? 'Signing up...' : buttonText}</button>
+      </form>
+      {error && <div className="lp-error-msg">{error}</div>}
+    </div>
   )
 }
 
@@ -279,6 +285,12 @@ const styles = `
   background: rgba(0,200,100,0.1); border: 1px solid rgba(0,200,100,0.2);
   color: #4ade80; padding: 14px 20px; border-radius: 8px;
   font-size: 15px; max-width: 460px; margin: 0 auto;
+}
+.lp-error-msg {
+  background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25);
+  color: var(--amber); padding: 12px 18px; border-radius: 8px;
+  font-size: 13.5px; line-height: 1.5; max-width: 460px; margin: 14px auto 0;
+  text-align: center;
 }
 
 /* ─── RESPONSIVE ─── */
