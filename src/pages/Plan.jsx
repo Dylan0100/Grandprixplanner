@@ -14,6 +14,7 @@ import FlightGuide from '../components/FlightGuide'
 import LocalTransport from '../components/LocalTransport'
 import Itinerary from '../components/Itinerary'
 import VisaChecker from '../components/VisaChecker'
+import Footer from '../components/Footer'
 
 const SESSIONS = [
   { round:1,  fp1:'2026-03-06T01:30Z', raceEnd:'2026-03-08T08:00Z' },
@@ -385,6 +386,7 @@ export default function Plan() {
             </div>
           </div>
         </div>
+        <Footer />
       </>
     )
   }
@@ -507,6 +509,7 @@ export default function Plan() {
           )
         })}
       </div>
+      <Footer />
     </>
   )
 }
