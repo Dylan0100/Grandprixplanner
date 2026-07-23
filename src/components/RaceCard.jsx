@@ -37,6 +37,10 @@ const styles = `
     border-color: var(--border-md);
     background: var(--surface-2);
   }
+  .rc:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
   .rc-next { border-color: var(--red); }
   .rc-live { border-color: #22c55e; }
   .rc-done {
@@ -197,10 +201,25 @@ export default function RaceCard({ race, isComplete, isLive, isNext, onSelect })
     isComplete ? 'rc-done' : '',
   ].filter(Boolean).join(' ')
 
+  function handleKeyDown(e) {
+    if (isComplete) return
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onSelect()
+    }
+  }
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: styles }} />
-      <div className={cardClass} onClick={onSelect}>
+      <div
+        className={cardClass}
+        onClick={onSelect}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={isComplete ? -1 : 0}
+        aria-label={(isComplete ? 'Completed: ' : 'Plan ') + race.name}
+      >
 
         {isNext && !isLive && <div className="rc-accent rc-accent-next" />}
         {isLive && <div className="rc-accent rc-accent-live" />}
