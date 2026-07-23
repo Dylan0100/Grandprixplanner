@@ -22,6 +22,31 @@ function clusterToIATA(cluster) {
   return map[cluster] || ''
 }
 
+const DEST_IATA = {
+  'Australian Grand Prix': 'MEL',
+  'Chinese Grand Prix': 'PVG',
+  'Japanese Grand Prix': 'NGO',
+  'Miami Grand Prix': 'MIA',
+  'Canadian Grand Prix': 'YUL',
+  'Monaco Grand Prix': 'NCE',
+  'Spanish Grand Prix': 'BCN',
+  'Austrian Grand Prix': 'GRZ',
+  'British Grand Prix': 'LHR',
+  'Belgian Grand Prix': 'LGG',
+  'Hungarian Grand Prix': 'BUD',
+  'Dutch Grand Prix': 'AMS',
+  'Italian Grand Prix': 'MXP',
+  'Madrid Grand Prix': 'MAD',
+  'Azerbaijan Grand Prix': 'GYD',
+  'Singapore Grand Prix': 'SIN',
+  'United States Grand Prix': 'AUS',
+  'Mexico City Grand Prix': 'MEX',
+  'São Paulo Grand Prix': 'GRU',
+  'Las Vegas Grand Prix': 'LAS',
+  'Qatar Grand Prix': 'DOH',
+  'Abu Dhabi Grand Prix': 'AUH',
+}
+
 function parseSkyDate(dateStr) {
   const months = {Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12'}
   const cross = dateStr.match(/(\d+)\s+(\w+)–(\d+)\s+(\w+)\s+(\d{4})/)
@@ -48,7 +73,7 @@ function parseSkyDateOut(dateStr, nights) {
 
 function buildSkyscannerUrl(race, cluster, party) {
   if (!race || !cluster) return 'https://www.skyscanner.net'
-  var dest = race.destinationIATA || ''
+  var dest = race.destinationIATA || DEST_IATA[race.name] || ''
   var origin = clusterToIATA(cluster)
   var ci = parseSkyDate(race.dates)
   var co = parseSkyDateOut(race.dates, race.nights)
