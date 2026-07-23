@@ -121,87 +121,6 @@ const flightData = {
     ]
   },
 
-  "Bahrain Grand Prix": {
-    destination: "Sakhir, Bahrain",
-    primaryAirport: {
-      code: "BAH",
-      name: "Bahrain International Airport",
-      transferTime: "30 min to circuit, 20 min to Manama",
-      transferOptions: [
-        "Taxi (~BHD 5–8 to Manama, BHD 8–12 to circuit)",
-        "Uber available and reliable throughout Bahrain",
-        "Race weekend official shuttles from Manama city hotels"
-      ]
-    },
-    avoidAirport: null,
-    secondaryOption: null,
-    ukRouting: {
-      typicalRoute: "London Heathrow or Gatwick → Bahrain direct",
-      commonHubs: [],
-      totalTravelTime: "6.5–7 hours direct",
-      directAvailable: true
-    },
-    recommendedAirlines: ["Gulf Air", "British Airways"],
-    bookingWindow: {
-      ideal: "3–4 months out",
-      acceptable: "6–8 weeks out",
-      lastMinuteRisk: "Low-moderate — this route is well-served and prices are relatively stable until 3–4 weeks before the race"
-    },
-    typicalFareRange: "£350 – £700 return from London",
-    pricingTips: [
-      "Gulf Air often significantly undercuts BA on this route — compare both before booking",
-      "Direct flights make Bahrain one of the most logistically straightforward races on the calendar",
-      "Bahrain makes an excellent stopover hub if you are combining with other Gulf races"
-    ],
-    destinationNotes: [
-      "Night race — temperatures are far more comfortable than daytime (18–24°C in the evening in March)",
-      "UK citizens can obtain a Bahrain e-Visa on arrival (free) or apply online in advance — no hassle either way",
-      "Bahrain is more relaxed than other Gulf states but dress respectfully outside circuit and hotel areas",
-      "The circuit is in the desert — outside of race weekend infrastructure the surrounding area is sparse"
-    ]
-  },
-
-  "Saudi Arabian Grand Prix": {
-    destination: "Jeddah, Saudi Arabia",
-    primaryAirport: {
-      code: "JED",
-      name: "King Abdulaziz International Airport",
-      transferTime: "25–30 min to Jeddah Corniche Circuit",
-      transferOptions: [
-        "Taxi (~SAR 50–80 to circuit area)",
-        "Uber available and widely used in Jeddah",
-        "Race weekend official shuttles from central Jeddah hotels"
-      ]
-    },
-    avoidAirport: null,
-    secondaryOption: null,
-    ukRouting: {
-      typicalRoute: "London Heathrow → Jeddah direct",
-      commonHubs: ["Dubai (Emirates — if not flying direct)"],
-      totalTravelTime: "6.5 hours direct",
-      directAvailable: true
-    },
-    recommendedAirlines: ["British Airways", "Saudia", "Flydubai via Dubai"],
-    bookingWindow: {
-      ideal: "3–4 months out",
-      acceptable: "6–8 weeks out",
-      lastMinuteRisk: "Moderate — race weekend demand noticeably pushes fares up; book when you secure tickets"
-    },
-    typicalFareRange: "£400 – £750 return from London",
-    pricingTips: [
-      "Saudia often offers competitive fares vs BA — compare both as prices fluctuate",
-      "BA operates direct Heathrow–Jeddah year-round — reliable but rarely the cheapest option",
-      "Check Flydubai or Emirates via Dubai if direct options are expensive on your preferred dates"
-    ],
-    destinationNotes: [
-      "UK citizens require a Saudi e-Visa (~£120, multiple-entry now available) — apply online well in advance",
-      "Night race — the Corniche street circuit at night is spectacular; late finishes mean midnight transfers so book reliable transport in advance",
-      "Jeddah is notably more liberal than Riyadh — the Corniche area is tourist-friendly",
-      "Alcohol is unavailable throughout Saudi Arabia — plan accordingly",
-      "March evenings are warm and pleasant (~22–26°C) — very comfortable for spectating"
-    ]
-  },
-
   "Miami Grand Prix": {
     destination: "Miami, Florida, USA",
     primaryAirport: {
@@ -240,47 +159,6 @@ const flightData = {
       "The circuit is in Miami Gardens, not Miami Beach — plan transfers accordingly; they are different parts of a very spread-out city",
       "May in Miami: hot and humid (~30°C), afternoon thunderstorms are common — dress light and have a poncho",
       "Miami race weekend is a major social event — expect premium pricing on everything in the city"
-    ]
-  },
-
-  "Emilia Romagna Grand Prix": {
-    destination: "Imola, Italy",
-    primaryAirport: {
-      code: "BLQ",
-      name: "Bologna Guglielmo Marconi Airport",
-      transferTime: "35–40 min to Imola",
-      transferOptions: [
-        "Aerobus to Bologna Centrale then regional train to Imola (~EUR 8 total, 50 min)",
-        "Taxi direct from airport (~EUR 60–75 to Imola)",
-        "Race weekend park-and-ride organised from Bologna outskirts"
-      ]
-    },
-    avoidAirport: "Avoid Rome Fiumicino (FCO) — 3.5+ hours to Imola by high-speed train; not worth it",
-    secondaryOption: "Rimini (RMI) — seasonal Ryanair routes, 75 min from Imola. Milan Malpensa (MXP) — 2.5 hours, useful if combining with Milan.",
-    ukRouting: {
-      typicalRoute: "UK regional airport → Bologna direct (budget carriers)",
-      commonHubs: [],
-      totalTravelTime: "2–2.5 hours flight",
-      directAvailable: true
-    },
-    recommendedAirlines: ["Ryanair", "easyJet", "Jet2", "Wizz Air"],
-    bookingWindow: {
-      ideal: "2–3 months out",
-      acceptable: "6–8 weeks out",
-      lastMinuteRisk: "Moderate — flights stay reasonable; Imola and Bologna accommodation is the real constraint, especially for Friday–Sunday"
-    },
-    typicalFareRange: "£80 – £250 return from UK (budget carriers)",
-    pricingTips: [
-      "One of the most accessible races from the UK — multiple UK airports have direct budget routes to Bologna",
-      "Ryanair from Stansted and easyJet from Gatwick, Bristol, and Liverpool are usually cheapest",
-      "Hire a car at Bologna for flexibility — Imola town and the surrounding Emilia-Romagna region rewards exploration",
-      "Staying in Bologna city is often better value than Imola, with excellent food and easy daily commute to the circuit"
-    ],
-    destinationNotes: [
-      "No visa required for UK citizens — standard 90-day Schengen access",
-      "Imola is a beautiful historic circuit town — many restaurants are within walking distance of the paddock",
-      "May weather in Emilia-Romagna: warm (18–24°C) but changeable — pack a rain layer",
-      "The region is world-famous for food and motor racing history — well worth extending the trip"
     ]
   },
 
@@ -654,6 +532,47 @@ const flightData = {
       "September: warm and usually excellent weather (22–27°C) — one of the better races for conditions",
       "The Tifosi are unlike any other fans in sport — wear neutral colours unless you want good-natured ribbing all weekend",
       "Monza town centre has excellent restaurants — book dinner for Saturday night well in advance"
+    ]
+  },
+
+  "Madrid Grand Prix": {
+    destination: "Madrid, Spain",
+    primaryAirport: {
+      code: "MAD",
+      name: "Madrid–Barajas Adolfo Suárez Airport",
+      transferTime: "10–15 min to the IFEMA / Valdebebas circuit area",
+      transferOptions: [
+        "Metro Line 8 direct from the airport terminals to Feria de Madrid station — right at the circuit's south entrance",
+        "Taxi (~EUR 15–25 to the circuit, journey is very short from the airport)",
+        "Cercanías train Line C1 to Valdebebas station, also close to the circuit"
+      ]
+    },
+    avoidAirport: null,
+    secondaryOption: null,
+    ukRouting: {
+      typicalRoute: "UK airport → Madrid direct — one of the best-served routes in Europe",
+      commonHubs: [],
+      totalTravelTime: "2.5 hours flight",
+      directAvailable: true
+    },
+    recommendedAirlines: ["British Airways", "Iberia", "easyJet", "Ryanair"],
+    bookingWindow: {
+      ideal: "5–6 months out",
+      acceptable: "3–4 months out",
+      lastMinuteRisk: "Very high — this is the inaugural Madrid Grand Prix, replacing Barcelona as the Spanish round, and first-year demand for flights and hotels is expected to be exceptional"
+    },
+    typicalFareRange: "£70 – £220 return from UK",
+    pricingTips: [
+      "Madrid is one of the cheapest and most frequent European routes from the UK — multiple airlines fly it daily from several airports",
+      "Because this is a brand-new circuit's debut race, book flights and accommodation as early as possible rather than relying on typical last-minute European city-break pricing",
+      "Regional UK airports (Manchester, Bristol, Edinburgh) often have direct budget routes worth comparing against London fares"
+    ],
+    destinationNotes: [
+      "No visa required for UK citizens — standard 90-day Schengen access",
+      "The circuit is built around the IFEMA exhibition centre in Valdebebas, a short metro ride from central Madrid — no need to stay near the track itself",
+      "September in Madrid: warm and dry (24–29°C) — comfortable for spectating",
+      "This is the circuit's first-ever race — expect some first-year logistics teething issues alongside the excitement of a brand-new venue",
+      "Staying centrally (Malasaña, Salamanca, Sol) keeps you close to Madrid's nightlife and restaurants, with an easy metro commute to the circuit"
     ]
   },
 
