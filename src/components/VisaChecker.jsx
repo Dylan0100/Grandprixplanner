@@ -295,6 +295,17 @@ const VC_CSS = `
   max-width: 260px;
   line-height: 1.6;
 }
+.vc-unmatched-note {
+  margin-top: 4px;
+  padding: 9px 14px;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.22);
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--amber);
+  max-width: 280px;
+}
 .vc-status-card {
   border-radius: 10px;
   padding: 18px 20px;
@@ -473,17 +484,20 @@ export default function VisaChecker({ race, onBack, passport: passportProp }) {
   const [search, setSearch] = useState('')
   const [showAll, setShowAll] = useState(false)
   const [autoSelected, setAutoSelected] = useState(false)
+  const [unmatchedProfile, setUnmatchedProfile] = useState(false)
   const activeRef = useRef(null)
 
   useEffect(function() {
-    if (!passportProp) return
+    if (!passportProp) { setUnmatchedProfile(false); return }
     var vcId = PLAN_TO_VC[passportProp]
-    if (!vcId) return
-    var match = VC_PASSPORTS.find(function(p) { return p.id === vcId })
+    var match = vcId ? VC_PASSPORTS.find(function(p) { return p.id === vcId }) : null
     if (match) {
       setPassport(match)
       setAutoSelected(true)
       setShowAll(false)
+      setUnmatchedProfile(false)
+    } else {
+      setUnmatchedProfile(true)
     }
   }, [passportProp])
 
@@ -523,6 +537,7 @@ export default function VisaChecker({ race, onBack, passport: passportProp }) {
           <input
             className="vc-search"
             placeholder="Search nationality..."
+            aria-label="Search nationality"
             value={search}
             onChange={function(e) { setSearch(e.target.value) }}
           />
@@ -558,6 +573,11 @@ export default function VisaChecker({ race, onBack, passport: passportProp }) {
               <div className="vc-prompt-text">
                 {'Choose your nationality to check entry requirements for ' + destInfo.flag + ' ' + destInfo.name + '.'}
               </div>
+              {unmatchedProfile && (
+                <div className="vc-unmatched-note">
+                  We couldn't automatically match the nationality saved in your trip profile — please select it from the list on the left.
+                </div>
+              )}
             </div>
           ) : (
             <div>
