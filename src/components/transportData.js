@@ -131,96 +131,6 @@ const transportData = {
     ]
   },
 
-  "Bahrain Grand Prix": {
-    overview: "Bahrain International Circuit is in the desert near Sakhir, about 40 minutes from Manama. There is no public transport to the venue — all travel is by shuttle, taxi, or private car.",
-    alert: "No public transport serves the circuit. Official shuttle buses and taxis are your only practical options.",
-    modes: [
-      {
-        name: "Official Shuttle Bus",
-        icon: "🚌",
-        rating: "best",
-        cost: "BHD 5–10 (~£11–22) return",
-        time: "40–50 min from Manama",
-        notes: "Departs from the Exhibition Centre and key hotels. The most reliable option — book before you arrive."
-      },
-      {
-        name: "Taxi / Uber",
-        icon: "🚕",
-        rating: "good",
-        cost: "BHD 8–15 (~£18–33) each way",
-        time: "35–50 min",
-        notes: "Uber and local taxis available. Negotiate price with local taxis before getting in. Surge applies on race day."
-      },
-      {
-        name: "Rental Car",
-        icon: "🚗",
-        rating: "good",
-        cost: "BHD 10–20 per day",
-        time: "40 min, longer post-race",
-        notes: "Ample parking on site. Convenient if you want flexibility across the weekend."
-      }
-    ],
-    byDay: {
-      friday: "Shuttles run frequently. Taxi is easy and cheap on a practice day.",
-      saturday: "Demand increases — book your return shuttle seat in advance.",
-      sunday: "All shuttle seats fill quickly. Book the earliest return you are comfortable with. Taxis are scarce post-race."
-    },
-    tips: [
-      "Heat is a major factor — even moving between vehicles is exhausting in March. Stay hydrated throughout.",
-      "Some hotels run private transfer services — check with yours before booking public shuttles.",
-      "Post-race taxi availability is poor. Pre-book a return or arrange a private transfer before race day."
-    ]
-  },
-
-  "Saudi Arabian Grand Prix": {
-    overview: "The Jeddah Corniche Circuit runs along the Red Sea waterfront. Official shuttle buses are the primary transport option, though walking is feasible from Corniche hotels. The race runs at night.",
-    alert: "No public transport serves the circuit. Use official shuttle buses or hotel transfers.",
-    modes: [
-      {
-        name: "Official Shuttle Bus",
-        icon: "🚌",
-        rating: "best",
-        cost: "SAR 50–100 (~£11–22) return",
-        time: "20–40 min from central Jeddah",
-        notes: "Multiple pick-up points across the city. Most reliable option — book before arrival and note the last return departure time."
-      },
-      {
-        name: "Uber / Careem",
-        icon: "🚕",
-        rating: "good",
-        cost: "SAR 40–80 (~£9–18) each way",
-        time: "20–45 min",
-        notes: "Both apps work well in Jeddah. Drop-off zones are managed. Careem often has shorter wait times than Uber."
-      },
-      {
-        name: "Walking",
-        icon: "🚶",
-        rating: "good",
-        cost: "Free",
-        time: "20–40 min from Corniche hotels",
-        notes: "If staying on the Corniche itself, walking is genuinely feasible on practice and qualifying days."
-      },
-      {
-        name: "Rental Car",
-        icon: "🚗",
-        rating: "avoid",
-        cost: "SAR 80–150 per day",
-        time: "Variable",
-        notes: "Parking near the circuit is limited and access roads become heavily managed on race evenings."
-      }
-    ],
-    byDay: {
-      friday: "Light traffic — any option works.",
-      saturday: "Use the shuttle or Uber. Corniche road closures begin building from Saturday.",
-      sunday: "Shuttle strongly recommended. Corniche access restrictions peak on race night. Check your return time carefully."
-    },
-    tips: [
-      "The race runs at night — plan for late returns and confirm the shuttle's last departure before you go in.",
-      "Careem is the regional Uber equivalent and often has better availability in Jeddah.",
-      "Book your hotel on or near the Corniche to minimise transport complexity significantly."
-    ]
-  },
-
   "Miami Grand Prix": {
     overview: "The Miami International Autodrome is built around Hard Rock Stadium in Miami Gardens, 30 minutes north of downtown Miami. There is no direct transit link — the Metrorail shuttle combination is the most practical public option.",
     alert: "No direct public transport to the circuit. Use the Metrorail feeder shuttle from Golden Glades station.",
@@ -259,55 +169,6 @@ const transportData = {
       "Miami Gardens is not walkable from South Beach or downtown — factor journey time carefully when choosing accommodation.",
       "Stay near a Metrorail station (Brickell, Coconut Grove, or Dadeland) for the easiest access.",
       "Circuit parking lots open from 6am — early arrival pays off significantly on race day."
-    ]
-  },
-
-  "Emilia Romagna Grand Prix": {
-    overview: "Imola is a compact Italian town built around the circuit. The train from Bologna takes 30 minutes and the circuit is a short, flat walk from the station — making this one of the most walkable venues on the calendar.",
-    alert: null,
-    modes: [
-      {
-        name: "Train (Bologna Centrale → Imola)",
-        icon: "🚆",
-        rating: "best",
-        cost: "EUR 3–5 (~£3)",
-        time: "30 min from Bologna",
-        notes: "Regional trains run every 30 minutes. Imola station is a 15-minute walk from the circuit gates. Cheap, easy, and reliable."
-      },
-      {
-        name: "Walking from Station",
-        icon: "🚶",
-        rating: "best",
-        cost: "Free",
-        time: "15 min from Imola station",
-        notes: "Easy, flat walk through the town centre. Follow the crowds — you cannot miss it."
-      },
-      {
-        name: "Shuttle Bus",
-        icon: "🚌",
-        rating: "good",
-        cost: "EUR 5–10",
-        time: "Varies",
-        notes: "Limited services from Bologna and surrounding towns. Train is quicker and cheaper for most fans."
-      },
-      {
-        name: "Driving",
-        icon: "🚗",
-        rating: "avoid",
-        cost: "Variable",
-        time: "45 min from Bologna, much longer post-race",
-        notes: "Town parking fills rapidly. Egress after the race is very slow. The train is overwhelmingly the better option."
-      }
-    ],
-    byDay: {
-      friday: "Quiet day — perfect for a relaxed train journey and a walk around the town.",
-      saturday: "Early morning trains from Bologna are comfortable.",
-      sunday: "Book an early morning train. Return services fill up — consider waiting 45–60 minutes post-race before joining the station queue."
-    },
-    tips: [
-      "Buy your train ticket in advance at trenitalia.com — tickets are cheap but the last trains post-race fill up fast.",
-      "Bologna is an ideal base — excellent food, affordable hotels, and easy daily access by train.",
-      "The Variante Alta section offers stunning views and is accessible via a hillside walk from the main circuit area."
     ]
   },
 
@@ -737,6 +598,47 @@ const transportData = {
     ]
   },
 
+  "Madrid Grand Prix": {
+    overview: "The new circuit is built around the IFEMA exhibition centre in Valdebebas, northeast Madrid, directly connected to the airport and city centre by metro. This is designed to be one of the most accessible venues on the calendar — no need to stay near the track itself.",
+    alert: null,
+    modes: [
+      {
+        name: "Metro Line 8 (to Feria de Madrid)",
+        icon: "🚇",
+        rating: "best",
+        cost: "EUR 1.50–5 depending on zone/ticket",
+        time: "20–30 min from central Madrid, 10–15 min from the airport",
+        notes: "Feria de Madrid station sits right at the circuit's south entrance. The same line runs directly from the airport terminals, so arriving fans can go straight from baggage claim towards the circuit."
+      },
+      {
+        name: "Cercanías Train (Line C1 to Valdebebas)",
+        icon: "🚆",
+        rating: "good",
+        cost: "EUR 1.70–5",
+        time: "20–30 min from central stations (Atocha, Nuevos Ministerios, Chamartín)",
+        notes: "An alternative route into the circuit area if the metro is especially busy — useful to know as a backup on race day."
+      },
+      {
+        name: "Taxi / Uber",
+        icon: "🚕",
+        rating: "good",
+        cost: "EUR 15–30 each way",
+        time: "15–30 min, longer in race-weekend traffic",
+        notes: "Quick from the airport, but expect congestion on approach roads around the circuit during qualifying and the race. The metro is generally faster on session days."
+      }
+    ],
+    byDay: {
+      friday: "Quieter — a good day to metro in and explore IFEMA and Valdebebas without crowds.",
+      saturday: "Busier trains and stations. Build in extra time for queues at Feria de Madrid.",
+      sunday: "Expect the metro to be at its busiest of the weekend. Organisers expect the vast majority of fans to arrive by public transport — leave earlier than you think you need to."
+    },
+    tips: [
+      "As this is the circuit's debut season, treat published timings as a guide rather than a guarantee — build in extra buffer time.",
+      "A multi-day Tourist Travel Pass for Zone A covers the metro, Cercanías, and buses, and is usually the simplest ticket option for a race weekend.",
+      "Staying centrally in Madrid rather than near the circuit is genuinely fine here — the metro connection is short and direct."
+    ]
+  },
+
   "Azerbaijan Grand Prix": {
     overview: "The Baku City Circuit threads through the Old City and along the seafront Boulevard. The circuit is the heart of the city — most central accommodation is within easy walking distance of grandstands, making transport refreshingly simple.",
     alert: null,
@@ -996,6 +898,96 @@ const transportData = {
       "Staying on the Strip is not just convenient — it is the experience. Off-Strip savings are not worth the transport complexity here.",
       "Food and drink on the Strip is expensive. Stock up at a CVS or Walgreens near your hotel before race sessions.",
       "The race ends around 1am and the Strip never sleeps — post-race celebrations are built into the venue itself."
+    ]
+  },
+
+  "Qatar Grand Prix": {
+    overview: "Lusail International Circuit sits around 10km north of Lusail city and roughly 30km from Doha. There's no way to walk in — the Doha Metro plus a free shuttle bus is the standard route for the vast majority of fans.",
+    alert: "The circuit cannot be reached on foot from the metro. You must connect via the free shuttle bus from Lusail (QNB) Metro Station — and note the metro doesn't open until 2pm on Fridays.",
+    modes: [
+      {
+        name: "Doha Metro (Red Line) + Free Shuttle",
+        icon: "🚇",
+        rating: "best",
+        cost: "QAR 2–6 for the metro; shuttle is free for ticket holders",
+        time: "~30 min metro from central Doha, then 20–40 min shuttle to the circuit",
+        notes: "Ride the Red Line north to Lusail (QNB) Station, then follow signs to the free shuttle buses on the east side of the station. Build in 60–90 minutes total from central Doha to be safe."
+      },
+      {
+        name: "Taxi / Uber / Careem",
+        icon: "🚕",
+        rating: "good",
+        cost: "Varies with distance and demand",
+        time: "30–45 min from central Doha on a quiet day, much longer at race-day peak times",
+        notes: "Karwa taxis are Qatar's licensed service. On practice days with light traffic this can be quicker than the metro-shuttle combination; on race day, congestion around the Lusail access roads makes the metro the more reliable choice."
+      },
+      {
+        name: "Driving",
+        icon: "🚗",
+        rating: "avoid",
+        cost: "Free parking, but limited",
+        time: "Variable — congestion around access roads",
+        notes: "Self-driving is possible with signed parking areas, but spaces are limited and congestion builds around entry and exit times. Not recommended unless carpooling."
+      }
+    ],
+    byDay: {
+      friday: "The metro doesn't start running until 2pm — plan your day in Doha first, then head out via metro and shuttle for the session.",
+      saturday: "Metro runs from the morning. Standard metro-plus-shuttle route works well.",
+      sunday: "This is a night race — the metro runs late (past midnight), so there's no need to rush your exit. Waiting 20–30 minutes after the flag for the shuttle queue to thin out is usually faster overall."
+    },
+    tips: [
+      "Ticket holders have historically received a complimentary multi-day metro and tram pass — check the official Qatar GP site closer to the race to confirm this still applies for 2026.",
+      "The shuttle picks up and drops off from the same point on the east side of Lusail Metro Station — remember this spot for your return journey.",
+      "If flying into Doha on race weekend itself, a taxi direct to your hotel is usually simpler than trying to navigate the metro with luggage."
+    ]
+  },
+
+  "Abu Dhabi Grand Prix": {
+    overview: "Yas Marina Circuit is on Yas Island, and this is one of the few F1 venues where walking from your hotel is a genuine option. A free island-wide shuttle network covers everywhere else.",
+    alert: null,
+    modes: [
+      {
+        name: "Walking (Yas Island hotels)",
+        icon: "🚶",
+        rating: "best",
+        cost: "Free",
+        time: "5–15 min from several Yas Island hotels",
+        notes: "A number of hotels — including the W Abu Dhabi, which sits directly above part of the circuit — are within easy walking distance of the gates. If you can book one of these, transport stops being a consideration at all."
+      },
+      {
+        name: "Free Island Shuttles",
+        icon: "🚌",
+        rating: "best",
+        cost: "Free",
+        time: "10–20 min from most Yas Island points",
+        notes: "The Circuit Circular Shuttle links all four grandstands (South, Marina, West, North) roughly every 15 minutes; the Yas Courtesy Shuttle connects the main hotels to the circuit on a similar schedule."
+      },
+      {
+        name: "Taxi / Uber / Careem",
+        icon: "🚕",
+        rating: "good",
+        cost: "Inexpensive by international standards",
+        time: "~10 min from Abu Dhabi airport, ~25–30 min from central Abu Dhabi",
+        notes: "Widely available and reasonably priced. A practical option if staying off Yas Island or arriving straight from the airport."
+      },
+      {
+        name: "Bus from Abu Dhabi city",
+        icon: "🚍",
+        rating: "good",
+        cost: "Low-cost public bus fare",
+        time: "40–60 min plus onward shuttle",
+        notes: "Bus route 190 runs from central Abu Dhabi to Yas Island, connecting onward to the free circuit shuttles — a budget-friendly option if not staying on the island itself."
+      }
+    ],
+    byDay: {
+      friday: "Straightforward — walking or the free shuttles handle everything comfortably.",
+      saturday: "Same pattern, slightly busier. No real change to your approach.",
+      sunday: "Shuttles and walking routes get busy immediately after the race, especially around the post-race concerts. Waiting out the immediate rush inside the venue is often faster than joining the crowd straight away."
+    },
+    tips: [
+      "If your budget stretches to it, booking a Yas Island hotel — rather than staying in Abu Dhabi city or Dubai — is genuinely the single best transport decision for this race.",
+      "The free shuttle network is extensive but can queue heavily right after the chequered flag — build in some slack on Sunday evening.",
+      "If pairing this trip with Dubai, allow 60–90 minutes each way by taxi or shuttle bus between the two cities."
     ]
   }
 
