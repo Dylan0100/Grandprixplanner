@@ -15,14 +15,28 @@ const styles = `
     cursor: pointer;
     text-align: left;
     transition: border-color 0.15s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     line-height: 1.4;
   }
   .ti-trigger:focus { outline: none; border-color: rgba(232,0,45,0.5); }
   .ti-trigger.placeholder { color: var(--text-dim); }
+  .ti-trigger-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ti-filled-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+    flex-shrink: 0;
+  }
   .ti-arrow {
     position: absolute;
     right: 12px;
@@ -112,7 +126,8 @@ function CustomSelect({ placeholder, value, onChange, groups, flat }) {
         className={'ti-trigger' + (!value ? ' placeholder' : '')}
         onClick={function() { setOpen(function(o) { return !o }) }}
       >
-        {displayLabel}
+        {value && <span className="ti-filled-dot gp-reveal" aria-hidden="true" />}
+        <span className="ti-trigger-label">{displayLabel}</span>
       </button>
       <span className={'ti-arrow' + (open ? ' open' : '')}>▼</span>
       {open && (
