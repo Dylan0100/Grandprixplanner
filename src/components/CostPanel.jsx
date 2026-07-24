@@ -1,8 +1,39 @@
+import { useState, useEffect, useRef } from 'react'
 import { fmt, buildBookingComUrl } from '../utils/costCalc'
 import { UK_CLUSTERS } from '../data/racesData'
 
 const SKYSCANNER_AFFILIATE_ID = null
 const BOOKING_AFFILIATE_ID = null
+
+const panelStyles = `
+  .cost-panel-complete {
+    margin: 0 22px 14px;
+    padding: 10px 14px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.28);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #4ade80;
+  }
+  .cost-panel-complete-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+`
 
 function clusterToIATA(cluster) {
   const map = {
@@ -85,6 +116,45 @@ function buildSkyscannerUrl(race, cluster, party) {
   return 'https://www.skyscanner.net'
 }
 
+/* Animates a number smoothly toward `target` whenever it changes, instead of
+   snapping straight to the new value. Used for the headline cost total. */
+function useAnimatedNumber(target) {
+  var [display, setDisplay] = useState(target)
+  var prevRef = useRef(target)
+  var rafRef = useRef(null)
+
+  useEffect(function() {
+    var from = prevRef.current
+    var to = target
+    if (from === to) return undefined
+
+    var startTime = null
+    var duration = 500
+
+    function step(timestamp) {
+      if (startTime === null) startTime = timestamp
+      var progress = Math.min((timestamp - startTime) / duration, 1)
+      var eased = 1 - Math.pow(1 - progress, 3)
+      var value = Math.round(from + (to - from) * eased)
+      setDisplay(value)
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(step)
+      } else {
+        prevRef.current = to
+      }
+    }
+
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(step)
+
+    return function() {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [target])
+
+  return display
+}
+
 function CostRow(props) {
   var color = props.color
   var label = props.label
@@ -94,8 +164,10 @@ function CostRow(props) {
   var high = props.high
   var included = props.included
   var noRange = props.noRange
+  var flash = props.flash
+  var rowClass = (included ? 'cost-row' : 'cost-row excluded') + (flash ? ' gp-flash' : '')
   return (
-    <div className={included ? 'cost-row' : 'cost-row excluded'}>
+    <div className={rowClass}>
       <div className="cost-row-left">
         <div className="cost-row-dot" style={{background: color}} />
         <div>
@@ -130,6 +202,52 @@ export default function CostPanel(props) {
   var skyscannerUrl = buildSkyscannerUrl(race, depCluster, trip.party)
   var bookingUrl = buildBookingComUrl(race, trip.party, BOOKING_AFFILIATE_ID)
 
+  // Animated headline total — counts toward the new value instead of snapping.
+  var totalMidRaw = c ? c.totalMid : 0
+  var animatedTotal = useAnimatedNumber(totalMidRaw)
+
+  // Brief highlight flash on whichever row's value just changed.
+  var flightMid = c ? c.flight.mid : null
+  var ticketMid = c ? c.ticket.mid : null
+  var accomMid = c ? c.accom.mid : null
+  var [flashRow, setFlashRow] = useState(null)
+  var prevMidsRef = useRef({ flight: null, ticket: null, accom: null })
+
+  useEffect(function() {
+    if (!c) return undefined
+    var prev = prevMidsRef.current
+    var changed = null
+    if (prev.ticket !== null && ticketMid !== prev.ticket) changed = 'ticket'
+    else if (prev.accom !== null && accomMid !== prev.accom) changed = 'accom'
+    else if (prev.flight !== null && flightMid !== prev.flight) changed = 'flight'
+    prevMidsRef.current = { flight: flightMid, ticket: ticketMid, accom: accomMid }
+    if (changed) {
+      setFlashRow(changed)
+      var t = setTimeout(function() { setFlashRow(null) }, 900)
+      return function() { clearTimeout(t) }
+    }
+    return undefined
+  }, [flightMid, ticketMid, accomMid])
+
+  // "Trip plan complete" milestone — fires once, the first time the person has
+  // set a departure city, a passport, and picked a specific grandstand.
+  var planComplete = !!(trip.departureCity && trip.passport && selectedGrandstand)
+  var [justCompleted, setJustCompleted] = useState(false)
+  var wasCompleteRef = useRef(false)
+
+  useEffect(function() {
+    if (planComplete && !wasCompleteRef.current) {
+      wasCompleteRef.current = true
+      setJustCompleted(true)
+      var t = setTimeout(function() { setJustCompleted(false) }, 600)
+      return function() { clearTimeout(t) }
+    }
+    if (!planComplete) {
+      wasCompleteRef.current = false
+    }
+    return undefined
+  }, [planComplete])
+
   function w(v, inc) { return inc ? (v / tot * 100).toFixed(1) : 0 }
 
   function toggleInc(key) {
@@ -148,7 +266,7 @@ export default function CostPanel(props) {
     <div className="cost-panel-full">
       <div className="cost-panel-total">
         <div className="cost-panel-total-label">{'Estimated total ' + partyLabel}</div>
-        <div className="cost-panel-total-amount">{fmt(c.totalMid)}</div>
+        <div className="cost-panel-total-amount">{fmt(animatedTotal)}</div>
         <div className="cost-panel-total-range">
           {'Range: '}<span>{fmt(c.totalLow)}</span>{' – '}<span>{fmt(c.totalHigh)}</span>
         </div>
@@ -165,9 +283,9 @@ export default function CostPanel(props) {
         </div>
       </div>
       <div className="cost-breakdown">
-        <CostRow color="#3B82F6" label={isUKHome ? 'Local Travel' : 'Return Flights'} sub={isUKHome ? 'Local race — no flights needed' : ('From ' + depLabel)} mid={c.flight.mid} low={c.flight.low} high={c.flight.high} included={c.flight.included && !isUKHome} />
-        <CostRow color="#E8002D" label={ticketLabel} sub={ticketSub} mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high} included={c.ticket.included} />
-        <CostRow color="#F59E0B" label={'Accommodation (' + c.accom.nights + ' nights)'} sub={race.accumLabels[trip.accumTier]} mid={c.accom.mid} low={c.accom.low} high={c.accom.high} included={c.accom.included} />
+        <CostRow color="#3B82F6" label={isUKHome ? 'Local Travel' : 'Return Flights'} sub={isUKHome ? 'Local race — no flights needed' : ('From ' + depLabel)} mid={c.flight.mid} low={c.flight.low} high={c.flight.high} included={c.flight.included && !isUKHome} flash={flashRow === 'flight'} />
+        <CostRow color="#E8002D" label={ticketLabel} sub={ticketSub} mid={c.ticket.mid} low={c.ticket.low} high={c.ticket.high} included={c.ticket.included} flash={flashRow === 'ticket'} />
+        <CostRow color="#F59E0B" label={'Accommodation (' + c.accom.nights + ' nights)'} sub={race.accumLabels[trip.accumTier]} mid={c.accom.mid} low={c.accom.low} high={c.accom.high} included={c.accom.included} flash={flashRow === 'accom'} />
         <CostRow color="#22C55E" label="Local Transport" sub="Return travel to circuit" mid={c.transport.mid} low={c.transport.low} high={c.transport.high} included={true} noRange={true} />
       </div>
     </div>
@@ -203,44 +321,56 @@ export default function CostPanel(props) {
     </a>
   )
 
+  var completeRibbon = planComplete ? (
+    <div className={'cost-panel-complete' + (justCompleted ? ' gp-reveal' : '')}>
+      <span className="cost-panel-complete-check" aria-hidden="true">✓</span>
+      Trip plan complete — ready to book
+    </div>
+  ) : null
+
   return (
-    <div className="cost-panel">
-      <div className="cost-panel-header">
-        <div className="cost-panel-title">Trip Cost Estimate</div>
-        <div className="cost-panel-sub">Updates live as you plan</div>
-      </div>
+    <>
+      <style dangerouslySetInnerHTML={{ __html: panelStyles }} />
+      <div className="cost-panel">
+        <div className="cost-panel-header">
+          <div className="cost-panel-title">Trip Cost Estimate</div>
+          <div className="cost-panel-sub">Updates live as you plan</div>
+        </div>
 
-      {trip.departureCity ? fullPanel : emptyPanel}
+        {trip.departureCity ? fullPanel : emptyPanel}
 
-      <div className="cost-panel-section">
-        <div className="cost-panel-section-label">Include in estimate</div>
-        <div className="cost-toggles">
-          {flightToggle}
-          <div className="cost-toggle-item" onClick={function() { toggleInc('incTickets') }}>
-            <div>
-              <div className="cost-toggle-label">Race Tickets</div>
-              <div className="cost-toggle-sub">Already have tickets? Toggle off</div>
+        <div className="cost-panel-section">
+          <div className="cost-panel-section-label">Include in estimate</div>
+          <div className="cost-toggles">
+            {flightToggle}
+            <div className="cost-toggle-item" onClick={function() { toggleInc('incTickets') }}>
+              <div>
+                <div className="cost-toggle-label">Race Tickets</div>
+                <div className="cost-toggle-sub">Already have tickets? Toggle off</div>
+              </div>
+              <div className={trip.incTickets ? 'cost-toggle-switch on' : 'cost-toggle-switch'} />
             </div>
-            <div className={trip.incTickets ? 'cost-toggle-switch on' : 'cost-toggle-switch'} />
-          </div>
-          <div className="cost-toggle-item" onClick={function() { toggleInc('incAccom') }}>
-            <div>
-              <div className="cost-toggle-label">Accommodation</div>
-              <div className="cost-toggle-sub">Already booked? Toggle off</div>
+            <div className="cost-toggle-item" onClick={function() { toggleInc('incAccom') }}>
+              <div>
+                <div className="cost-toggle-label">Accommodation</div>
+                <div className="cost-toggle-sub">Already booked? Toggle off</div>
+              </div>
+              <div className={trip.incAccom ? 'cost-toggle-switch on' : 'cost-toggle-switch'} />
             </div>
-            <div className={trip.incAccom ? 'cost-toggle-switch on' : 'cost-toggle-switch'} />
           </div>
         </div>
-      </div>
 
-      <div className="cost-panel-ctas">
-        {skyBtn}
-        {hotelBtn}
-      </div>
+        {completeRibbon}
 
-      <div className="cost-disclaimer">
-        Estimates based on advance bookings (3+ months). Always verify before purchasing.
+        <div className="cost-panel-ctas">
+          {skyBtn}
+          {hotelBtn}
+        </div>
+
+        <div className="cost-disclaimer">
+          Estimates based on advance bookings (3+ months). Always verify before purchasing.
+        </div>
       </div>
-    </div>
+    </>
   )
 }
