@@ -1298,3 +1298,62 @@ footer .nav-logo { font-size: 16px; }
   color: var(--text-dim);
   text-align: center;
 }
+
+/* ─── MICRO-INTERACTIONS — BUTTON PRESS FEEDBACK ──────────────────────────── */
+/* Additive only — gives every primary/secondary button a tactile "press" on
+   click, matching the pattern already used on the homepage signup button. */
+
+.nav-cta:active,
+.nav-btn:active,
+.filter-btn:active,
+.section-nav-btn:active,
+.psh-tier-btn:active,
+.psh-gs-clear:active,
+.trip-party-btn:active,
+.cost-cta-primary:active,
+.cost-cta-secondary:active,
+.accom-cta-btn:active,
+.accom-tier-btn:active,
+.close-btn:active {
+  transform: scale(0.98);
+}
+
+/* ─── SHARED REVEAL / TRANSITION LIBRARY ──────────────────────────────────── */
+/* Reusable animation classes. Not used anywhere yet — later commits (Plan.jsx,
+   VisaChecker.jsx, CostPanel.jsx, etc.) will reference these class names
+   directly rather than each defining their own version. */
+
+@keyframes gpFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gpFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gpFlash {
+  0% { background: rgba(232,0,45,0.16); }
+  100% { background: transparent; }
+}
+
+/* Use on an element that should settle into place, e.g. a status card
+   appearing after a selection is made. */
+.gp-reveal {
+  animation: gpFadeUp 0.4s ease both;
+}
+
+/* Use for swapping content in place (tab content, filtered lists). */
+.gp-crossfade {
+  animation: gpFadeIn 0.25s ease both;
+}
+
+/* Use for a brief highlight pulse, e.g. a cost row after its value changes. */
+.gp-flash {
+  animation: gpFlash 0.9s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gp-reveal, .gp-crossfade, .gp-flash { animation: none; }
+}
