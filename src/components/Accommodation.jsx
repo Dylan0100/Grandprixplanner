@@ -65,7 +65,21 @@ const styles = `
     flex-shrink: 0;
     margin-top: 5px;
   }
+  .accom-tier-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: 'Barlow Condensed', sans-serif;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
 `
+
+const ACCOM_TIER_COLORS = ['#22C55E', '#F59E0B', '#E8002D']
 
 export default function Accommodation(props) {
   var race = props.race
@@ -113,7 +127,16 @@ export default function Accommodation(props) {
                 onClick={function() { onSet('accumTier', i) }}
               >
                 <div className="accom-tier-left">
-                  <div className="accom-tier-name">{['Standard', 'Advanced', 'Premium'][i]}</div>
+                  <div
+                    className="accom-tier-badge"
+                    style={{
+                      background: ACCOM_TIER_COLORS[i] + '20',
+                      border: '1px solid ' + ACCOM_TIER_COLORS[i] + '50',
+                      color: ACCOM_TIER_COLORS[i],
+                    }}
+                  >
+                    {['Standard', 'Advanced', 'Premium'][i]}
+                  </div>
                   <div className="accom-tier-desc">{label}</div>
                 </div>
                 <div className="accom-tier-right">
