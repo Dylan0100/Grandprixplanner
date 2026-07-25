@@ -242,6 +242,60 @@ const FG_CSS = `
   font-weight: 500;
   font-family: 'Barlow', sans-serif;
 }
+.fg-booking-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.fg-booking-countdown {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border: 1px solid var(--border-md);
+  border-radius: 100px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+.fg-booking-now-wrap {
+  position: relative;
+  height: 15px;
+}
+.fg-booking-now-label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+}
+.fg-booking-bar {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.fg-booking-seg {
+  flex: 1;
+  height: 100%;
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+.fg-booking-seg.green { background: #22C55E; }
+.fg-booking-seg.amber { background: var(--amber); }
+.fg-booking-seg.red   { background: var(--red); }
+.fg-booking-seg-now { opacity: 1; }
 .fg-booking-tiers {
   display: flex;
   flex-direction: column;
@@ -375,10 +429,58 @@ function getPersonalisedFare(race, departureCity) {
   return { low: Math.round(mid * 0.86), high: Math.round(mid * 1.16) }
 }
 
+/* Parses the race's date string (e.g. "5–7 Jun 2026" or "27 Feb–1 Mar 2026")
+   into a real JS Date for the first day of the weekend. Same pattern already
+   used elsewhere in the app for date handling. */
+function parseRaceStartDate(dateStr) {
+  var months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11}
+  var cross = dateStr.match(/(\d+)\s+(\w+)–(\d+)\s+(\w+)\s+(\d{4})/)
+  if (cross) return new Date(parseInt(cross[5], 10), months[cross[2]], parseInt(cross[1], 10))
+  var same = dateStr.match(/(\d+)–\d+\s+(\w+)\s+(\d{4})/)
+  if (same) return new Date(parseInt(same[3], 10), months[same[2]], parseInt(same[1], 10))
+  return null
+}
+
+/* Turns free text like "5–6 months out" or "6+ months out" into a day range.
+   Returns null if the text doesn't match a recognisable pattern rather than
+   guessing — a handful of entries in flightData.js use a different format
+   and are deliberately left unhighlighted rather than misread. */
+function parseWindowToDays(str) {
+  if (!str) return null
+  var perUnit = { month: 30, week: 7 }
+  var range = str.match(/(\d+)\s*[–-]\s*(\d+)\s*(month|week)/i)
+  if (range) {
+    var unit = range[3].toLowerCase()
+    return { loDays: parseInt(range[1], 10) * perUnit[unit], hiDays: parseInt(range[2], 10) * perUnit[unit] }
+  }
+  var plus = str.match(/(\d+)\+\s*(month|week)/i)
+  if (plus) {
+    var unit2 = plus[2].toLowerCase()
+    var n = parseInt(plus[1], 10) * perUnit[unit2]
+    return { loDays: n, hiDays: n }
+  }
+  return null
+}
+
+function getBookingZone(daysUntilRace, idealText, acceptableText) {
+  if (daysUntilRace === null || daysUntilRace <= 0) return null
+  var ideal = parseWindowToDays(idealText)
+  var acceptable = parseWindowToDays(acceptableText)
+  if (!ideal || !acceptable) return null
+  if (daysUntilRace >= ideal.loDays) return 'ideal'
+  if (daysUntilRace >= acceptable.loDays) return 'acceptable'
+  return 'last'
+}
+
+var ZONE_OFFSET = { ideal: '16.67%', acceptable: '50%', last: '83.33%' }
+
 export default function FlightGuide({ race, trip }) {
   var data = flightData[race ? race.name : '']
   var departureCity = trip ? trip.departureCity : null
   var personalisedFare = race ? getPersonalisedFare(race, departureCity) : null
+
+  var raceStart = race ? parseRaceStartDate(race.dates) : null
+  var daysUntilRace = raceStart ? Math.ceil((raceStart - new Date()) / 86400000) : null
 
   if (!data) {
     return (
@@ -392,6 +494,7 @@ export default function FlightGuide({ race, trip }) {
   }
 
   var isDirect = data.ukRouting.directAvailable
+  var bookingZone = getBookingZone(daysUntilRace, data.bookingWindow.ideal, data.bookingWindow.acceptable)
 
   return (
     <div className="fg-wrap">
@@ -503,7 +606,22 @@ export default function FlightGuide({ race, trip }) {
         )}
 
         <div className="fg-cell">
-          <span className="fg-cell-label">When to book</span>
+          <div className="fg-booking-head">
+            <span className="fg-cell-label" style={{marginBottom: 0}}>When to book</span>
+            {daysUntilRace !== null && daysUntilRace > 0 && (
+              <span className="fg-booking-countdown">{daysUntilRace + ' days to go'}</span>
+            )}
+          </div>
+          {bookingZone && (
+            <div className="fg-booking-now-wrap">
+              <span className="fg-booking-now-label" style={{left: ZONE_OFFSET[bookingZone]}}>You're here</span>
+            </div>
+          )}
+          <div className="fg-booking-bar">
+            <div className={'fg-booking-seg green' + (bookingZone === 'ideal' ? ' fg-booking-seg-now' : '')} />
+            <div className={'fg-booking-seg amber' + (bookingZone === 'acceptable' ? ' fg-booking-seg-now' : '')} />
+            <div className={'fg-booking-seg red' + (bookingZone === 'last' ? ' fg-booking-seg-now' : '')} />
+          </div>
           <div className="fg-booking-tiers">
             <div className="fg-booking-tier green">
               <span className="fg-booking-tier-label">Ideal</span>
