@@ -320,7 +320,7 @@ export default function LocalTransport({ race }) {
           })}
         </div>
         <div className="lt-day-content">
-          <p className="lt-day-content-text">{data.byDay[activeDay]}</p>
+          <p key={activeDay} className="lt-day-content-text gp-crossfade">{data.byDay[activeDay]}</p>
         </div>
       </div>
 
