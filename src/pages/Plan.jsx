@@ -289,7 +289,7 @@ export default function Plan() {
       <>
         <style dangerouslySetInnerHTML={{ __html: heroStyles }} />
         {navEl}
-        <div className="gp-detail-wrap">
+        <div className="gp-detail-wrap gp-reveal">
           <div className="gp-breadcrumb">
             <a href="#" onClick={function(e){ e.preventDefault(); handleBack() }}>Home</a>
             <span>›</span>
@@ -396,7 +396,7 @@ export default function Plan() {
       <style dangerouslySetInnerHTML={{ __html: heroStyles }} />
       {navEl}
 
-      <div className="gp-hero-wrap">
+      <div className="gp-hero-wrap gp-reveal">
         <div className="gp-hero-inner">
           <div className="gp-hero-top">
             <div className="gp-hero-left">
@@ -495,17 +495,18 @@ export default function Plan() {
         </div>
       </div>
 
-      <div className="gp-calendar">
-        {filteredRaces.map(function(race) {
+      <div className="gp-calendar" key={filter}>
+        {filteredRaces.map(function(race, i) {
           return (
-            <RaceCard
-              key={race.round}
-              race={race}
-              isComplete={isRaceComplete(race.round)}
-              isLive={isRaceLive(race.round)}
-              isNext={seasonStatus && seasonStatus.type === 'next' && seasonStatus.session && seasonStatus.session.round === race.round}
-              onSelect={function(){ handleSelectRace(race) }}
-            />
+            <div key={race.round} className="gp-reveal" style={{animationDelay: Math.min(i * 25, 300) + 'ms'}}>
+              <RaceCard
+                race={race}
+                isComplete={isRaceComplete(race.round)}
+                isLive={isRaceLive(race.round)}
+                isNext={seasonStatus && seasonStatus.type === 'next' && seasonStatus.session && seasonStatus.session.round === race.round}
+                onSelect={function(){ handleSelectRace(race) }}
+              />
+            </div>
           )
         })}
       </div>
