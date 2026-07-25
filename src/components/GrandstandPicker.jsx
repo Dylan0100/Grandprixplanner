@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const BackIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -7,6 +7,15 @@ const BackIcon = () => (
 )
 
 function RatingBar({ label, value, color }) {
+  var [filled, setFilled] = useState(false)
+
+  useEffect(function() {
+    var t = setTimeout(function() { setFilled(true) }, 30)
+    return function() { clearTimeout(t) }
+  }, [])
+
+  var targetWidth = Math.round(value/5*100)
+
   return (
     <div style={{marginBottom:'8px'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'3px'}}>
@@ -14,7 +23,7 @@ function RatingBar({ label, value, color }) {
         <span style={{fontSize:'11px',color:'var(--text-dim)'}}>{value}/5</span>
       </div>
       <div style={{height:'4px',background:'var(--surface-3)',borderRadius:'2px',overflow:'hidden'}}>
-        <div style={{height:'4px',width:String(Math.round(value/5*100))+'%',background:color,borderRadius:'2px'}}/>
+        <div style={{height:'4px',width:String(filled ? targetWidth : 0)+'%',background:color,borderRadius:'2px',transition:'width 0.6s ease'}}/>
       </div>
     </div>
   )
@@ -1069,8 +1078,25 @@ const grandstandData = {
 function GrandstandCard({ gs, onSelect, isSelected }) {
   const tierColor = TIER_COLORS[gs.priceTier]
   const tierLabel = TIER_LABELS[gs.priceTier]
+
+  var [justSelected, setJustSelected] = useState(false)
+  var wasSelectedRef = useRef(false)
+
+  useEffect(function() {
+    if (isSelected && !wasSelectedRef.current) {
+      wasSelectedRef.current = true
+      setJustSelected(true)
+      var t = setTimeout(function() { setJustSelected(false) }, 350)
+      return function() { clearTimeout(t) }
+    }
+    if (!isSelected) {
+      wasSelectedRef.current = false
+    }
+    return undefined
+  }, [isSelected])
+
   return (
-    <div style={{background:'var(--surface-2)',borderRadius:'12px',padding:'20px',border:'1px solid ' + (isSelected ? 'rgba(34,197,94,0.4)' : 'var(--surface-3)'),display:'flex',flexDirection:'column',gap:'14px',transition:'border-color 0.2s'}}>
+    <div className={justSelected ? 'gps-card-pop' : ''} style={{background:'var(--surface-2)',borderRadius:'12px',padding:'20px',border:'1px solid ' + (isSelected ? 'rgba(34,197,94,0.4)' : 'var(--surface-3)'),display:'flex',flexDirection:'column',gap:'14px',transition:'border-color 0.2s'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px'}}>
         <div style={{flex:1}}>
           <div style={{fontSize:'15px',fontWeight:700,color:'var(--text)',fontFamily:"'Barlow Condensed',sans-serif",textTransform:'uppercase',letterSpacing:'0.04em',lineHeight:1.2,marginBottom:'5px'}}>{gs.name}</div>
@@ -1107,6 +1133,7 @@ function GrandstandCard({ gs, onSelect, isSelected }) {
       </div>
       {onSelect && (
         <button
+          className="gps-select-btn"
           onClick={function() { onSelect({ name: gs.name, id: gs.id, tierIndex: TIER_INDEX[gs.priceTier] }) }}
           style={{
             width:'100%',
@@ -1167,7 +1194,7 @@ export default function GrandstandPicker({ race, onBack, onSelect, selectedId })
     whiteSpace:'nowrap',
   })
 
-  const css = '.gps-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.gps-chips{display:flex;flex-wrap:wrap;gap:8px}@media(max-width:720px){.gps-grid{grid-template-columns:1fr}}'
+  const css = '.gps-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.gps-chips{display:flex;flex-wrap:wrap;gap:8px}@media(max-width:720px){.gps-grid{grid-template-columns:1fr}}@keyframes gpsPop{0%{transform:scale(0.98)}60%{transform:scale(1.008)}100%{transform:scale(1)}}.gps-card-pop{animation:gpsPop 0.35s ease}.gps-select-btn:active{transform:scale(0.97)}'
 
   return (
     <div style={{padding:'20px 28px 28px'}}>
