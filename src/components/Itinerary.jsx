@@ -307,6 +307,155 @@ const ITIN_CSS = `
   transition: background 0.15s;
 }
 .itin-edit-btn:hover { background: var(--surface-4); }
+.itin-print-btn {
+  background: var(--surface-3);
+  color: var(--text);
+  border: 1px solid var(--border-md);
+  border-radius: 8px;
+  padding: 11px 22px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.itin-print-btn:hover { background: var(--surface-4); }
+.itin-card {
+  background: var(--black);
+  border: 1px solid var(--border-md);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.itin-card-header {
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface-3), var(--surface-2));
+}
+.itin-card-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.itin-card-eyebrow-bar {
+  width: 14px;
+  height: 2px;
+  background: var(--red);
+  display: inline-block;
+}
+.itin-card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  line-height: 0.95;
+  color: var(--text);
+}
+.itin-card-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.itin-card-facts {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.itin-card-fact {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 16px;
+  border-right: 1px solid var(--border);
+}
+.itin-card-fact:last-child { border-right: none; }
+.itin-card-fact-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 3px;
+}
+.itin-card-fact-value {
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+}
+.itin-card-days {
+  padding: 18px 26px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.itin-card-day {
+  border-left: 3px solid var(--red);
+  background: var(--surface-2);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+}
+.itin-card-day-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.itin-card-day-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.itin-card-day-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.itin-card-day-pills {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.itin-card-pill {
+  font-size: 10.5px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  background: var(--surface-3);
+  border: 1px solid var(--border-md);
+  color: var(--text-muted);
+  padding: 3px 9px;
+  border-radius: 5px;
+}
+.itin-card-day-notes {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.itin-card-footer {
+  padding: 14px 26px 20px;
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  text-align: center;
+}
+.itin-card-footer-brand {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
 @media (max-width: 600px) {
   .itin-fields { grid-template-columns: 1fr; }
   .itin-day-header { flex-direction: column; }
@@ -319,6 +468,12 @@ const ITIN_CSS = `
   .itin-section-header { padding: 10px 18px; }
   .itin-meta-row { padding: 10px 18px; }
   .itin-preview { padding: 18px; }
+  .itin-card-facts { flex-direction: column; }
+  .itin-card-fact { border-right: none; border-bottom: 1px solid var(--border); }
+  .itin-card-fact:last-child { border-bottom: none; }
+}
+@media print {
+  .itin-preview-actions { display: none; }
 }
 `
 
@@ -495,6 +650,10 @@ export default function Itinerary({ race, grandstand }) {
     })
   }
 
+  function handlePrint() {
+    window.print()
+  }
+
   return (
     <div className="itin-wrap">
       <style dangerouslySetInnerHTML={{ __html: ITIN_CSS }} />
@@ -596,17 +755,82 @@ export default function Itinerary({ race, grandstand }) {
       ) : (
         <div className="itin-preview">
           <div className="itin-preview-label">
-            Your race weekend itinerary — ready to copy and share
+            Your race weekend — ready to keep, print or share
           </div>
-          <pre className="itin-preview-block">
-            {buildText(race, grandstandInput, accom, notes, schedule)}
-          </pre>
+
+          <div className="itin-card">
+            <div className="itin-card-header">
+              <div className="itin-card-eyebrow">
+                <span className="itin-card-eyebrow-bar" />
+                Your race weekend
+              </div>
+              <div className="itin-card-title">{race.name}</div>
+              <div className="itin-card-sub">{race.circuit + ' · ' + race.dates}</div>
+            </div>
+
+            {(grandstandInput || accom || race.airport) && (
+              <div className="itin-card-facts">
+                {grandstandInput && (
+                  <div className="itin-card-fact">
+                    <div className="itin-card-fact-label">Grandstand</div>
+                    <div className="itin-card-fact-value">{grandstandInput}</div>
+                  </div>
+                )}
+                {accom && (
+                  <div className="itin-card-fact">
+                    <div className="itin-card-fact-label">Staying</div>
+                    <div className="itin-card-fact-value">{accom}</div>
+                  </div>
+                )}
+                {race.airport && (
+                  <div className="itin-card-fact">
+                    <div className="itin-card-fact-label">Airport</div>
+                    <div className="itin-card-fact-value">{race.airport}</div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="itin-card-days">
+              {schedule.map(function(dayObj, i) {
+                var dayColors = ['#3B82F6', '#F59E0B', '#E8002D']
+                return (
+                  <div key={dayObj.key} className="itin-card-day" style={{borderLeftColor: dayColors[i % dayColors.length]}}>
+                    <div className="itin-card-day-top">
+                      <span className="itin-card-day-name">{dayObj.day}</span>
+                      <span className="itin-card-day-label">{dayObj.label}</span>
+                    </div>
+                    <div className="itin-card-day-pills">
+                      {dayObj.sessions.map(function(s) {
+                        return (
+                          <span key={s.name} className="itin-card-pill">
+                            {s.time.replace('~', '').replace(' local', '') + ' ' + s.name}
+                          </span>
+                        )
+                      })}
+                    </div>
+                    {notes[i] && notes[i].trim() && (
+                      <div className="itin-card-day-notes">{notes[i].trim()}</div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="itin-card-footer">
+              <span className="itin-card-footer-brand">grandprixplanner.com</span>
+            </div>
+          </div>
+
           <div className="itin-preview-actions">
             <button
               className={'itin-copy-btn' + (copied ? ' copied' : '')}
               onClick={handleCopy}
             >
-              {copied ? '✓ Copied to clipboard' : 'Copy to Clipboard'}
+              {copied ? '✓ Copied to clipboard' : 'Copy as Text'}
+            </button>
+            <button className="itin-print-btn" onClick={handlePrint}>
+              Print / Save as PDF
             </button>
             <button className="itin-edit-btn" onClick={function() { setPhase('build') }}>
               ← Edit Itinerary
