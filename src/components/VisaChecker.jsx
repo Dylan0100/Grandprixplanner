@@ -561,7 +561,7 @@ export default function VisaChecker({ race, onBack, passport: passportProp }) {
             )}
           </div>
           {autoSelected && passport && (
-            <div className="vc-auto-tag">⚡ From your trip settings</div>
+            <div className="vc-auto-tag gp-reveal">⚡ From your trip settings</div>
           )}
         </div>
 
@@ -580,8 +580,8 @@ export default function VisaChecker({ race, onBack, passport: passportProp }) {
               )}
             </div>
           ) : (
-            <div>
-              <div className="vc-status-card" style={{ background: sc.bg, borderColor: sc.color + '28' }}>
+            <div key={passport.id}>
+              <div className="vc-status-card gp-reveal" style={{ background: sc.bg, borderColor: sc.color + '28' }}>
                 <div className="vc-status-badge" style={{ background: sc.color + '20', color: sc.color, borderColor: sc.color + '45' }}>
                   <span>{sc.emoji}</span>
                   <span>{sc.label}</span>
