@@ -33,6 +33,47 @@ const panelStyles = `
     font-size: 10px;
     flex-shrink: 0;
   }
+  .cost-mobile-bar {
+    display: none;
+  }
+  @media (max-width: 960px) {
+    .cost-mobile-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 80;
+      padding: 12px 18px;
+      background: var(--surface-3);
+      border-top: 1px solid var(--border-md);
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+    .cost-mobile-bar-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .cost-mobile-bar-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: var(--text);
+      flex: 1;
+      text-align: right;
+      margin-right: 2px;
+    }
+    .cost-mobile-bar-chevron {
+      color: var(--text-dim);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+  }
 `
 
 function clusterToIATA(cluster) {
@@ -255,6 +296,11 @@ export default function CostPanel(props) {
     onSet(key, !trip[key])
   }
 
+  function handleMobileBarClick() {
+    var el = document.getElementById('gp-cost-summary')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   var emptyPanel = (
     <div className="cost-panel-empty">
       <div className="cost-panel-empty-icon">✈️</div>
@@ -331,7 +377,7 @@ export default function CostPanel(props) {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: panelStyles }} />
-      <div className="cost-panel">
+      <div className="cost-panel" id="gp-cost-summary">
         <div className="cost-panel-header">
           <div className="cost-panel-title">Trip Cost Estimate</div>
           <div className="cost-panel-sub">Updates live as you plan</div>
@@ -371,6 +417,14 @@ export default function CostPanel(props) {
           Estimates based on advance bookings (3+ months). Always verify before purchasing.
         </div>
       </div>
+
+      {trip.departureCity && c && (
+        <div className="cost-mobile-bar" onClick={handleMobileBarClick}>
+          <span className="cost-mobile-bar-label">Trip total</span>
+          <span className="cost-mobile-bar-amount">{fmt(animatedTotal)}</span>
+          <span className="cost-mobile-bar-chevron">▲</span>
+        </div>
+      )}
     </>
   )
 }
