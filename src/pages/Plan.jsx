@@ -289,7 +289,7 @@ export default function Plan() {
       <>
         <style dangerouslySetInnerHTML={{ __html: heroStyles }} />
         {navEl}
-        <div className="gp-detail-wrap gp-reveal">
+        <div className="gp-detail-wrap gp-crossfade">
           <div className="gp-breadcrumb">
             <a href="#" onClick={function(e){ e.preventDefault(); handleBack() }}>Home</a>
             <span>›</span>
@@ -396,7 +396,7 @@ export default function Plan() {
       <style dangerouslySetInnerHTML={{ __html: heroStyles }} />
       {navEl}
 
-      <div className="gp-hero-wrap gp-reveal">
+      <div className="gp-hero-wrap gp-crossfade">
         <div className="gp-hero-inner">
           <div className="gp-hero-top">
             <div className="gp-hero-left">
